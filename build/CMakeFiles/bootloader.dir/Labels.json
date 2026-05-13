@@ -1,0 +1,43 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/home/mrak/projects/soul_of_fiona/build/CMakeFiles/bootloader"
+		},
+		{
+			"file" : "/home/mrak/projects/soul_of_fiona/build/CMakeFiles/bootloader.rule"
+		},
+		{
+			"file" : "/home/mrak/projects/soul_of_fiona/build/CMakeFiles/bootloader-complete.rule"
+		},
+		{
+			"file" : "/home/mrak/projects/soul_of_fiona/build/bootloader-prefix/src/bootloader-stamp/bootloader-build.rule"
+		},
+		{
+			"file" : "/home/mrak/projects/soul_of_fiona/build/bootloader-prefix/src/bootloader-stamp/bootloader-configure.rule"
+		},
+		{
+			"file" : "/home/mrak/projects/soul_of_fiona/build/bootloader-prefix/src/bootloader-stamp/bootloader-download.rule"
+		},
+		{
+			"file" : "/home/mrak/projects/soul_of_fiona/build/bootloader-prefix/src/bootloader-stamp/bootloader-install.rule"
+		},
+		{
+			"file" : "/home/mrak/projects/soul_of_fiona/build/bootloader-prefix/src/bootloader-stamp/bootloader-mkdir.rule"
+		},
+		{
+			"file" : "/home/mrak/projects/soul_of_fiona/build/bootloader-prefix/src/bootloader-stamp/bootloader-patch.rule"
+		},
+		{
+			"file" : "/home/mrak/projects/soul_of_fiona/build/bootloader-prefix/src/bootloader-stamp/bootloader-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"bootloader"
+		],
+		"name" : "bootloader"
+	}
+}

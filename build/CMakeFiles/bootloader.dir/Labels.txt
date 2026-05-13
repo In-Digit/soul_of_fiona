@@ -1,0 +1,13 @@
+# Target labels
+ bootloader
+# Source files and their labels
+/home/mrak/projects/soul_of_fiona/build/CMakeFiles/bootloader
+/home/mrak/projects/soul_of_fiona/build/CMakeFiles/bootloader.rule
+/home/mrak/projects/soul_of_fiona/build/CMakeFiles/bootloader-complete.rule
+/home/mrak/projects/soul_of_fiona/build/bootloader-prefix/src/bootloader-stamp/bootloader-build.rule
+/home/mrak/projects/soul_of_fiona/build/bootloader-prefix/src/bootloader-stamp/bootloader-configure.rule
+/home/mrak/projects/soul_of_fiona/build/bootloader-prefix/src/bootloader-stamp/bootloader-download.rule
+/home/mrak/projects/soul_of_fiona/build/bootloader-prefix/src/bootloader-stamp/bootloader-install.rule
+/home/mrak/projects/soul_of_fiona/build/bootloader-prefix/src/bootloader-stamp/bootloader-mkdir.rule
+/home/mrak/projects/soul_of_fiona/build/bootloader-prefix/src/bootloader-stamp/bootloader-patch.rule
+/home/mrak/projects/soul_of_fiona/build/bootloader-prefix/src/bootloader-stamp/bootloader-update.rule
