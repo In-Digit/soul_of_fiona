@@ -15,11 +15,11 @@ extern void ui_Screen_DashBoard_screen_init(void);
 extern void ui_Screen_DashBoard_screen_destroy(void);
 extern void ui_event_Screen_DashBoard(lv_event_t * e);
 extern lv_obj_t * ui_Screen_DashBoard;
-extern lv_obj_t * ui_DashBoard_Image_Backgrownd;
 extern lv_obj_t * ui_DashBoard_Label_FionaSpeachLabelDash;
 extern lv_obj_t * ui_DashBoard_Label_TahoLBL;
 extern lv_obj_t * ui_DashBoard_Arc_Taho;
 extern lv_obj_t * ui_DashBoard_Image_BlueRing;
+extern lv_obj_t * ui_DashBoard_Image_ImageSpeed;
 extern lv_obj_t * ui_DashBoard_Bar_BatBar;
 extern lv_obj_t * ui_DashBoard_Image_BatShape;
 extern lv_obj_t * ui_DashBoard_Image_Batallert;
@@ -66,6 +66,12 @@ extern lv_obj_t * ui_DashBoard_Container_TripContainer;
 extern void ui_event_DashBoard_Container_FuelContainer(lv_event_t * e);
 extern lv_obj_t * ui_DashBoard_Container_FuelContainer;
 extern lv_obj_t * ui_DashBoard_Label_EditionString;
+extern lv_obj_t * ui_DashBoard_Image_ImageCyan;
+extern lv_obj_t * ui_DashBoard_Image_ImageGreen;
+extern lv_obj_t * ui_DashBoard_Image_ImageYellow;
+extern lv_obj_t * ui_DashBoard_Image_ImageRed;
+extern void ui_event_DashBoard_Container_ContainerRez(lv_event_t * e);
+extern lv_obj_t * ui_DashBoard_Container_ContainerRez;
 // CUSTOM VARIABLES
 extern lv_obj_t * uic_DashBoard_Label_q;
 

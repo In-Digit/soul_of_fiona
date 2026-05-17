@@ -4,6 +4,7 @@ idf_component_register(
          "uart_rx_dashboard.c"
          "uart_rx_stats.c"
          "uart_rx_arduino.c"
+         "uart_rx_imu.c"
     INCLUDE_DIRS "."
     REQUIRES driver esp_timer car_data
 )

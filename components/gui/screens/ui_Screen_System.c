@@ -32,6 +32,13 @@ lv_obj_t * ui_System_Slider_SliderLight = NULL;
 lv_obj_t * ui_System_Slider_SliderDark = NULL;
 lv_obj_t * ui_System_Label_CurrentLight = NULL;
 lv_obj_t * ui_System_Slider_SliderBridges = NULL;
+lv_obj_t * ui_System_Label_CalibrateMCU = NULL;
+lv_obj_t * ui_System_Label_FanPlus = NULL;
+lv_obj_t * ui_System_Label_FanMinus = NULL;
+lv_obj_t * ui_System_Label_FanApply = NULL;
+lv_obj_t * ui_System_Label_FanSaved = NULL;
+lv_obj_t * ui_System_Label_FanCalibLbl = NULL;
+lv_obj_t * ui_System_Dropdown_DropdownFanDot = NULL;
 lv_obj_t * ui_System_Tabpage_DebugArduino = NULL;
 lv_obj_t * ui_System_Textarea_TextAreaArduino = NULL;
 lv_obj_t * ui_System_Tabpage_DebugESP32 = NULL;
@@ -256,6 +263,61 @@ void ui_event_System_Slider_SliderBridges(lv_event_t * e)
 
     if(event_code == LV_EVENT_VALUE_CHANGED) {
         OnLightSliderChanged(e);
+    }
+}
+
+void ui_event_System_Label_CalibrateMCU(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+
+    if(event_code == LV_EVENT_CLICKED) {
+        CalibrateMCUBtnClick(e);
+        _ui_screen_change(&ui_Screen_DashBoard, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 500, 0, &ui_Screen_DashBoard_screen_init);
+    }
+}
+
+void ui_event_System_Label_FanPlus(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+
+    if(event_code == LV_EVENT_CLICKED) {
+        FanPlusClk(e);
+    }
+}
+
+void ui_event_System_Label_FanMinus(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+
+    if(event_code == LV_EVENT_CLICKED) {
+        FanMinusClk(e);
+    }
+}
+
+void ui_event_System_Label_FanApply(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+
+    if(event_code == LV_EVENT_CLICKED) {
+        FanSaveApply(e);
+    }
+}
+
+void ui_event_System_Label_FanSaved(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+
+    if(event_code == LV_EVENT_CLICKED) {
+        FanPlusClk(e);
+    }
+}
+
+void ui_event_System_Dropdown_DropdownFanDot(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+
+    if(event_code == LV_EVENT_VALUE_CHANGED) {
+        FanChangeDot(e);
     }
 }
 
@@ -681,6 +743,124 @@ void ui_Screen_System_screen_init(void)
     if(lv_obj_get_style_pad_top(ui_System_Slider_SliderBridges,
                                 LV_PART_MAIN) > 0) lv_obj_set_style_pad_right(ui_System_Slider_SliderBridges,
                                                                                   lv_obj_get_style_pad_right(ui_System_Slider_SliderBridges, LV_PART_MAIN) + 1, LV_PART_MAIN);
+    ui_System_Label_CalibrateMCU = lv_label_create(ui_System_Tabpage_Setting);
+    lv_obj_set_width(ui_System_Label_CalibrateMCU, 900);
+    lv_obj_set_height(ui_System_Label_CalibrateMCU, 35);
+    lv_obj_set_x(ui_System_Label_CalibrateMCU, 3);
+    lv_obj_set_y(ui_System_Label_CalibrateMCU, -60);
+    lv_obj_set_align(ui_System_Label_CalibrateMCU, LV_ALIGN_BOTTOM_MID);
+    lv_label_set_long_mode(ui_System_Label_CalibrateMCU, LV_LABEL_LONG_DOT);
+    lv_label_set_text(ui_System_Label_CalibrateMCU, "Калибровать аксклерометр");
+    lv_obj_add_flag(ui_System_Label_CalibrateMCU, LV_OBJ_FLAG_CLICKABLE);     /// Flags
+    lv_obj_set_style_text_color(ui_System_Label_CalibrateMCU, lv_color_hex(0x18187B), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_System_Label_CalibrateMCU, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_align(ui_System_Label_CalibrateMCU, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_decor(ui_System_Label_CalibrateMCU, LV_TEXT_DECOR_UNDERLINE, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_System_Label_CalibrateMCU, &ui_font_BaseFont, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_radius(ui_System_Label_CalibrateMCU, 15, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui_System_Label_CalibrateMCU, lv_color_hex(0x00FF00), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_System_Label_CalibrateMCU, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_System_Label_FanPlus = lv_label_create(ui_System_Tabpage_Setting);
+    lv_obj_set_width(ui_System_Label_FanPlus, LV_SIZE_CONTENT);   /// 235
+    lv_obj_set_height(ui_System_Label_FanPlus, LV_SIZE_CONTENT);    /// 35
+    lv_obj_set_x(ui_System_Label_FanPlus, 416);
+    lv_obj_set_y(ui_System_Label_FanPlus, 208);
+    lv_label_set_long_mode(ui_System_Label_FanPlus, LV_LABEL_LONG_DOT);
+    lv_label_set_text(ui_System_Label_FanPlus, ">>>");
+    lv_obj_add_flag(ui_System_Label_FanPlus, LV_OBJ_FLAG_CLICKABLE);     /// Flags
+    lv_obj_set_style_text_color(ui_System_Label_FanPlus, lv_color_hex(0x18187B), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_System_Label_FanPlus, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_align(ui_System_Label_FanPlus, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_decor(ui_System_Label_FanPlus, LV_TEXT_DECOR_UNDERLINE, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_System_Label_FanPlus, &ui_font_BaseFont, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_radius(ui_System_Label_FanPlus, 15, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui_System_Label_FanPlus, lv_color_hex(0x00FF00), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_System_Label_FanPlus, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_System_Label_FanMinus = lv_label_create(ui_System_Tabpage_Setting);
+    lv_obj_set_width(ui_System_Label_FanMinus, LV_SIZE_CONTENT);   /// 235
+    lv_obj_set_height(ui_System_Label_FanMinus, LV_SIZE_CONTENT);    /// 35
+    lv_obj_set_x(ui_System_Label_FanMinus, 274);
+    lv_obj_set_y(ui_System_Label_FanMinus, 208);
+    lv_label_set_long_mode(ui_System_Label_FanMinus, LV_LABEL_LONG_DOT);
+    lv_label_set_text(ui_System_Label_FanMinus, "<<<");
+    lv_obj_add_flag(ui_System_Label_FanMinus, LV_OBJ_FLAG_CLICKABLE);     /// Flags
+    lv_obj_set_style_text_color(ui_System_Label_FanMinus, lv_color_hex(0x18187B), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_System_Label_FanMinus, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_align(ui_System_Label_FanMinus, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_decor(ui_System_Label_FanMinus, LV_TEXT_DECOR_UNDERLINE, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_System_Label_FanMinus, &ui_font_BaseFont, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_radius(ui_System_Label_FanMinus, 15, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui_System_Label_FanMinus, lv_color_hex(0x00FF00), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_System_Label_FanMinus, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_System_Label_FanApply = lv_label_create(ui_System_Tabpage_Setting);
+    lv_obj_set_width(ui_System_Label_FanApply, LV_SIZE_CONTENT);   /// 235
+    lv_obj_set_height(ui_System_Label_FanApply, LV_SIZE_CONTENT);    /// 35
+    lv_obj_set_x(ui_System_Label_FanApply, 488);
+    lv_obj_set_y(ui_System_Label_FanApply, 208);
+    lv_label_set_long_mode(ui_System_Label_FanApply, LV_LABEL_LONG_DOT);
+    lv_label_set_text(ui_System_Label_FanApply, "Применить/сохранить");
+    lv_obj_add_flag(ui_System_Label_FanApply, LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_CLICKABLE);     /// Flags
+    lv_obj_set_style_text_color(ui_System_Label_FanApply, lv_color_hex(0x18187B), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_System_Label_FanApply, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_align(ui_System_Label_FanApply, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_decor(ui_System_Label_FanApply, LV_TEXT_DECOR_UNDERLINE, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_System_Label_FanApply, &ui_font_BaseFont, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_radius(ui_System_Label_FanApply, 15, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui_System_Label_FanApply, lv_color_hex(0x00FF00), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_System_Label_FanApply, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_System_Label_FanSaved = lv_label_create(ui_System_Tabpage_Setting);
+    lv_obj_set_width(ui_System_Label_FanSaved, LV_SIZE_CONTENT);   /// 235
+    lv_obj_set_height(ui_System_Label_FanSaved, LV_SIZE_CONTENT);    /// 35
+    lv_obj_set_x(ui_System_Label_FanSaved, 820);
+    lv_obj_set_y(ui_System_Label_FanSaved, 208);
+    lv_label_set_long_mode(ui_System_Label_FanSaved, LV_LABEL_LONG_DOT);
+    lv_label_set_text(ui_System_Label_FanSaved, "Сохранено");
+    lv_obj_add_flag(ui_System_Label_FanSaved, LV_OBJ_FLAG_HIDDEN);     /// Flags
+    lv_obj_remove_flag(ui_System_Label_FanSaved,
+                       LV_OBJ_FLAG_PRESS_LOCK | LV_OBJ_FLAG_CLICK_FOCUSABLE | LV_OBJ_FLAG_GESTURE_BUBBLE |
+                       LV_OBJ_FLAG_SNAPPABLE);     /// Flags
+    lv_obj_set_style_text_color(ui_System_Label_FanSaved, lv_color_hex(0x18187B), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_System_Label_FanSaved, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_align(ui_System_Label_FanSaved, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_decor(ui_System_Label_FanSaved, LV_TEXT_DECOR_UNDERLINE, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_System_Label_FanSaved, &ui_font_BaseFont, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_radius(ui_System_Label_FanSaved, 15, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui_System_Label_FanSaved, lv_color_hex(0x00FF00), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_System_Label_FanSaved, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_System_Label_FanCalibLbl = lv_label_create(ui_System_Tabpage_Setting);
+    lv_obj_set_width(ui_System_Label_FanCalibLbl, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_System_Label_FanCalibLbl, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_System_Label_FanCalibLbl, 342);
+    lv_obj_set_y(ui_System_Label_FanCalibLbl, 208);
+    lv_label_set_text(ui_System_Label_FanCalibLbl, "128");
+    lv_obj_set_style_text_color(ui_System_Label_FanCalibLbl, lv_color_hex(0xFFFF00), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_System_Label_FanCalibLbl, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_System_Label_FanCalibLbl, &ui_font_BaseFont, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_System_Dropdown_DropdownFanDot = lv_dropdown_create(ui_System_Tabpage_Setting);
+    lv_dropdown_set_options(ui_System_Dropdown_DropdownFanDot,
+                            "В1-Точка старта\nВ1-Точка остановки\nВ1-Точка ВЧ\nВ1-Точка аэродинамики\nВ2-Точка старта\nВ2-Точка остановки\nВ2-Точка ВЧ\nВ2-Точка аэродинамики\nВП-Точка старта\nВП-Точка остановки\nВП-Точка ВЧ\nВП-Точка аэродинамики");
+    lv_obj_set_width(ui_System_Dropdown_DropdownFanDot, 238);
+    lv_obj_set_height(ui_System_Dropdown_DropdownFanDot, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_System_Dropdown_DropdownFanDot, 20);
+    lv_obj_set_y(ui_System_Dropdown_DropdownFanDot, 200);
+    lv_obj_add_flag(ui_System_Dropdown_DropdownFanDot, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
+    lv_obj_set_style_text_font(ui_System_Dropdown_DropdownFanDot, &ui_font_BaseFont20, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    lv_obj_set_style_text_font(ui_System_Dropdown_DropdownFanDot, &lv_font_montserrat_14,
+                               LV_PART_INDICATOR | LV_STATE_DEFAULT);
+
+    lv_obj_set_style_text_font(lv_dropdown_get_list(ui_System_Dropdown_DropdownFanDot), &ui_font_BaseFont20,
+                               LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    lv_obj_set_style_text_font(lv_dropdown_get_list(ui_System_Dropdown_DropdownFanDot), &ui_font_BaseFont20,
+                               LV_PART_SELECTED | LV_STATE_DEFAULT);
+
     ui_System_Tabpage_DebugArduino = lv_tabview_add_tab(ui_System_Tabview_SystemTabView, "Ардуино");
 
     ui_System_Textarea_TextAreaArduino = lv_textarea_create(ui_System_Tabpage_DebugArduino);
@@ -1052,6 +1232,12 @@ void ui_Screen_System_screen_init(void)
     lv_obj_add_event_cb(ui_System_Slider_SliderLight, ui_event_System_Slider_SliderLight, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_System_Slider_SliderDark, ui_event_System_Slider_SliderDark, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_System_Slider_SliderBridges, ui_event_System_Slider_SliderBridges, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_System_Label_CalibrateMCU, ui_event_System_Label_CalibrateMCU, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_System_Label_FanPlus, ui_event_System_Label_FanPlus, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_System_Label_FanMinus, ui_event_System_Label_FanMinus, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_System_Label_FanApply, ui_event_System_Label_FanApply, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_System_Label_FanSaved, ui_event_System_Label_FanSaved, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_System_Dropdown_DropdownFanDot, ui_event_System_Dropdown_DropdownFanDot, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_System_Tabpage_Setting, ui_event_System_Tabpage_Setting, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_System_Textarea_TextAreaArduino, ui_event_System_Textarea_TextAreaArduino, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_System_Tabpage_DebugArduino, ui_event_System_Tabpage_DebugArduino, LV_EVENT_ALL, NULL);
@@ -1095,6 +1281,13 @@ void ui_Screen_System_screen_destroy(void)
     ui_System_Slider_SliderDark = NULL;
     ui_System_Label_CurrentLight = NULL;
     ui_System_Slider_SliderBridges = NULL;
+    ui_System_Label_CalibrateMCU = NULL;
+    ui_System_Label_FanPlus = NULL;
+    ui_System_Label_FanMinus = NULL;
+    ui_System_Label_FanApply = NULL;
+    ui_System_Label_FanSaved = NULL;
+    ui_System_Label_FanCalibLbl = NULL;
+    ui_System_Dropdown_DropdownFanDot = NULL;
     ui_System_Tabpage_DebugArduino = NULL;
     ui_System_Textarea_TextAreaArduino = NULL;
     ui_System_Tabpage_DebugESP32 = NULL;

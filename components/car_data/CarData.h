@@ -71,55 +71,46 @@ extern "C" {
  *                          СТРУКТУРЫ СТАТИСТИКИ
  * ========================================================================== */
 
-/**
- * @brief Статистика одной поездки (рейса).
- */
 typedef struct {
-    uint32_t start_time;          ///< Unix-время начала поездки
-    uint8_t  status;              ///< 0=авто, 1=ручная
-    uint32_t duration_sec;        ///< Длительность поездки, сек
-    uint32_t pause_sec;           ///< Суммарное время стоянок, сек
-    uint16_t pause_count;         ///< Количество стоянок
-    uint32_t distance_m;          ///< Пройденное расстояние, метры
-    uint16_t fuel_x100;           ///< Потрачено топлива, литры ×100
-    uint16_t max_speed;           ///< Максимальная скорость, км/ч
-    uint16_t max_lph_x100;        ///< Максимальный мгновенный расход, л/ч ×100
-    uint32_t warmup_sec;          ///< Время прогрева, сек
-    uint16_t avg_throttle_rel_x100; ///< Средний относительный дроссель, ×100
-    uint16_t max_throttle_rel;    ///< Максимальный относительный дроссель
-    uint16_t aggressive_count;    ///< Количество агрессивных нажатий
-    uint16_t full_throttle_count; ///< Количество полных открытий дросселя
-    uint32_t moving_time_sec;     ///< Чистое время движения, сек
-    bool     valid;               ///< Флаг достоверности данных
+    uint32_t start_time;
+    uint8_t  status;
+    uint32_t duration_sec;
+    uint32_t pause_sec;
+    uint16_t pause_count;
+    uint32_t distance_m;
+    uint16_t fuel_x100;
+    uint16_t max_speed;
+    uint16_t max_lph_x100;
+    uint32_t warmup_sec;
+    uint16_t avg_throttle_rel_x100;
+    uint16_t max_throttle_rel;
+    uint16_t aggressive_count;
+    uint16_t full_throttle_count;
+    uint32_t moving_time_sec;
+    bool     valid;
 } TripStats;
 
-/**
- * @brief Суточная статистика.
- */
 typedef struct {
-    uint32_t date;                ///< Дата (Unix-начало суток)
-    uint8_t  valid_flag;          ///< Флаг достоверности (0/1)
-    uint32_t engine_sec;          ///< Время работы двигателя, сек
-    uint32_t distance_m;          ///< Пройденное расстояние, метры
-    uint16_t fuel_x100;           ///< Потрачено топлива, литры ×100
-    uint16_t max_speed;           ///< Максимальная скорость, км/ч
-    uint16_t max_lph_x100;        ///< Максимальный мгновенный расход, л/ч ×100
-    uint32_t first_start_time;    ///< Время первого запуска двигателя (Unix)
-    uint32_t last_stop_time;      ///< Время последнего глушения (Unix)
-    uint8_t  trip_count;          ///< Количество рейсов за сутки
-    uint8_t  drive_count;         ///< Количество заездов за сутки
-    uint16_t avg_throttle_rel_x100; ///< Средний относительный дроссель, ×100
-    uint16_t max_throttle_rel;    ///< Максимальный относительный дроссель
-    uint32_t warmup_sec;          ///< Время прогрева, сек
-    uint16_t aggressive_count;    ///< Суммарное количество агрессивных нажатий
-    uint16_t full_throttle_count; ///< Суммарное количество полных открытий дросселя
-    uint32_t moving_time_sec;     ///< Чистое время движения, сек
-    bool     valid;               ///< Флаг достоверности данных
+    uint32_t date;
+    uint8_t  valid_flag;
+    uint32_t engine_sec;
+    uint32_t distance_m;
+    uint16_t fuel_x100;
+    uint16_t max_speed;
+    uint16_t max_lph_x100;
+    uint32_t first_start_time;
+    uint32_t last_stop_time;
+    uint8_t  trip_count;
+    uint8_t  drive_count;
+    uint16_t avg_throttle_rel_x100;
+    uint16_t max_throttle_rel;
+    uint32_t warmup_sec;
+    uint16_t aggressive_count;
+    uint16_t full_throttle_count;
+    uint32_t moving_time_sec;
+    bool     valid;
 } DayStats;
 
-/**
- * @brief Запись о заправке.
- */
 typedef struct {
     uint32_t timestamp;
     float    liters;
@@ -129,23 +120,20 @@ typedef struct {
     bool     calibration;
 } RefuelRecord;
 
-/**
- * @brief Один заезд (Drive Cycle) — непрерывный период работы двигателя с движением.
- */
 typedef struct {
-    uint32_t start_time;          ///< Unix-время начала заезда
-    uint32_t end_time;            ///< Unix-время окончания заезда
-    uint32_t duration_sec;        ///< Чистое время движения, сек
-    uint32_t distance_m;          ///< Пройденное расстояние, метры
-    uint16_t fuel_x100;           ///< Потрачено топлива, литры ×100
-    uint16_t max_speed;           ///< Максимальная скорость, км/ч
-    uint16_t max_lph_x100;        ///< Максимальный мгновенный расход, л/ч ×100
-    uint16_t avg_throttle_rel_x100; ///< Средний относительный дроссель, ×100
-    uint16_t max_throttle_rel;    ///< Максимальный относительный дроссель
-    uint16_t aggressive_count;    ///< Количество агрессивных нажатий
-    uint16_t full_throttle_count; ///< Количество полных открытий дросселя
-    uint32_t warmup_sec;          ///< Время прогрева, сек
-    bool     valid;               ///< Флаг достоверности данных
+    uint32_t start_time;
+    uint32_t end_time;
+    uint32_t duration_sec;
+    uint32_t distance_m;
+    uint16_t fuel_x100;
+    uint16_t max_speed;
+    uint16_t max_lph_x100;
+    uint16_t avg_throttle_rel_x100;
+    uint16_t max_throttle_rel;
+    uint16_t aggressive_count;
+    uint16_t full_throttle_count;
+    uint32_t warmup_sec;
+    bool     valid;
 } DriveCycle;
 
 /* ============================================================================
@@ -392,37 +380,56 @@ typedef struct {
     } day_rx;
 
     /* ================ ЗАЕЗДЫ (DRIVE CYCLES) ================ */
-    DriveCycle receivedDriveCycles[15]; ///< Массив принятых от шлюза заездов
-    uint8_t    receivedDriveCycleCount; ///< Реальное количество заездов
-    bool       drive_cycles_rx_active;  ///< Флаг активного приёма заездов
-    bool       drive_cycles_pending;    ///< Флаг ожидания приёма заездов
+    DriveCycle receivedDriveCycles[15];
+    uint8_t    receivedDriveCycleCount;
+    bool       drive_cycles_rx_active;
+    bool       drive_cycles_pending;
 
     /* ================ ФЛАГ СИНХРОНИЗАЦИИ ВРЕМЕНИ ================ */
     bool time_synced;
     bool time_received_this_boot; 
     
     /* ================ ЯРКОСТЬ ================ */
-    uint8_t  backlight_brightness;      // Ручная яркость (0-100%)
-    uint8_t  light_threshold_dark;      // Порог "темно"
-    uint8_t  light_threshold_bright;    // Порог "светло"
-    uint8_t  backlight_min_brightness;  // Минимальная яркость (0-100%)
-    uint8_t  ambient_light_pct;         // Освещённость от физического датчика (0-100)
-    uint8_t  ambient_light_synth;       // Синтетическая освещённость по времени (0-100)
-    uint16_t ambient_light_raw;         // Сырое значение АЦП фоторезистора (0–4095)
+    uint8_t  backlight_brightness;
+    uint8_t  light_threshold_dark;
+    uint8_t  light_threshold_bright;
+    uint8_t  backlight_min_brightness;
+    uint8_t  ambient_light_pct;
+    uint8_t  ambient_light_synth;
+    uint16_t ambient_light_raw;
 
     /* ================ ТЕМА ФОНА ================ */
-    uint8_t  bg_theme;                  // 0 = синий (по умолчанию), 1 = зелёный, 2 = красный
+    uint8_t  bg_theme;
 
     /* ================ РУЧНАЯ УСТАНОВКА ВРЕМЕНИ ================ */
-    bool time_set_manually;             // true - ручная установка имеет приоритет
+    bool time_set_manually;
 
     /* ================ ТЕПЛОВАЯ ПАМЯТЬ ================ */
-    int last_valid_coolant_temp;        // Последнее достоверное значение температуры ОЖ
+    int last_valid_coolant_temp;
 
     /* ================ ЦВЕТА ТОНАЛЬНОСТЕЙ ================ */
-    uint32_t color_tone_neutral;        // Бирюзовый по умолчанию
-    uint32_t color_tone_funny;          // Мягкий розовый
-    uint32_t color_tone_serious;        // Зелёный
+    uint32_t color_tone_neutral;
+    uint32_t color_tone_funny;
+    uint32_t color_tone_serious;
+
+    /* ================ IMU (АКСЕЛЕРОМЕТР / ГИРОСКОП) ================ */
+    float accel_x;                     // Продольное ускорение, м/с²
+    float accel_y;
+    float accel_z;
+    float gyro_x;                      // Угловая скорость, °/с
+    float gyro_y;
+    float gyro_z;
+    int8_t tilt_roll;                  // Крен, градусы
+    int8_t tilt_pitch;                 // Тангаж, градусы
+    uint8_t calib_status;              // Статус калибровки (0x00 – 0x13)
+
+    bool accelDirty;
+    bool gyroDirty;
+    bool tiltDirty;
+
+    /* --- Пиковые перегрузки (автовычисление) --- */
+    float max_pos_accel_g;             // Максимальное зарегистрированное ускорение, g
+    float max_neg_accel_g;             // Максимальное зарегистрированное торможение (по модулю), g
 
 } CarData;
 

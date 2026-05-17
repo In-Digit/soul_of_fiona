@@ -23,7 +23,7 @@ static int arduino_uart_num = -1;
 volatile int64_t last_rx_time_us = 0;
 volatile uint8_t last_rx_msg_id = 0;
 
-// Предварительное объявление внутренней функции
+// Предварительное объявление внутренней функции отправки кадра
 static bool uart_send_frame(int uart_num, uint8_t msg_id, uint8_t dst, const uint8_t *payload, uint8_t len);
 
 uint8_t crc8_calculate(const uint8_t *data, size_t len) {

@@ -1,6 +1,7 @@
 /**
  * @file uart_rx_task.c
  * @brief Задача приёма UART-пакетов и диспетчеризация по обработчикам.
+ *        Классический приём кадров фиксированной длины (10 байт).
  */
 
 #include "freertos/FreeRTOS.h"
@@ -13,6 +14,7 @@
 #include "uart_rx_dashboard.h"
 #include "uart_rx_stats.h"
 #include "uart_rx_arduino.h"
+#include "uart_rx_imu.h"
 #include "CarData.h"
 #include <string.h>
 #include <sys/time.h>
@@ -132,6 +134,14 @@ void process_frame(int uart_num, const uint8_t *frame) {
         msg_id == MSG_DRIVE_CYCLE_DATA || msg_id == MSG_DRIVE_CYCLE_END ||
         (msg_id >= 0x50 && msg_id <= 0x5C && s_in_drive_cycle)) {
         uart_rx_stats_process(msg_id, payload, len);
+        last_rx_time_us = esp_timer_get_time();
+        return;
+    }
+
+    // Данные IMU (акселерометр, гироскоп, наклон, статус калибровки)
+    if (msg_id == MSG_REQ_ACCEL || msg_id == MSG_ACCEL_Z || msg_id == MSG_REQ_GYRO ||
+        msg_id == MSG_REQ_TILT || msg_id == MSG_REQ_CALIB_STATUS) {
+        uart_rx_imu_process(msg_id, payload, len);
         last_rx_time_us = esp_timer_get_time();
         return;
     }

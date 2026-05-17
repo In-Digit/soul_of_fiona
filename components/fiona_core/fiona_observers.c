@@ -1,10 +1,13 @@
 /**
  * @file fiona_observers.c
  * @brief Коллбэки LVGL-наблюдателей для виджетов дашборда.
+ *
+ * ВАЖНО: цвет дуги дросселя теперь определяется стилем вождения (driving_style).
  */
 
 #include "fiona_core.h"
 #include "CarData.h"
+#include "fiona_brain.h"
 #include <stdio.h>
 #include <string.h>
 #include "uart_protocol.h"
@@ -52,11 +55,13 @@ extern lv_obj_t * ui_DashBoard_Image_RSecondVentAlert1;
 extern lv_obj_t * ui_DashBoard_Label_FionaSpeachLabelDash;
 extern lv_obj_t * ui_DashBoard_Label_EditionString;
 extern lv_obj_t * ui_System_Label_CurrentLight;
-extern lv_obj_t * ui_DashBoard_Image_Backgrownd;   // <-- добавлено
-// Вспомогательная функция для анимации дуги (чтобы LVGL мог менять значение плавно)
+extern lv_obj_t * ui_DashBoard_Image_Backgrownd;
+
+// Вспомогательная функция для анимации дуги
 static void set_arc_value(void * obj, int32_t new_value) {
     lv_arc_set_value((lv_obj_t *)obj, new_value);
 }
+
 // -------------------- Observer'ы --------------------
 void speed_observer_cb(lv_observer_t * obs, lv_subject_t * subj) {
     int val = lv_subject_get_int(subj);
@@ -73,22 +78,19 @@ void rpm_observer_cb(lv_observer_t * obs, lv_subject_t * subj) {
     int new_val = lv_subject_get_int(subj);
     int current_val = lv_arc_get_value(ui_DashBoard_Arc_Taho);
 
-    // Запускаем плавную анимацию только если значение изменилось
     if (new_val != current_val) {
         lv_anim_t a;
         lv_anim_init(&a);
-        lv_anim_set_var(&a, ui_DashBoard_Arc_Taho);        // какой объект анимируем
-        lv_anim_set_exec_cb(&a, set_arc_value);            // функция, которая обновляет дугу
-        lv_anim_set_values(&a, current_val, new_val);      // от и до
-        lv_anim_set_duration(&a, 200);                     // 200 мс – плавно, но без отставания
-        lv_anim_set_path_cb(&a, lv_anim_path_ease_in_out); // мягкий старт и финиш
-        lv_anim_start(&a);                                 // поехали!
+        lv_anim_set_var(&a, ui_DashBoard_Arc_Taho);
+        lv_anim_set_exec_cb(&a, set_arc_value);
+        lv_anim_set_values(&a, current_val, new_val);
+        lv_anim_set_duration(&a, 200);
+        lv_anim_set_path_cb(&a, lv_anim_path_ease_in_out);
+        lv_anim_start(&a);
     }
 
-    // Текст под дугой обновляем мгновенно (цифры не должны отставать)
     lv_label_set_text_fmt(ui_DashBoard_Label_TahoLBL, "%d", new_val);
 
-    // Цвет дуги меняем сразу, в зависимости от оборотов
     CarData *data = CarData_Get();
     if (data && CarData_Lock(0)) {
         uint32_t color = CarData_getRPMColor(data);
@@ -210,18 +212,36 @@ static void adc_light_observer_cb(lv_observer_t * obs, lv_subject_t * subj) {
     lv_label_set_text_fmt(ui_System_Label_CurrentLight, "Освещённость: %d", val);
 }
 
+/* Обновлённый наблюдатель дросселя:
+ * значение дуги и прозрачность – по throttlePos,
+ * цвет дуги – по стилю вождения (driving_style) из FionaState.
+ */
 void throttle_observer_cb(lv_observer_t * obs, lv_subject_t * subj) {
-    int val = lv_subject_get_int(subj);
+    int val = lv_subject_get_int(subj);       // положение дросселя 0-100
     uint8_t opa = 64 + (uint8_t)((val * (192 - 32)) / 100);
     lv_arc_set_value(ui_DashBoard_Arc_Drossel, val);
     lv_obj_set_style_arc_opa(ui_DashBoard_Arc_Drossel, opa, LV_PART_INDICATOR);
     lv_label_set_text_fmt(ui_DashBoard_Label_GazBL, "%d%%", val);
+
+    // Определяем цвет по стилю
+    uint32_t color = 0x2196F3;   // исходный синий, если стиль не определён
+    FionaState *state = fiona_brain_get_state();
+    if (state) {
+        switch (state->driving_style) {
+            case 1: color = 0x00FF00; break;   // зелёный – спокойный
+            case 2: color = 0xFFBF00; break;   // жёлтый – агрессивный
+            case 3: color = 0xFF3333; break;   // красный – спортивный
+            default: break;
+        }
+    }
+    lv_obj_set_style_arc_color(ui_DashBoard_Arc_Drossel, lv_color_hex(color), LV_PART_INDICATOR);
 }
 
 void accel_observer_cb(lv_observer_t * obs, lv_subject_t * subj) {
-    int val = lv_subject_get_int(subj);
-    lv_label_set_text_fmt(ui_DashBoard_Label_AxelBL, "%.1f", val / 10.0f);
-    lv_obj_set_style_arc_opa(ui_DashBoard_Arc_Uskorenie, 32, LV_PART_MAIN);
+    int val = lv_subject_get_int(subj);   // сотые доли g
+    lv_label_set_text_fmt(ui_DashBoard_Label_AxelBL, "%.1f g", val / 100.0f);
+    lv_arc_set_value(ui_DashBoard_Arc_Uskorenie, val);
+    lv_obj_set_style_arc_opa(ui_DashBoard_Arc_Uskorenie, 96, LV_PART_INDICATOR);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -258,8 +278,10 @@ void fiona_observers_init_widgets(void) {
     lv_obj_set_style_arc_opa(ui_DashBoard_Arc_Drossel, 64, LV_PART_INDICATOR);
     lv_label_set_text(ui_DashBoard_Label_GazBL, "0%");
 
+    lv_arc_set_range(ui_DashBoard_Arc_Uskorenie, -300, 300);
+    lv_arc_set_value(ui_DashBoard_Arc_Uskorenie, 0);
     lv_obj_set_style_arc_opa(ui_DashBoard_Arc_Uskorenie, 32, LV_PART_MAIN);
-    lv_label_set_text(ui_DashBoard_Label_AxelBL, "0.0");
+    lv_label_set_text(ui_DashBoard_Label_AxelBL, "0.0 g");
 
     lv_obj_add_flag(ui_DashBoard_Image_BlueRing, LV_OBJ_FLAG_HIDDEN);
     lv_obj_add_flag(ui_DashBoard_Image_Batallert, LV_OBJ_FLAG_HIDDEN);

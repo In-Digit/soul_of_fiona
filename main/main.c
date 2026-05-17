@@ -64,7 +64,8 @@ void app_main(void)
     // Инициализация UART
     #define NUM_UART_PORTS 2
     static uart_pin_config_t scan_configs[NUM_UART_PORTS][2] = {
-        {{ .tx = 37, .rx = 38 }, { .tx = 38, .rx = 37 }},
+        //{{ .tx = 37, .rx = 38 }, { .tx = 38, .rx = 37 }},
+        {{ .tx = 46, .rx = 47 }, { .tx = 47, .rx = 46 }},
         {{ .tx = 26, .rx = 27 }, { .tx = 27, .rx = 26 }}
     };
     static int scan_idx[NUM_UART_PORTS] = {0, 0};

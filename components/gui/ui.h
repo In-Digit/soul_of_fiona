@@ -33,6 +33,7 @@ extern lv_obj_t * ui_Startevents____initial_actions0;
 // IMAGES AND IMAGE SETS
 LV_IMG_DECLARE(ui_img_bg_red_png);    // assets/bg_red.png
 LV_IMG_DECLARE(ui_img_small_blue_png);    // assets/small_blue.png
+LV_IMG_DECLARE(ui_img_speed_png);    // assets/speed.png
 LV_IMG_DECLARE(ui_img_akb_png);    // assets/AKB.png
 LV_IMG_DECLARE(ui_img_battery_png);    // assets/battery.png
 LV_IMG_DECLARE(ui_img_h_l_png);    // assets/h_l.png
@@ -51,11 +52,16 @@ LV_IMG_DECLARE(ui_img_cooller1a_png);    // assets/cooller1a.png
 LV_IMG_DECLARE(ui_img_cooller1_png);    // assets/cooller1.png
 LV_IMG_DECLARE(ui_img_cooller2a_png);    // assets/cooller2a.png
 LV_IMG_DECLARE(ui_img_cooller3_png);    // assets/cooller3.png
+LV_IMG_DECLARE(ui_img_cyan_cat_png);    // assets/cyan_cat.png
+LV_IMG_DECLARE(ui_img_green_cat_png);    // assets/green_cat.png
+LV_IMG_DECLARE(ui_img_yellow_cat_png);    // assets/yellow_cat.png
+LV_IMG_DECLARE(ui_img_red_cat_png);    // assets/red_cat.png
 LV_IMG_DECLARE(ui_img_global_bg_png);    // assets/global_bg.png
 LV_IMG_DECLARE(ui_img_black_png);    // assets/black.png
 LV_IMG_DECLARE(ui_img_grey_png);    // assets/grey.png
 LV_IMG_DECLARE(ui_img_red_png);    // assets/red.png
 LV_IMG_DECLARE(ui_img_fordlogo_png);    // assets/FordLogo.png
+
 
 // FONTS
 LV_FONT_DECLARE(ui_font_BaseFont);

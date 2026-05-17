@@ -138,6 +138,13 @@
 #define MSG_LIGHT_SYNTH      0x96   // синтетическая освещённость по времени суток (Len=1, 0-100%)
 #define MSG_LIGHT_RAW        0x97   // запрос (Len=0) и ответ (Len=2, uint16_t 0..4095)
 
+// --------------- IMU (АКСЕЛЕРОМЕТР / ГИРОСКОП / НАКЛОН) ---------------
+#define MSG_REQ_ACCEL         0xA0   // запрос ускорений, ответ: ax,ay (4 байта)
+#define MSG_ACCEL_Z           0xA5   // дополнительный кадр: az (4 байта)
+#define MSG_REQ_GYRO          0xA1
+#define MSG_REQ_TILT          0xA2
+#define MSG_CALIBRATE_ACCEL   0xA3
+#define MSG_REQ_CALIB_STATUS  0xA4
 uint8_t crc8_calculate(const uint8_t *data, size_t len);
 
 #endif // PROTOCOL_H

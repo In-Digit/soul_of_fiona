@@ -2,8 +2,10 @@
  * @file fiona_brain.c
  * @brief Движок правил аналитики Фионы.
  *
- * Загружает правила из /sdcard/fiona/rules.json либо создаёт его из вшитых дефолтов.
+ * Загружает правила из /sdcard/fiona/rules.jsn либо создаёт его из вшитых дефолтов.
  * В каждом цикле применяет правила к CarData и обновляет FionaState.
+ * Стиль вождения определяется по мгновенному расходу и продольному ускорению.
+ * Поддерживает ручной выбор стиля (manual_style).
  */
 
 #include "fiona_brain.h"
@@ -23,7 +25,7 @@
 static const char *TAG = "FIONA_BRAIN";
 
 /* --------------------------------------------------------------------------
- * Вшитый JSON правил (дефолт)
+ * Вшитый JSON правил (дефолт) – новые правила на основе LPH и ускорения
  * -------------------------------------------------------------------------- */
 static const char* BUILTIN_RULES = 
     "{"
@@ -89,57 +91,6 @@ static const char* BUILTIN_RULES =
     "      \"id\": \"batt_over\","
     "      \"condition\": { \"sensor\": \"batt_voltage\", \"gt\": 15.0 },"
     "      \"action\": { \"set_state\": { \"batt_state\": 3, \"event_trigger\": \"batt_over\", \"tone\": 2 } }"
-    "    },"
-    "    {"
-    "      \"id\": \"rpm_sport\","
-    "      \"condition\": {"
-    "        \"and\": ["
-    "          { \"sensor\": \"rpm\", \"gt\": 5000 },"
-    "          { \"sensor\": \"is_alone\", \"eq\": true }"
-    "        ]"
-    "      },"
-    "      \"action\": { \"set_state\": { \"event_trigger\": \"rpm_sport\", \"tone\": 1 } }"
-    "    },"
-    "    {"
-    "      \"id\": \"rpm_active\","
-    "      \"condition\": {"
-    "        \"and\": ["
-    "          { \"sensor\": \"rpm\", \"gt\": 4000 },"
-    "          { \"sensor\": \"is_alone\", \"eq\": true }"
-    "        ]"
-    "      },"
-    "      \"action\": { \"set_state\": { \"event_trigger\": \"rpm_active\", \"tone\": 0 } }"
-    "    },"
-    "    {"
-    "      \"id\": \"rpm_family_high\","
-    "      \"condition\": {"
-    "        \"and\": ["
-    "          { \"sensor\": \"rpm\", \"gt\": 3500 },"
-    "          { \"sensor\": \"is_alone\", \"eq\": false }"
-    "        ]"
-    "      },"
-    "      \"action\": { \"set_state\": { \"event_trigger\": \"rpm_family_high\", \"tone\": 2 } }"
-    "    },"
-    "    {"
-    "      \"id\": \"rpm_family_calm\","
-    "      \"condition\": {"
-    "        \"and\": ["
-    "          { \"sensor\": \"rpm\", \"gte\": 1500 },"
-    "          { \"sensor\": \"rpm\", \"lte\": 2500 },"
-    "          { \"sensor\": \"is_alone\", \"eq\": false }"
-    "        ]"
-    "      },"
-    "      \"action\": { \"set_state\": { \"event_trigger\": \"rpm_family_calm\", \"tone\": 0 } }"
-    "    },"
-    "    {"
-    "      \"id\": \"alone_detect\","
-    "      \"condition\": { \"sensor\": \"aggressive_count_10min\", \"gte\": 3 },"
-    "      \"action\": { \"set_state\": { \"is_alone\": true } }"
-    "    },"
-    "    {"
-    "      \"id\": \"alone_reset\","
-    "      \"condition\": { \"sensor\": \"aggressive_count_10min\", \"lt\": 1 },"
-    "      \"action\": { \"set_state\": { \"is_alone\": false } }"
     "    },"
     "    {"
     "      \"id\": \"highway_enter\","
@@ -224,6 +175,53 @@ static const char* BUILTIN_RULES =
     "        ]"
     "      },"
     "      \"action\": { \"set_state\": { \"driving_mode\": 2 } }"
+    "    },"
+    "    {"
+    "      \"id\": \"alone_detect\","
+    "      \"condition\": { \"sensor\": \"spike_count_3min\", \"gte\": 3 },"
+    "      \"action\": { \"set_state\": { \"is_alone\": true } }"
+    "    },"
+    "    {"
+    "      \"id\": \"alone_reset\","
+    "      \"condition\": { \"sensor\": \"spike_count_5min\", \"lt\": 2 },"
+    "      \"action\": { \"set_state\": { \"is_alone\": false } }"
+    "    },"
+    "    {"
+    "      \"id\": \"style_calm\","
+    "      \"condition\": {"
+    "        \"and\": ["
+    "          { \"sensor\": \"avg_lph_1min\", \"lt\": 9.0 },"
+    "          { \"sensor\": \"spike_count_5min\", \"lt\": 2 }"
+    "        ]"
+    "      },"
+    "      \"action\": { \"set_state\": { \"driving_style\": 1 } }"
+    "    },"
+    "    {"
+    "      \"id\": \"style_active\","
+    "      \"condition\": {"
+    "        \"or\": ["
+    "          { \"sensor\": \"spike_count_5min\", \"gte\": 2 },"
+    "          { \"sensor\": \"avg_lph_1min\", \"gte\": 9.0 }"
+    "        ]"
+    "      },"
+    "      \"action\": { \"set_state\": { \"driving_style\": 2 } }"
+    "    },"
+    "    {"
+    "      \"id\": \"style_sport\","
+    "      \"condition\": {"
+    "        \"or\": ["
+    "          { \"sensor\": \"spike_count_5min\", \"gt\": 4 },"
+    "          { \"sensor\": \"avg_lph_1min\", \"gt\": 10.5 },"
+    "          { \"sensor\": \"accel_g\", \"gt\": 0.4 },"
+    "          { \"sensor\": \"accel_g\", \"lt\": -0.5 }"
+    "        ]"
+    "      },"
+    "      \"action\": { \"set_state\": { \"driving_style\": 3, \"event_trigger\": \"rpm_sport\", \"tone\": 1 } }"
+    "    },"
+    "    {"
+    "      \"id\": \"style_default\","
+    "      \"condition\": { \"sensor\": \"always\", \"eq\": 1 },"
+    "      \"action\": { \"set_state\": { \"driving_style\": 0 } }"
     "    }"
     "  ]"
     "}";
@@ -235,6 +233,17 @@ static FionaState g_fiona_state;
 static cJSON *g_rules_root = NULL;
 
 /* --------------------------------------------------------------------------
+ * Внутренние структуры для подсчёта всплесков расхода и среднего
+ * -------------------------------------------------------------------------- */
+#define LPH_HISTORY_SIZE 60   // 60 секунд для минутного среднего
+static float lph_history[LPH_HISTORY_SIZE] = {0};
+static int lph_hist_idx = 0;
+
+#define SPIKE_TIMESTAMPS_SIZE 32
+static uint32_t spike_timestamps[SPIKE_TIMESTAMPS_SIZE] = {0};
+static int spike_idx = 0;
+
+/* --------------------------------------------------------------------------
  * Внутренние прототипы
  * -------------------------------------------------------------------------- */
 static bool eval_condition(cJSON *cond);
@@ -242,6 +251,10 @@ static void apply_action(cJSON *action);
 static float get_sensor_value(const char *name);
 static void save_rules_to_sd(const char *json_content);
 static bool load_rules_from_sd(void);
+static void update_lph_history(float lph);
+static void update_spike_history(uint32_t now, float lph);
+static float get_avg_lph_1min(void);
+static int get_spike_count(uint32_t now, uint32_t interval_sec);
 
 /* --------------------------------------------------------------------------
  * Инициализация
@@ -250,6 +263,8 @@ void fiona_brain_init(void) {
     memset(&g_fiona_state, 0, sizeof(g_fiona_state));
     g_fiona_state.initialized = true;
     g_fiona_state.driving_mode = 0; // CALM
+    g_fiona_state.driving_style = 0; // не определён
+    g_fiona_state.manual_style = 0;  // авто-режим
 
     if (!load_rules_from_sd()) {
         save_rules_to_sd(BUILTIN_RULES);
@@ -261,7 +276,7 @@ void fiona_brain_init(void) {
 }
 
 /* --------------------------------------------------------------------------
- * Цикл обновления
+ * Цикл обновления (вызывается раз в секунду)
  * -------------------------------------------------------------------------- */
 void fiona_brain_update(void) {
     if (!g_rules_root || !g_fiona_state.initialized) return;
@@ -269,16 +284,39 @@ void fiona_brain_update(void) {
     CarData *data = CarData_Get();
     if (!data) return;
 
-    // Сброс триггера
+    // Обновляем историю расхода и всплесков
+    float lph = data->lphValue;
+    update_lph_history(lph);
+    time_t now = time(NULL);
+    update_spike_history((uint32_t)now, lph);
+
+    // Сброс триггера и тональности перед каждым циклом правил
     g_fiona_state.event_trigger[0] = '\0';
     g_fiona_state.tone = FIONA_TONE_NEUTRAL;
-    g_fiona_state.driving_mode = 0; // по умолчанию CALM
+
+    // Если активен ручной режим – принудительно устанавливаем стиль
+    if (g_fiona_state.manual_style != 0) {
+        g_fiona_state.driving_style = g_fiona_state.manual_style;
+    } else {
+        // В авто-режиме сбрасываем стиль в "не определён", чтобы правила пересчитали
+        g_fiona_state.driving_style = 0;
+    }
 
     cJSON *rules = cJSON_GetObjectItem(g_rules_root, "rules");
     if (!cJSON_IsArray(rules)) return;
 
     cJSON *rule = NULL;
     cJSON_ArrayForEach(rule, rules) {
+        // В ручном режиме пропускаем правила стиля, чтобы автодетекция не перезаписала
+        if (g_fiona_state.manual_style != 0) {
+            const char *rule_id = cJSON_GetObjectItem(rule, "id")->valuestring;
+            if (rule_id && (strcmp(rule_id, "style_calm") == 0 ||
+                            strcmp(rule_id, "style_active") == 0 ||
+                            strcmp(rule_id, "style_sport") == 0 ||
+                            strcmp(rule_id, "style_default") == 0)) {
+                continue;
+            }
+        }
         cJSON *cond = cJSON_GetObjectItem(rule, "condition");
         if (eval_condition(cond)) {
             cJSON *action = cJSON_GetObjectItem(rule, "action");
@@ -328,10 +366,10 @@ void fiona_brain_reload_rules(void) {
  * Загрузка / сохранение файла правил
  * -------------------------------------------------------------------------- */
 static bool load_rules_from_sd(void) {
-    const char *path = "/sdcard/fiona/rules.json";
+    const char *path = "/sdcard/fiona/rules.jsn";
     FILE *f = fopen(path, "r");
     if (!f) {
-        ESP_LOGW(TAG, "rules.json not found");
+        ESP_LOGW(TAG, "rules.jsn not found");
         return false;
     }
 
@@ -347,7 +385,7 @@ static bool load_rules_from_sd(void) {
     g_rules_root = cJSON_Parse(buf);
     free(buf);
     if (!g_rules_root) {
-        ESP_LOGE(TAG, "Failed to parse rules.json");
+        ESP_LOGE(TAG, "Failed to parse rules.jsn");
         return false;
     }
 
@@ -357,10 +395,10 @@ static bool load_rules_from_sd(void) {
 
 static void save_rules_to_sd(const char *json_content) {
     mkdir("/sdcard/fiona", 0755);
-    const char *path = "/sdcard/fiona/rules.json";
+    const char *path = "/sdcard/fiona/rules.jsn";
     FILE *f = fopen(path, "w");
     if (!f) {
-        ESP_LOGE(TAG, "Cannot create rules.json");
+        ESP_LOGE(TAG, "Cannot create rules.jsn");
         return;
     }
     fputs(json_content, f);
@@ -369,12 +407,44 @@ static void save_rules_to_sd(const char *json_content) {
 }
 
 /* --------------------------------------------------------------------------
+ * Внутренние функции работы с историей расхода и всплесков
+ * -------------------------------------------------------------------------- */
+static void update_lph_history(float lph) {
+    lph_history[lph_hist_idx] = lph;
+    lph_hist_idx = (lph_hist_idx + 1) % LPH_HISTORY_SIZE;
+}
+
+static void update_spike_history(uint32_t now, float lph) {
+    if (lph > 10.5f) {
+        spike_timestamps[spike_idx] = now;
+        spike_idx = (spike_idx + 1) % SPIKE_TIMESTAMPS_SIZE;
+    }
+}
+
+static float get_avg_lph_1min(void) {
+    float sum = 0.0f;
+    for (int i = 0; i < LPH_HISTORY_SIZE; i++) {
+        sum += lph_history[i];
+    }
+    return sum / (float)LPH_HISTORY_SIZE;
+}
+
+static int get_spike_count(uint32_t now, uint32_t interval_sec) {
+    int count = 0;
+    for (int i = 0; i < SPIKE_TIMESTAMPS_SIZE; i++) {
+        if (spike_timestamps[i] != 0 && (now - spike_timestamps[i]) <= interval_sec) {
+            count++;
+        }
+    }
+    return count;
+}
+
+/* --------------------------------------------------------------------------
  * Вычисление условий
  * -------------------------------------------------------------------------- */
 static bool eval_condition(cJSON *cond) {
     if (!cond) return false;
 
-    // Безопасно получаем имя сенсора, если оно есть
     cJSON *sensor_item = cJSON_GetObjectItem(cond, "sensor");
     if (cJSON_IsString(sensor_item)) {
         const char *sensor = sensor_item->valuestring;
@@ -415,6 +485,7 @@ static bool eval_condition(cJSON *cond) {
 
     return false;
 }
+
 /* --------------------------------------------------------------------------
  * Применение действия
  * -------------------------------------------------------------------------- */
@@ -443,6 +514,11 @@ static void apply_action(cJSON *action) {
             g_fiona_state.long_trip = (bool)item->valueint;
         } else if (strcmp(key, "very_long_trip") == 0) {
             g_fiona_state.very_long_trip = (bool)item->valueint;
+        } else if (strcmp(key, "driving_style") == 0) {
+            // В ручном режиме стиль не переопределяем
+            if (g_fiona_state.manual_style == 0) {
+                g_fiona_state.driving_style = (uint8_t)item->valueint;
+            }
         }
     }
 }
@@ -459,11 +535,24 @@ static float get_sensor_value(const char *name) {
     if (strcmp(name, "fuel_pct") == 0)      return data->fuelValue;
     if (strcmp(name, "batt_voltage") == 0)  return data->batValue;
     if (strcmp(name, "is_alone") == 0)      return g_fiona_state.is_alone ? 1.0f : 0.0f;
-    if (strcmp(name, "aggressive_count_10min") == 0) {
-        return data->throttlePos > 80 ? 5.0f : 0.0f;
-    }
 
-    // Новые сенсоры
+    // Новые сенсоры стиля
+    if (strcmp(name, "avg_lph_1min") == 0)  return get_avg_lph_1min();
+    if (strcmp(name, "spike_count_3min") == 0) {
+        time_t now = time(NULL);
+        return (float)get_spike_count((uint32_t)now, 180);
+    }
+    if (strcmp(name, "spike_count_5min") == 0) {
+        time_t now = time(NULL);
+        return (float)get_spike_count((uint32_t)now, 300);
+    }
+    if (strcmp(name, "accel_g") == 0) {
+        return data->accel_x / 9.81f;
+    }
+    if (strcmp(name, "always") == 0) return 1.0f;
+
+    // Старые сенсоры (оставлены для обратной совместимости, не используются)
+    if (strcmp(name, "aggressive_count_10min") == 0) return 0.0f;
     if (strcmp(name, "speed") == 0)          return (float)data->speedValue;
     if (strcmp(name, "trip_duration_min") == 0) {
         return g_fiona_state.trip_duration_sec / 60.0f;

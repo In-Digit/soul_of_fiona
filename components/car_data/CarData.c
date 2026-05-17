@@ -6,7 +6,6 @@
 #include "freertos/semphr.h"
 #include "esp_heap_caps.h"
 
-// Глобальный экземпляр CarData, размещённый в PSRAM
 static CarData *g_carData = NULL;
 static SemaphoreHandle_t g_carDataMutex = NULL;
 
@@ -195,18 +194,37 @@ void CarData_init(CarData* data) {
     data->color_tone_neutral = 0x9EEFFC;
     data->color_tone_funny   = 0xFFB6C1;
     data->color_tone_serious = 0x00FF00;
+
+    // --------------- IMU ---------------
+    data->accel_x = 0.0f;
+    data->accel_y = 0.0f;
+    data->accel_z = 0.0f;
+    data->gyro_x  = 0.0f;
+    data->gyro_y  = 0.0f;
+    data->gyro_z  = 0.0f;
+    data->tilt_roll  = 0;
+    data->tilt_pitch = 0;
+    data->calib_status = 0;
+
+    // Пиковые перегрузки – начинаем с нуля, дальше автообновление
+    data->max_pos_accel_g = 0.0f;
+    data->max_neg_accel_g = 0.0f;
+
+    data->accelDirty = false;
+    data->gyroDirty  = false;
+    data->tiltDirty  = false;
 }
 
 uint32_t CarData_getFuelColor(const CarData* data) {
     if (data->fuelValue < data->fuelRedThreshold)      return data->colorRed;
     if (data->fuelValue < data->fuelYellowThreshold)   return data->colorYellow;
-    return data->colorGreen;   // было colorCyan
+    return data->colorGreen;
 }
 
 uint32_t CarData_getBatteryColor(const CarData* data) {
     if (data->batValue < data->battLowThreshold || data->batValue > data->battHighThreshold)
         return data->colorRed;
-    return data->colorGreen;   // было colorCyan
+    return data->colorGreen;
 }
 
 uint32_t CarData_getTempColor(const CarData* data) {

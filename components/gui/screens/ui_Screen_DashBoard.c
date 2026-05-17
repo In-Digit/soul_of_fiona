@@ -7,11 +7,11 @@
 
 lv_obj_t * uic_DashBoard_Label_q;
 lv_obj_t * ui_Screen_DashBoard = NULL;
-lv_obj_t * ui_DashBoard_Image_Backgrownd = NULL;
 lv_obj_t * ui_DashBoard_Label_FionaSpeachLabelDash = NULL;
 lv_obj_t * ui_DashBoard_Label_TahoLBL = NULL;
 lv_obj_t * ui_DashBoard_Arc_Taho = NULL;
 lv_obj_t * ui_DashBoard_Image_BlueRing = NULL;
+lv_obj_t * ui_DashBoard_Image_ImageSpeed = NULL;
 lv_obj_t * ui_DashBoard_Bar_BatBar = NULL;
 lv_obj_t * ui_DashBoard_Image_BatShape = NULL;
 lv_obj_t * ui_DashBoard_Image_Batallert = NULL;
@@ -54,6 +54,11 @@ lv_obj_t * ui_DashBoard_Container_CenterContainer = NULL;
 lv_obj_t * ui_DashBoard_Container_TripContainer = NULL;
 lv_obj_t * ui_DashBoard_Container_FuelContainer = NULL;
 lv_obj_t * ui_DashBoard_Label_EditionString = NULL;
+lv_obj_t * ui_DashBoard_Image_ImageCyan = NULL;
+lv_obj_t * ui_DashBoard_Image_ImageGreen = NULL;
+lv_obj_t * ui_DashBoard_Image_ImageYellow = NULL;
+lv_obj_t * ui_DashBoard_Image_ImageRed = NULL;
+lv_obj_t * ui_DashBoard_Container_ContainerRez = NULL;
 // event funtions
 void ui_event_Screen_DashBoard(lv_event_t * e)
 {
@@ -107,6 +112,15 @@ void ui_event_DashBoard_Container_FuelContainer(lv_event_t * e)
     }
 }
 
+void ui_event_DashBoard_Container_ContainerRez(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+
+    if(event_code == LV_EVENT_CLICKED) {
+        RezChange(e);
+    }
+}
+
 // build funtions
 
 void ui_Screen_DashBoard_screen_init(void)
@@ -116,15 +130,7 @@ void ui_Screen_DashBoard_screen_init(void)
                        LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_PRESS_LOCK | LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_SCROLL_ELASTIC |
                        LV_OBJ_FLAG_SCROLL_MOMENTUM);     /// Flags
     lv_obj_set_scrollbar_mode(ui_Screen_DashBoard, LV_SCROLLBAR_MODE_OFF);
-
-    ui_DashBoard_Image_Backgrownd = lv_image_create(ui_Screen_DashBoard);
-    lv_image_set_src(ui_DashBoard_Image_Backgrownd, &ui_img_bg_red_png);
-    lv_obj_set_width(ui_DashBoard_Image_Backgrownd, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_DashBoard_Image_Backgrownd, LV_SIZE_CONTENT);    /// 1
-    lv_obj_remove_flag(ui_DashBoard_Image_Backgrownd,
-                       LV_OBJ_FLAG_PRESS_LOCK | LV_OBJ_FLAG_CLICK_FOCUSABLE | LV_OBJ_FLAG_GESTURE_BUBBLE | LV_OBJ_FLAG_SNAPPABLE |
-                       LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_SCROLL_ELASTIC | LV_OBJ_FLAG_SCROLL_MOMENTUM |
-                       LV_OBJ_FLAG_SCROLL_CHAIN);     /// Flags
+    lv_obj_set_style_bg_image_src(ui_Screen_DashBoard, &ui_img_bg_red_png, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_DashBoard_Label_FionaSpeachLabelDash = lv_label_create(ui_Screen_DashBoard);
     lv_obj_set_width(ui_DashBoard_Label_FionaSpeachLabelDash, 1024);
@@ -151,7 +157,7 @@ void ui_Screen_DashBoard_screen_init(void)
     lv_obj_remove_flag(ui_DashBoard_Label_TahoLBL,
                        LV_OBJ_FLAG_PRESS_LOCK | LV_OBJ_FLAG_CLICK_FOCUSABLE | LV_OBJ_FLAG_GESTURE_BUBBLE |
                        LV_OBJ_FLAG_SNAPPABLE);     /// Flags
-    lv_obj_set_style_text_color(ui_DashBoard_Label_TahoLBL, lv_color_hex(0x2196F3), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui_DashBoard_Label_TahoLBL, lv_color_hex(0x00FFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_DashBoard_Label_TahoLBL, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_DashBoard_Label_TahoLBL, &ui_font_BaseFont, LV_PART_MAIN | LV_STATE_DEFAULT);
 
@@ -187,6 +193,16 @@ void ui_Screen_DashBoard_screen_init(void)
                        LV_OBJ_FLAG_PRESS_LOCK | LV_OBJ_FLAG_CLICK_FOCUSABLE | LV_OBJ_FLAG_GESTURE_BUBBLE | LV_OBJ_FLAG_SNAPPABLE |
                        LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_SCROLL_ELASTIC | LV_OBJ_FLAG_SCROLL_MOMENTUM |
                        LV_OBJ_FLAG_SCROLL_CHAIN);     /// Flags
+
+    ui_DashBoard_Image_ImageSpeed = lv_image_create(ui_Screen_DashBoard);
+    lv_image_set_src(ui_DashBoard_Image_ImageSpeed, &ui_img_speed_png);
+    lv_obj_set_width(ui_DashBoard_Image_ImageSpeed, LV_SIZE_CONTENT);   /// 283
+    lv_obj_set_height(ui_DashBoard_Image_ImageSpeed, LV_SIZE_CONTENT);    /// 160
+    lv_obj_set_x(ui_DashBoard_Image_ImageSpeed, 1);
+    lv_obj_set_y(ui_DashBoard_Image_ImageSpeed, -106);
+    lv_obj_set_align(ui_DashBoard_Image_ImageSpeed, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_DashBoard_Image_ImageSpeed, LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_CLICKABLE);     /// Flags
+    lv_obj_remove_flag(ui_DashBoard_Image_ImageSpeed, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
     ui_DashBoard_Bar_BatBar = lv_bar_create(ui_Screen_DashBoard);
     lv_bar_set_range(ui_DashBoard_Bar_BatBar, 0, 16);
@@ -352,7 +368,6 @@ void ui_Screen_DashBoard_screen_init(void)
     lv_obj_set_x(ui_DashBoard_Image_CoolHigh, -380);
     lv_obj_set_y(ui_DashBoard_Image_CoolHigh, -51);
     lv_obj_set_align(ui_DashBoard_Image_CoolHigh, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_DashBoard_Image_CoolHigh, LV_OBJ_FLAG_HIDDEN);     /// Flags
     lv_obj_remove_flag(ui_DashBoard_Image_CoolHigh,
                        LV_OBJ_FLAG_PRESS_LOCK | LV_OBJ_FLAG_CLICK_FOCUSABLE | LV_OBJ_FLAG_GESTURE_BUBBLE | LV_OBJ_FLAG_SNAPPABLE |
                        LV_OBJ_FLAG_SCROLLABLE);     /// Flags
@@ -389,7 +404,7 @@ void ui_Screen_DashBoard_screen_init(void)
                        LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_PRESS_LOCK | LV_OBJ_FLAG_CLICK_FOCUSABLE | LV_OBJ_FLAG_GESTURE_BUBBLE |
                        LV_OBJ_FLAG_SNAPPABLE | LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_SCROLL_ELASTIC | LV_OBJ_FLAG_SCROLL_MOMENTUM |
                        LV_OBJ_FLAG_SCROLL_CHAIN);     /// Flags
-    lv_arc_set_range(ui_DashBoard_Arc_Uskorenie, -100, 100);
+    lv_arc_set_range(ui_DashBoard_Arc_Uskorenie, -300, 300);
     lv_arc_set_value(ui_DashBoard_Arc_Uskorenie, 0);
     lv_arc_set_bg_angles(ui_DashBoard_Arc_Uskorenie, 357, 37);
     lv_arc_set_mode(ui_DashBoard_Arc_Uskorenie, LV_ARC_MODE_SYMMETRICAL);
@@ -756,28 +771,78 @@ void ui_Screen_DashBoard_screen_init(void)
                        LV_OBJ_FLAG_PRESS_LOCK | LV_OBJ_FLAG_CLICK_FOCUSABLE | LV_OBJ_FLAG_SNAPPABLE | LV_OBJ_FLAG_SCROLLABLE);     /// Flags
 
     ui_DashBoard_Label_EditionString = lv_label_create(ui_Screen_DashBoard);
-    lv_obj_set_width(ui_DashBoard_Label_EditionString, 280);
-    lv_obj_set_height(ui_DashBoard_Label_EditionString, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_width(ui_DashBoard_Label_EditionString, 300);
+    lv_obj_set_height(ui_DashBoard_Label_EditionString, 32);
     lv_obj_set_x(ui_DashBoard_Label_EditionString, 0);
-    lv_obj_set_y(ui_DashBoard_Label_EditionString, 416);
-    lv_obj_set_align(ui_DashBoard_Label_EditionString, LV_ALIGN_TOP_MID);
+    lv_obj_set_y(ui_DashBoard_Label_EditionString, -130);
+    lv_obj_set_align(ui_DashBoard_Label_EditionString, LV_ALIGN_BOTTOM_MID);
     lv_label_set_long_mode(ui_DashBoard_Label_EditionString, LV_LABEL_LONG_SCROLL_CIRCULAR);
-    lv_label_set_text(ui_DashBoard_Label_EditionString, "\n");
-    lv_obj_remove_flag(ui_DashBoard_Label_EditionString,
-                       LV_OBJ_FLAG_PRESS_LOCK | LV_OBJ_FLAG_CLICK_FOCUSABLE | LV_OBJ_FLAG_GESTURE_BUBBLE |
-                       LV_OBJ_FLAG_SNAPPABLE);     /// Flags
+    lv_label_set_text(ui_DashBoard_Label_EditionString, "Привет, Куда поедем?");
     lv_obj_set_style_text_color(ui_DashBoard_Label_EditionString, lv_color_hex(0xFFFF00), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_DashBoard_Label_EditionString, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_align(ui_DashBoard_Label_EditionString, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_DashBoard_Label_EditionString, &ui_font_BaseFont, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_outline_color(ui_DashBoard_Label_EditionString, lv_color_hex(0xD9FF00),
-                                   LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_outline_opa(ui_DashBoard_Label_EditionString, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_shadow_color(ui_DashBoard_Label_EditionString, lv_color_hex(0x000000),
-                                  LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_shadow_opa(ui_DashBoard_Label_EditionString, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_shadow_width(ui_DashBoard_Label_EditionString, 1, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_shadow_spread(ui_DashBoard_Label_EditionString, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui_DashBoard_Label_EditionString, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_DashBoard_Label_EditionString, 128, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_DashBoard_Image_ImageCyan = lv_image_create(ui_Screen_DashBoard);
+    lv_image_set_src(ui_DashBoard_Image_ImageCyan, &ui_img_cyan_cat_png);
+    lv_obj_set_width(ui_DashBoard_Image_ImageCyan, LV_SIZE_CONTENT);   /// 140
+    lv_obj_set_height(ui_DashBoard_Image_ImageCyan, LV_SIZE_CONTENT);    /// 90
+    lv_obj_set_x(ui_DashBoard_Image_ImageCyan, 0);
+    lv_obj_set_y(ui_DashBoard_Image_ImageCyan, -71);
+    lv_obj_set_align(ui_DashBoard_Image_ImageCyan, LV_ALIGN_LEFT_MID);
+    lv_obj_add_flag(ui_DashBoard_Image_ImageCyan, LV_OBJ_FLAG_HIDDEN);     /// Flags
+    lv_obj_remove_flag(ui_DashBoard_Image_ImageCyan,
+                       LV_OBJ_FLAG_PRESS_LOCK | LV_OBJ_FLAG_CLICK_FOCUSABLE | LV_OBJ_FLAG_GESTURE_BUBBLE | LV_OBJ_FLAG_SNAPPABLE |
+                       LV_OBJ_FLAG_SCROLLABLE);     /// Flags
+
+    ui_DashBoard_Image_ImageGreen = lv_image_create(ui_Screen_DashBoard);
+    lv_image_set_src(ui_DashBoard_Image_ImageGreen, &ui_img_green_cat_png);
+    lv_obj_set_width(ui_DashBoard_Image_ImageGreen, LV_SIZE_CONTENT);   /// 140
+    lv_obj_set_height(ui_DashBoard_Image_ImageGreen, LV_SIZE_CONTENT);    /// 90
+    lv_obj_set_x(ui_DashBoard_Image_ImageGreen, 0);
+    lv_obj_set_y(ui_DashBoard_Image_ImageGreen, -71);
+    lv_obj_set_align(ui_DashBoard_Image_ImageGreen, LV_ALIGN_LEFT_MID);
+    lv_obj_add_flag(ui_DashBoard_Image_ImageGreen, LV_OBJ_FLAG_HIDDEN);     /// Flags
+    lv_obj_remove_flag(ui_DashBoard_Image_ImageGreen,
+                       LV_OBJ_FLAG_PRESS_LOCK | LV_OBJ_FLAG_CLICK_FOCUSABLE | LV_OBJ_FLAG_GESTURE_BUBBLE | LV_OBJ_FLAG_SNAPPABLE |
+                       LV_OBJ_FLAG_SCROLLABLE);     /// Flags
+
+    ui_DashBoard_Image_ImageYellow = lv_image_create(ui_Screen_DashBoard);
+    lv_image_set_src(ui_DashBoard_Image_ImageYellow, &ui_img_yellow_cat_png);
+    lv_obj_set_width(ui_DashBoard_Image_ImageYellow, LV_SIZE_CONTENT);   /// 140
+    lv_obj_set_height(ui_DashBoard_Image_ImageYellow, LV_SIZE_CONTENT);    /// 90
+    lv_obj_set_x(ui_DashBoard_Image_ImageYellow, 0);
+    lv_obj_set_y(ui_DashBoard_Image_ImageYellow, -71);
+    lv_obj_set_align(ui_DashBoard_Image_ImageYellow, LV_ALIGN_LEFT_MID);
+    lv_obj_add_flag(ui_DashBoard_Image_ImageYellow, LV_OBJ_FLAG_HIDDEN);     /// Flags
+    lv_obj_remove_flag(ui_DashBoard_Image_ImageYellow,
+                       LV_OBJ_FLAG_PRESS_LOCK | LV_OBJ_FLAG_CLICK_FOCUSABLE | LV_OBJ_FLAG_GESTURE_BUBBLE | LV_OBJ_FLAG_SNAPPABLE |
+                       LV_OBJ_FLAG_SCROLLABLE);     /// Flags
+
+    ui_DashBoard_Image_ImageRed = lv_image_create(ui_Screen_DashBoard);
+    lv_image_set_src(ui_DashBoard_Image_ImageRed, &ui_img_red_cat_png);
+    lv_obj_set_width(ui_DashBoard_Image_ImageRed, LV_SIZE_CONTENT);   /// 140
+    lv_obj_set_height(ui_DashBoard_Image_ImageRed, LV_SIZE_CONTENT);    /// 90
+    lv_obj_set_x(ui_DashBoard_Image_ImageRed, 0);
+    lv_obj_set_y(ui_DashBoard_Image_ImageRed, -71);
+    lv_obj_set_align(ui_DashBoard_Image_ImageRed, LV_ALIGN_LEFT_MID);
+    lv_obj_add_flag(ui_DashBoard_Image_ImageRed, LV_OBJ_FLAG_HIDDEN);     /// Flags
+    lv_obj_remove_flag(ui_DashBoard_Image_ImageRed,
+                       LV_OBJ_FLAG_PRESS_LOCK | LV_OBJ_FLAG_CLICK_FOCUSABLE | LV_OBJ_FLAG_GESTURE_BUBBLE | LV_OBJ_FLAG_SNAPPABLE |
+                       LV_OBJ_FLAG_SCROLLABLE);     /// Flags
+
+    ui_DashBoard_Container_ContainerRez = lv_obj_create(ui_Screen_DashBoard);
+    lv_obj_remove_style_all(ui_DashBoard_Container_ContainerRez);
+    lv_obj_set_width(ui_DashBoard_Container_ContainerRez, 140);
+    lv_obj_set_height(ui_DashBoard_Container_ContainerRez, 90);
+    lv_obj_set_x(ui_DashBoard_Container_ContainerRez, 0);
+    lv_obj_set_y(ui_DashBoard_Container_ContainerRez, -71);
+    lv_obj_set_align(ui_DashBoard_Container_ContainerRez, LV_ALIGN_LEFT_MID);
+    lv_obj_remove_flag(ui_DashBoard_Container_ContainerRez,
+                       LV_OBJ_FLAG_PRESS_LOCK | LV_OBJ_FLAG_CLICK_FOCUSABLE | LV_OBJ_FLAG_GESTURE_BUBBLE | LV_OBJ_FLAG_SNAPPABLE |
+                       LV_OBJ_FLAG_SCROLLABLE);     /// Flags
 
     lv_obj_add_event_cb(ui_DashBoard_Label_Time, ui_event_DashBoard_Label_Time, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_DashBoard_Container_CenterContainer, ui_event_DashBoard_Container_CenterContainer, LV_EVENT_ALL,
@@ -786,6 +851,7 @@ void ui_Screen_DashBoard_screen_init(void)
                         NULL);
     lv_obj_add_event_cb(ui_DashBoard_Container_FuelContainer, ui_event_DashBoard_Container_FuelContainer, LV_EVENT_ALL,
                         NULL);
+    lv_obj_add_event_cb(ui_DashBoard_Container_ContainerRez, ui_event_DashBoard_Container_ContainerRez, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_Screen_DashBoard, ui_event_Screen_DashBoard, LV_EVENT_ALL, NULL);
     uic_DashBoard_Label_q = ui_DashBoard_Label_TripTimePause;
 
@@ -797,11 +863,11 @@ void ui_Screen_DashBoard_screen_destroy(void)
 
     // NULL screen variables
     ui_Screen_DashBoard = NULL;
-    ui_DashBoard_Image_Backgrownd = NULL;
     ui_DashBoard_Label_FionaSpeachLabelDash = NULL;
     ui_DashBoard_Label_TahoLBL = NULL;
     ui_DashBoard_Arc_Taho = NULL;
     ui_DashBoard_Image_BlueRing = NULL;
+    ui_DashBoard_Image_ImageSpeed = NULL;
     ui_DashBoard_Bar_BatBar = NULL;
     ui_DashBoard_Image_BatShape = NULL;
     ui_DashBoard_Image_Batallert = NULL;
@@ -845,5 +911,10 @@ void ui_Screen_DashBoard_screen_destroy(void)
     ui_DashBoard_Container_TripContainer = NULL;
     ui_DashBoard_Container_FuelContainer = NULL;
     ui_DashBoard_Label_EditionString = NULL;
+    ui_DashBoard_Image_ImageCyan = NULL;
+    ui_DashBoard_Image_ImageGreen = NULL;
+    ui_DashBoard_Image_ImageYellow = NULL;
+    ui_DashBoard_Image_ImageRed = NULL;
+    ui_DashBoard_Container_ContainerRez = NULL;
 
 }

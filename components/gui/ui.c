@@ -35,7 +35,7 @@ void ui_init(void)
     ui_Screen_ClimateControl_screen_init();
     ui_Screen_SplashScreen_screen_init();
     ui_Startevents____initial_actions0 = lv_obj_create(NULL);
-    lv_disp_load_scr(ui_Screen_SplashScreen);
+    lv_disp_load_scr(ui_Screen_DashBoard);
 }
 
 void ui_destroy(void)

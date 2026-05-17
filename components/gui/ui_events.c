@@ -10,6 +10,7 @@
 #include "CarData.h"
 #include "uart_protocol.h"
 #include "sd_utils.h"
+#include "fiona_brain.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -33,6 +34,13 @@ extern lv_subject_t subject_dash_message;
 extern lv_timer_t * poll_timer;
 extern lv_timer_t * clock_timer;
 extern bool screensaver_active;
+
+// ---------- Переменные для ручного выбора стиля ----------
+static uint8_t selected_style = 0;      // 0=авто, 1=спорт(циан), 2=семья(зелёный), 3=агрессивный(жёлтый)
+static lv_timer_t * style_confirm_timer = NULL;
+
+// Прототип функции фиксации стиля
+static void style_confirm_timer_cb(lv_timer_t * t);
 
 /* ---------------------------------------------------------------------------
  * Обработчики событий дашборда и системных действий
@@ -292,6 +300,64 @@ void OnScreenSaverClk(lv_event_t * e)
     fiona_core_deactivate_screensaver();
 }
 
+// ------------------- Калибровка IMU -------------------
+void CalibrateMCUBtnClick(lv_event_t * e)
+{
+    uart_send_to_gateway(MSG_CALIBRATE_ACCEL, NULL, 0);
+    lv_label_set_text(ui_DashBoard_Label_FionaSpeachLabelDash, "Калибровка запущена");
+    extern bool calibration_active;
+    calibration_active = true;
+}
+
+// ------------------- Ручной выбор стиля (клик по контейнеру) -------------------
+void RezChange(lv_event_t * e)
+{
+    // Циклический перебор: 0(авто) -> 1(спокойный) -> 2(агрессивный) -> 3(спорт) -> 0...
+    selected_style = (selected_style + 1) % 4;
+
+    // Скрываем всех котов
+    lv_obj_add_flag(ui_DashBoard_Image_ImageCyan, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_add_flag(ui_DashBoard_Image_ImageGreen, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_add_flag(ui_DashBoard_Image_ImageYellow, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_add_flag(ui_DashBoard_Image_ImageRed, LV_OBJ_FLAG_HIDDEN);
+
+    // Показываем выбранного кота (соответствие стилям из fiona_brain)
+    if (selected_style == 1) {
+        lv_obj_remove_flag(ui_DashBoard_Image_ImageGreen, LV_OBJ_FLAG_HIDDEN);   // спокойный
+    } else if (selected_style == 2) {
+        lv_obj_remove_flag(ui_DashBoard_Image_ImageYellow, LV_OBJ_FLAG_HIDDEN);  // агрессивный
+    } else if (selected_style == 3) {
+        lv_obj_remove_flag(ui_DashBoard_Image_ImageCyan, LV_OBJ_FLAG_HIDDEN);    // спорт
+    }
+    // selected_style == 0 – все коты скрыты
+
+    // Показываем индикатор ручного режима (ImageSpeed)
+    lv_obj_remove_flag(ui_DashBoard_Image_ImageSpeed, LV_OBJ_FLAG_HIDDEN);
+
+    // Перезапускаем таймер подтверждения на 5 секунд
+    if (style_confirm_timer) {
+        lv_timer_del(style_confirm_timer);
+    }
+    style_confirm_timer = lv_timer_create(style_confirm_timer_cb, 5000, NULL);
+}
+
+// Таймер подтверждения: через 5 секунд после последнего клика фиксируем стиль
+static void style_confirm_timer_cb(lv_timer_t * t)
+{
+    // Записываем выбранный стиль в ручной режим
+    FionaState *state = fiona_brain_get_state();
+    if (state) {
+        state->manual_style = selected_style;
+    }
+
+    // Скрываем индикатор ручного режима
+    lv_obj_add_flag(ui_DashBoard_Image_ImageSpeed, LV_OBJ_FLAG_HIDDEN);
+
+    // Удаляем таймер
+    lv_timer_del(t);
+    style_confirm_timer = NULL;
+}
+
 // ------------------- Пустые обработчики ImageAnim -------------------
 void ImageAnimOnLoad(lv_event_t * e)
 {
@@ -301,4 +367,23 @@ void ImageAnimOnLoad(lv_event_t * e)
 void ImageAnimOnUnLoad(lv_event_t * e)
 {
     // Your code here
+}
+void FanPlusClk(lv_event_t * e)
+{
+	// Your code here
+}
+
+void FanMinusClk(lv_event_t * e)
+{
+	// Your code here
+}
+
+void FanSaveApply(lv_event_t * e)
+{
+	// Your code here
+}
+
+void FanChangeDot(lv_event_t * e)
+{
+	// Your code here
 }

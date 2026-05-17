@@ -111,8 +111,16 @@ static void wait_for_connection_timer(lv_timer_t *t) {
         synced = data->time_received_this_boot;
         CarData_Unlock();
     }
-    if (synced && uart_is_gateway_alive()) {
+
+    // Счётчик попыток (таймер вызывается каждые 500 мс)
+    static int attempts = 0;
+    attempts++;
+
+    // Условие выхода: шлюз появился И время синхронизировано, ИЛИ прошло 5 секунд (10 попыток)
+    if ((synced && uart_is_gateway_alive()) || attempts >= 10) {
         lv_timer_del(t);
+        attempts = 0; // сброс на случай повторного использования
+
         lv_anim_t a;
         lv_anim_init(&a);
         lv_anim_set_var(&a, ui_SplashScreen_Image_Logo);

@@ -1,6 +1,8 @@
 /**
  * @file fiona_background.c
  * @brief Фоновые таймеры и периодическая логика ядра.
+ *
+ * Управляет отображением «котов» (индикаторов стиля) и аварийного красного кота.
  */
 
 #include "fiona_core.h"
@@ -18,6 +20,7 @@
 #include <stdio.h>
 #include <math.h>
 #include "bsp/esp-bsp.h"
+#include "esp_adc/adc_oneshot.h"
 
 /* ========== Внешние UI-объекты ========== */
 extern lv_obj_t * ui_DashBoard_Label_SpeedDigit;
@@ -85,6 +88,13 @@ extern lv_obj_t * ui_System_Image_PresetBack;
 extern lv_obj_t * ui_System_Image_PresetGrey;
 extern lv_obj_t * ui_System_Image_PresetRed;
 
+/* Новые UI-объекты для «котов» */
+extern lv_obj_t * ui_DashBoard_Image_ImageCyan;
+extern lv_obj_t * ui_DashBoard_Image_ImageGreen;
+extern lv_obj_t * ui_DashBoard_Image_ImageYellow;
+extern lv_obj_t * ui_DashBoard_Image_ImageRed;
+extern lv_obj_t * ui_DashBoard_Image_ImageSpeed;
+
 extern lv_timer_t *poll_timer;
 extern lv_timer_t *clock_timer;
 extern bool screensaver_active;
@@ -111,6 +121,19 @@ static uint32_t last_casual_phrase_time = 0;
 static uint32_t phrase_display_start_time = 0;
 static char last_displayed_text[256] = {0};
 
+// ADC для фоторезистора (GPIO20)
+static adc_oneshot_unit_handle_t adc1_handle = NULL;
+
+// Сглаженное значение освещённости и последняя установленная яркость
+static float smooth_light = 0.0f;
+static uint8_t last_set_brightness = 255;
+
+// Флаг активности калибровки
+bool calibration_active = false;
+
+// Для отслеживания состояния аварийного красного кота
+static bool red_alert_active = false;
+
 // Прототипы
 static void fast_timer_cb(lv_timer_t *timer);
 static void clock_timer_cb(lv_timer_t *timer);
@@ -120,6 +143,21 @@ static int count_stops_last_5min(uint32_t now);
 void fiona_background_init_timers(void) {
     if (clock_timer == NULL) clock_timer = lv_timer_create(clock_timer_cb, 1000, NULL);
     if (poll_timer == NULL)   poll_timer   = lv_timer_create(fast_timer_cb, 100, NULL);
+
+    // Инициализация ADC для фоторезистора (GPIO20) – только один раз
+    if (adc1_handle == NULL) {
+        adc_oneshot_unit_init_cfg_t init_config = {
+            .unit_id = ADC_UNIT_1,
+            .clk_src = ADC_DIGI_CLK_SRC_DEFAULT,
+            .ulp_mode = ADC_ULP_MODE_DISABLE,
+        };
+        ESP_ERROR_CHECK(adc_oneshot_new_unit(&init_config, &adc1_handle));
+        adc_oneshot_chan_cfg_t chan_cfg = {
+            .bitwidth = ADC_BITWIDTH_DEFAULT,
+            .atten = ADC_ATTEN_DB_12,
+        };
+        ESP_ERROR_CHECK(adc_oneshot_config_channel(adc1_handle, ADC_CHANNEL_4, &chan_cfg));
+    }
 }
 
 /* ---------- Подсчёт остановок ---------- */
@@ -140,6 +178,44 @@ static int count_stops_last_5min(uint32_t now) {
 
 /* ---------- Быстрый таймер (100 мс) ---------- */
 static void fast_timer_cb(lv_timer_t *timer) {
+    // --- Автояркость по своему фоторезистору (GPIO20) – всегда, даже без шлюза ---
+    int light_raw = 0;
+    adc_oneshot_read(adc1_handle, ADC_CHANNEL_4, &light_raw);
+
+    // Экспоненциальное сглаживание (α = 0.2)
+    smooth_light = smooth_light + 0.2f * ((float)light_raw - smooth_light);
+
+    uint8_t max_brightness = 80;
+    uint8_t min_br = 5;
+    uint8_t dark_thr = 20;
+    uint8_t bright_thr = 80;
+
+    uint8_t new_duty;
+    if (dark_thr < bright_thr) {
+        if (smooth_light <= (float)dark_thr) {
+            new_duty = min_br;
+        } else if (smooth_light >= (float)bright_thr) {
+            new_duty = max_brightness;
+        } else {
+            float norm = (smooth_light - (float)dark_thr) / (float)(bright_thr - dark_thr);
+            float curved = powf(norm, 0.5f);
+            new_duty = min_br + (uint8_t)((max_brightness - min_br) * curved);
+        }
+    } else {
+        float norm = smooth_light / 4095.0f;
+        float curved = powf(norm, 0.5f);
+        new_duty = min_br + (uint8_t)((max_brightness - min_br) * curved);
+    }
+
+    if (new_duty > 100) new_duty = 100;
+    if (new_duty < min_br) new_duty = min_br;
+
+    if (new_duty != last_set_brightness) {
+        bsp_display_brightness_set(new_duty);
+        last_set_brightness = new_duty;
+    }
+
+    // --- Дальше стандартный код, требующий связи со шлюзом ---
     CarData *data = CarData_Get();
     if (!data || !uart_is_gateway_alive()) {
         return;
@@ -148,38 +224,47 @@ static void fast_timer_cb(lv_timer_t *timer) {
     static uint8_t fast_counter = 0;
     fast_counter++;
 
-    // RPM запрашиваем каждые 500 мс (каждый 5-й тик)
     if (fast_counter % 5 == 0) {
         uart_send_to_gateway(MSG_RPM, NULL, 0);
+        uart_send_to_gateway(MSG_THROTTLE, NULL, 0);
     }
-
-    // Speed и Instant Fuel – каждые 200 мс (каждый 2-й тик)
+    uart_send_to_gateway(MSG_REQ_ACCEL, NULL, 0);
     if (fast_counter % 2 == 0) {
         uart_send_to_gateway(MSG_SPEED, NULL, 0);
         uart_send_to_gateway(MSG_INST_FUEL, NULL, 0);
     }
 
-    // Абсолютное положение дросселя – каждые 500 мс
-    if (fast_counter % 5 == 0) {
-        uart_send_to_gateway(MSG_THROTTLE, NULL, 0);
-    }
-
     if (fast_counter >= 10) fast_counter = 0;
 
-    int speed_val, rpm_val, lph_val, throttle_val, accel_val;
+    int speed_val, rpm_val, lph_val, throttle_val;
+    float accel_x;
     CarData_Lock(10);
     speed_val = data->speedValue;
     rpm_val = data->rpmValue;
     lph_val = (int)(data->lphValue * 10);
     throttle_val = (int)data->throttlePos;
-    accel_val = 0;   // заглушка
+    accel_x = data->accel_x;
+
+    // Автоматическое обновление пиковых перегрузок
+    float accel_g = accel_x / 9.81f;
+    if (accel_g > data->max_pos_accel_g) {
+        data->max_pos_accel_g = accel_g;
+    }
+    if (accel_g < data->max_neg_accel_g) {
+        data->max_neg_accel_g = accel_g;
+    }
     CarData_Unlock();
 
     lv_subject_set_int(&subject_speed, speed_val);
     lv_subject_set_int(&subject_rpm, rpm_val);
     lv_subject_set_int(&subject_lph, lph_val);
     lv_subject_set_int(&subject_throttle, throttle_val);
-    lv_subject_set_int(&subject_accel, accel_val);
+
+    // Обновление дуги ускорения: переводим в сотые доли g и отправляем в субъект
+    int accel_dg = (int)(accel_g * 100.0f);
+    if (accel_dg > 300) accel_dg = 300;
+    if (accel_dg < -300) accel_dg = -300;
+    lv_subject_set_int(&subject_accel, accel_dg);
 }
 
 /* ---------- Медленный таймер (1 сек) ---------- */
@@ -217,7 +302,7 @@ static void clock_timer_cb(lv_timer_t *timer) {
         }
         CarData_Unlock();
     }
-
+    
     // Часы
     strftime(buf, sizeof(buf), "%H:%M:%S", timeinfo);
     lv_label_set_text(ui_DashBoard_Label_Time, buf);
@@ -230,7 +315,32 @@ static void clock_timer_cb(lv_timer_t *timer) {
 
     if (!data) return;
 
-    uart_send_to_gateway(MSG_LIGHT_RAW, NULL, 0);
+    // --- Опрос статуса калибровки IMU (читаем из CarData) ---
+    if (calibration_active) {
+        uart_send_to_gateway(MSG_REQ_CALIB_STATUS, NULL, 0);
+        switch (data->calib_status) {
+            case 0x01:
+                lv_label_set_text(ui_DashBoard_Label_FionaSpeachLabelDash, "Калибровка: не двигайтесь");
+                break;
+            case 0x02:
+                lv_label_set_text(ui_DashBoard_Label_FionaSpeachLabelDash, "Разгонитесь, прокатитесь и затормозите");
+                break;
+            case 0x03:
+                lv_label_set_text(ui_DashBoard_Label_FionaSpeachLabelDash, "Калибровка завершена");
+                calibration_active = false;
+                break;
+            case 0x10:
+            case 0x11:
+            case 0x12:
+            case 0x13:
+                lv_label_set_text(ui_DashBoard_Label_FionaSpeachLabelDash, "Ошибка калибровки. Повторите.");
+                calibration_active = false;
+                break;
+            default:
+                break;
+        }
+    }
+
     if (timeinfo->tm_hour == 0 && timeinfo->tm_min == 1 && timeinfo->tm_sec == 0) {
         if (!data->day_requested_today) {
             uart_send_to_gateway(MSG_REQ_DAY_STATS, NULL, 0);
@@ -239,6 +349,7 @@ static void clock_timer_cb(lv_timer_t *timer) {
             CarData_Unlock();
         }
     }
+    
     if (timeinfo->tm_hour == 0 && timeinfo->tm_min == 0 && timeinfo->tm_sec == 1) {
         CarData_Lock(10);
         data->day_requested_today = false;
@@ -280,6 +391,8 @@ static void clock_timer_cb(lv_timer_t *timer) {
         }
 
         if (show) {
+            // Осмысленная реплика – в бегущую строку
+            lv_label_set_text(ui_DashBoard_Label_EditionString, phrase.text);
             lv_subject_set_pointer(&subject_dash_message, (void*)phrase.text);
             g_current_tone = phrase.tone;
             lv_label_set_text(ui_DashBoard_Label_FionaSpeachLabelDash, "");
@@ -293,57 +406,55 @@ static void clock_timer_cb(lv_timer_t *timer) {
                 last_displayed_text[0] = '\0';
             }
         }
-
-                // ---------- ЦВЕТОВЫЕ МАСКИ (отключены, ждут реализации) ----------
-        // uint8_t bg_theme = 0; // синий по умолчанию
-        // if (!state->is_alone || state->trip_duration_sec > 10800) {
-        //     bg_theme = 1; // зелёный
-        // } else if (state->is_alone && state->driving_mode != 2) {
-        //     bg_theme = 2; // красный
-        // }
-        // fiona_animations_apply_bg_theme(bg_theme);
-        // fiona_animations_set_tripimg_color(1); // TODO: различать ручной/авто
-        // fiona_animations_set_bluering_color(data->internetAvailable);
-
-        // BlueRing: интернет
-        //fiona_animations_set_bluering_color(data->internetAvailable);
     }
 
-    // Автояркость (полный код)
-    CarData_Lock(10);
-    uint16_t ambient_raw = data->ambient_light_raw;
-    uint8_t max_brightness = data->backlight_brightness;
-    uint8_t min_br = data->backlight_min_brightness;
-    uint8_t dark_thr = data->light_threshold_dark;
-    uint8_t bright_thr = data->light_threshold_bright;
-    CarData_Unlock();
-
-    static uint8_t last_brightness = 255;
-    uint8_t new_duty;
-    if (dark_thr < bright_thr) {
-        if (ambient_raw <= dark_thr) {
-            new_duty = min_br;
-        } else if (ambient_raw >= bright_thr) {
-            new_duty = max_brightness;
-        } else {
-            float norm = (float)(ambient_raw - dark_thr) / (float)(bright_thr - dark_thr);
-            float curved = powf(norm, 0.5f);
-            new_duty = min_br + (uint8_t)((max_brightness - min_br) * curved);
+    // ============ УПРАВЛЕНИЕ «КОТАМИ» ============
+    bool red_condition = false;
+    if (data) {
+        float temp = data->tempValue;
+        float lph  = data->lphValue;
+        int   rpm  = data->rpmValue;
+        // Условие аварийного красного кота
+        if ((temp > 112 && rpm > 400 && lph > 12) || (temp < 90 && lph > 12)) {
+            red_condition = true;
         }
-    } else {
-        float norm = (float)ambient_raw / 4095.0f;
-        float curved = powf(norm, 0.5f);
-        new_duty = min_br + (uint8_t)((max_brightness - min_br) * curved);
     }
-    if (new_duty > 100) new_duty = 100;
-    if (new_duty < min_br) new_duty = min_br;
-    if (new_duty != last_brightness) {
-        bsp_display_brightness_set(new_duty);
-        last_brightness = new_duty;
-    }
-    lv_subject_set_int(&subject_adc_light, ambient_raw);
 
-    // Отладочные индикаторы и текстовые поля
+    // Всегда скрываем котов и ImageSpeed по умолчанию, потом покажем нужные
+    lv_obj_add_flag(ui_DashBoard_Image_ImageCyan, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_add_flag(ui_DashBoard_Image_ImageGreen, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_add_flag(ui_DashBoard_Image_ImageYellow, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_add_flag(ui_DashBoard_Image_ImageRed, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_add_flag(ui_DashBoard_Image_ImageSpeed, LV_OBJ_FLAG_HIDDEN);
+
+    if (red_condition) {
+        // Показываем только красного кота
+        lv_obj_remove_flag(ui_DashBoard_Image_ImageRed, LV_OBJ_FLAG_HIDDEN);
+        red_alert_active = true;
+    } else {
+        red_alert_active = false;
+        // Нормальное отображение
+        if (state) {
+            // Если есть ручной выбор, используем его; иначе берём автоопределение
+            uint8_t style = state->manual_style ? state->manual_style : state->driving_style;
+            lv_obj_t *cat_to_show = NULL;
+            if (style == 1) cat_to_show = ui_DashBoard_Image_ImageGreen;   // спокойный
+            else if (style == 2) cat_to_show = ui_DashBoard_Image_ImageYellow; // агрессивный
+            else if (style == 3) cat_to_show = ui_DashBoard_Image_ImageCyan;   // спорт
+            // style == 0 – не показываем ничего
+
+            if (cat_to_show) {
+                lv_obj_remove_flag(cat_to_show, LV_OBJ_FLAG_HIDDEN);
+            }
+
+            // Индикатор ручного режима
+            if (state->manual_style != 0) {
+                lv_obj_remove_flag(ui_DashBoard_Image_ImageSpeed, LV_OBJ_FLAG_HIDDEN);
+            }
+        }
+    }
+
+    // ============ ИНДИКАТОРЫ И ДИАГНОСТИКА (ВСЕГДА) ============
     CarData_Lock(10);
     float bat_voltage = data->batValue;
     float fuel_level = data->fuelValue;
@@ -353,38 +464,63 @@ static void clock_timer_cb(lv_timer_t *timer) {
     uint32_t odo_val = data->odoKm;
     bool arduino_alive = data->uartArduinoAlive;
     bool trip_state = data->tripState;
+    float current_accel_x = data->accel_x;
+    float current_accel_y = data->accel_y;
+    float current_accel_z = data->accel_z;
+    uint16_t light_raw = (uint16_t)smooth_light;
     CarData_Unlock();
 
+    // Обновляем массив индикаторов
+    indicators_ok[0] = sd_card_mounted();
+    indicators_ok[1] = arduino_alive;
+    indicators_ok[2] = uart_is_gateway_alive();
+    indicators_ok[3] = fiona_soul_phrases_check();
+    indicators_ok[4] = sd_stats_check();
+    indicators_ok[5] = sd_presets_check();
+
+    // --- Новый формат виджета ESP32 ---
     snprintf(esp32_status_text, sizeof(esp32_status_text),
-             "Время: %02d:%02d:%02d\n"
-             "Скорость: %d км/ч\n"
-             "Тахометр: %d об/мин\n"
-             "АКБ: %.1f В\n"
-             "Топливо: %.1f л\n"
-             "ОДО: %u км\n",
-             timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec,
+             "Speed: %d km/h\n"
+             "RPM: %d\n"
+             "Battery: %.1f V\n"
+             "Fuel: %.1f L\n"
+             "ODO: %u km\n"
+             "Accel X:%.2f Y:%.2f Z:%.2f m/s²\n"
+             "Gyro X:%.2f Y:%.2f Z:%.2f °/s\n"
+             "Tilt R:%d P:%d deg\n"
+             "Light: %d",
              speed_kmh, current_rpm,
-             bat_voltage, fuel_level, odo_val);
+             bat_voltage, fuel_level, odo_val,
+             current_accel_x, current_accel_y, current_accel_z,
+             data->gyro_x, data->gyro_y, data->gyro_z,
+             data->tilt_roll, data->tilt_pitch,
+             light_raw);
+
     snprintf(arduino_status_text, sizeof(arduino_status_text),
              "Статус: %s", arduino_alive ? "На связи" : "Нет связи");
 
-    static uint32_t uptime_seconds = 0;
-    uptime_seconds++;
+    // --- Новый формат виджета Экран ---
     snprintf(screen_status_text, sizeof(screen_status_text),
-             "Время работы: %lu сек\n"
+             "Uptime: %lu sec\n"
              "SD: %s\n"
-             "Arduino: %s\n"
-             "ESP32: %s\n",
-             uptime_seconds,
-             indicators_ok[0] ? "OK" : "Ошибка",
-             indicators_ok[1] ? "OK" : "Нет связи",
-             indicators_ok[2] ? "OK" : "Нет связи");
+             "GW: %s\n"
+             "Speech: %s\n"
+             "Stat: %s\n"
+             "Preset: %s\n"
+             "Calib: 0x%02X",
+             (uint32_t)(now - data->systemTime + 1),
+             indicators_ok[0] ? "OK" : "ERR",
+             indicators_ok[2] ? "OK" : "ERR",
+             indicators_ok[3] ? "OK" : "ERR",
+             indicators_ok[4] ? "OK" : "ERR",
+             indicators_ok[5] ? "OK" : "ERR",
+             data->calib_status);
 
     lv_textarea_set_text(ui_System_Textarea_TextAreaArduino, arduino_status_text);
     lv_textarea_set_text(ui_System_Textarea_TextAreaESP, esp32_status_text);
     lv_textarea_set_text(ui_System_Textarea_TextAreaScreen, screen_status_text);
 
-    // Индикаторы (мигание)
+    // Индикаторы (мигание) – тоже всегда
     static bool blink_toggle = false;
     blink_toggle = !blink_toggle;
     struct {
