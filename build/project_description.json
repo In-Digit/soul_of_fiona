@@ -1,7 +1,7 @@
 {
     "version":            "1.2",
     "project_name":       "lvgl_demo_v9",
-    "project_version":    "v27.3-1-g3f980d7-dirty",
+    "project_version":    "v27.3-2-gb027ce6-dirty",
     "project_path":       "/home/mrak/projects/soul_of_fiona",
     "idf_path":           "/home/mrak/esp-idf-stable",
     "build_dir":          "/home/mrak/projects/soul_of_fiona/build",

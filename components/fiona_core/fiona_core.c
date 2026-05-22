@@ -1,6 +1,9 @@
 /**
  * @file fiona_core.c
  * @brief Диспетчер и инициализация ядра Фионы.
+ *
+ * Управляет запуском, сохранением/загрузкой CarData, синхронизацией GUI
+ * с актуальными данными при входе на экраны.
  */
 
 #include "fiona_core.h"
@@ -19,6 +22,7 @@
 #include "nvs_flash.h"
 #include "nvs.h"
 #include "bsp/esp-bsp.h"
+#include "driver/uart.h"
 
 static const char *TAG = "FIONA_CORE";
 static void clock_color_reset_timer(lv_timer_t *t);
@@ -52,6 +56,16 @@ lv_subject_t subject_accel;
 lv_timer_t *poll_timer = NULL;
 lv_timer_t *clock_timer = NULL;
 bool screensaver_active = false;
+
+// Внешние объекты экранов
+extern lv_obj_t * ui_Screen_ClimateControl;
+extern lv_obj_t * ui_ClimateControl_Slider_TempSlider;
+extern lv_obj_t * ui_ClimateControl_Slider_FlowSlider;
+extern lv_obj_t * ui_ClimateControl_Label_Temperatura;
+extern lv_obj_t * ui_ClimateControl_Label_FlowShim;
+
+// Прототип обработчика события загрузки экрана климата
+static void climate_screen_load_cb(lv_event_t * e);
 
 // -------------------- Инициализация --------------------
 static void fiona_core_init_timer_cb(lv_timer_t *t) {
@@ -87,14 +101,10 @@ void fiona_core_init(void) {
     bsp_display_brightness_set(100);
 
     // --- Приоритет: SD-карта > NVS ---
-    // Сначала пробуем загрузить настройки с SD-карты.
-    // Если удалось – применяем их и сразу же сохраняем в NVS, чтобы внутренняя память
-    // всегда соответствовала карте.
     if (config_load_from_sd(data)) {
         ESP_LOGI(TAG, "CarData loaded from SD card, updating NVS...");
-        fiona_core_save_car_data_to_nvs();   // синхронизируем NVS с картой
+        fiona_core_save_car_data_to_nvs();
     } else {
-        // SD-карта не доступна или config.json повреждён – загружаем из NVS
         fiona_core_load_car_data_from_nvs();
     }
 
@@ -108,8 +118,16 @@ void fiona_core_init(void) {
     }
     CarData_Unlock();
 
+    // Назначаем второй UART для Arduino (фиксированно UART_NUM_2) и переключаем на 115200
+    uart_set_arduino_port(UART_NUM_2);
+
     fiona_soul_init();
     fiona_brain_init();
+
+    // Подписываемся на событие загрузки экрана климата для синхронизации слайдеров
+    if (ui_Screen_ClimateControl) {
+        lv_obj_add_event_cb(ui_Screen_ClimateControl, climate_screen_load_cb, LV_EVENT_SCREEN_LOADED, NULL);
+    }
 
     lv_timer_create(fiona_core_init_timer_cb, 0, NULL);
 }
@@ -131,7 +149,7 @@ void fiona_core_request_internet_time(void) {
     CarData *data = CarData_Get();
     if (data) {
         CarData_Lock(10);
-        data->time_set_manually = false;   // сбрасываем ручной приоритет
+        data->time_set_manually = false;
         CarData_Unlock();
     }
     lv_subject_set_int(&subject_clock_color, 1);
@@ -184,4 +202,32 @@ static void load_car_data_from_nvs(void) {
 
 void fiona_core_load_car_data_from_nvs(void) {
     load_car_data_from_nvs();
+}
+
+/* --------------------------------------------------------------------------
+ * Обработчик загрузки экрана климата
+ * -------------------------------------------------------------------------- */
+static void climate_screen_load_cb(lv_event_t * e) {
+    CarData *data = CarData_Get();
+    if (!data) return;
+
+    CarData_Lock(10);
+    float target = data->climate_target_temp;
+    uint8_t pwm = data->heater_pwm;
+    CarData_Unlock();
+
+    // Слайдер температуры: значение = target - 22
+    int slider_val = (int)(target - 22.0f);
+    if (slider_val < -20) slider_val = -20;
+    if (slider_val > 20) slider_val = 20;
+    lv_slider_set_value(ui_ClimateControl_Slider_TempSlider, slider_val, LV_ANIM_OFF);
+    if (ui_ClimateControl_Label_Temperatura) {
+        lv_label_set_text_fmt(ui_ClimateControl_Label_Temperatura, "%.1f°C", target);
+    }
+
+    // Слайдер потока (ШИМ печки)
+    lv_slider_set_value(ui_ClimateControl_Slider_FlowSlider, pwm, LV_ANIM_OFF);
+    if (ui_ClimateControl_Label_FlowShim) {
+        lv_label_set_text_fmt(ui_ClimateControl_Label_FlowShim, "%d%%", (pwm * 100) / 255);
+    }
 }

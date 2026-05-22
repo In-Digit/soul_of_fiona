@@ -1,3 +1,11 @@
+/**
+ * @file CarData.h
+ * @brief Центральная структура данных автомобиля и системы.
+ *
+ * Единый источник истины для всех параметров, получаемых от шлюза, Arduino,
+ * датчиков и пользовательского ввода. Потокобезопасный доступ через мьютекс.
+ */
+
 #ifndef CAR_DATA_H
 #define CAR_DATA_H
 
@@ -301,6 +309,20 @@ typedef struct {
     bool climateModeDirty;
     bool damperModeDirty;
 
+    /* --- Новые поля Arduino --- */
+    float   arduino_coolant_temp;      // температура ОЖ с датчика Arduino (градусы)
+    bool    arduino_coolant_dirty;     // флаг обновления
+    uint8_t arduino_fan_mode;          // текущий режим: 1=Normal, 2=Highway, 3=City
+    bool    arduino_mode_from_screen;  // true если режим задан с экрана
+
+    /* --- Новые поля климата (от шлюза) --- */
+    float   climate_target_temp;       // желаемая температура, подтверждённая шлюзом
+    float   cabin_temp;                // температура в салоне
+    uint8_t heater_pwm;                // текущий ШИМ печки
+    bool    climate_target_dirty;      // флаг обновления желаемой температуры
+    bool    cabin_temp_dirty;          // флаг обновления температуры салона
+    bool    heater_pwm_dirty;          // флаг обновления ШИМ печки
+
     /* ================ КАТЕГОРИЯ 4: НАСТРОЙКИ ИНТЕРФЕЙСА И СЕТЕЙ ================ */
     char wifiSsid1[33];
     char wifiPass1[65];
@@ -413,23 +435,28 @@ typedef struct {
     uint32_t color_tone_serious;
 
     /* ================ IMU (АКСЕЛЕРОМЕТР / ГИРОСКОП) ================ */
-    float accel_x;                     // Продольное ускорение, м/с²
+    float accel_x;
     float accel_y;
     float accel_z;
-    float gyro_x;                      // Угловая скорость, °/с
+    float gyro_x;
     float gyro_y;
     float gyro_z;
-    int8_t tilt_roll;                  // Крен, градусы
-    int8_t tilt_pitch;                 // Тангаж, градусы
-    uint8_t calib_status;              // Статус калибровки (0x00 – 0x13)
+    int8_t tilt_roll;
+    int8_t tilt_pitch;
+    uint8_t calib_status;
 
     bool accelDirty;
     bool gyroDirty;
     bool tiltDirty;
 
-    /* --- Пиковые перегрузки (автовычисление) --- */
-    float max_pos_accel_g;             // Максимальное зарегистрированное ускорение, g
-    float max_neg_accel_g;             // Максимальное зарегистрированное торможение (по модулю), g
+    float max_pos_accel_g;
+    float max_neg_accel_g;
+
+    /* --------------- Калибровочные точки (сохраняются на SD) --------------- */
+    uint8_t climateCalibStartPoint;   // точка старта печки
+    uint8_t climateCalibStopPoint;    // точка остановки печки
+    uint8_t climateCalibNoiseLow;     // порог ВЧ шума печки
+    uint8_t climateCalibNoiseHigh;    // порог аэродинамического шума печки
 
 } CarData;
 

@@ -1,0 +1,67 @@
+[1/56] Linking C static library esp-idf/system_actions/libsystem_actions.a
+[2/56] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/ui.c.obj
+[3/56] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/screens/ui_Screen_SplashScreen.c.obj
+[4/56] Building C object esp-idf/fiona_core/CMakeFiles/__idf_fiona_core.dir/fiona_core.c.obj
+[5/56] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/screens/ui_Screen_ClimateControl.c.obj
+[6/56] Building C object esp-idf/fiona_core/CMakeFiles/__idf_fiona_core.dir/fiona_background.c.obj
+[7/56] Linking C static library esp-idf/fiona_core/libfiona_core.a
+[8/56] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/ui_helpers.c.obj
+[9/56] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/ui_events.c.obj
+[10/56] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_small_blue_png.c.obj
+[11/56] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/screens/ui_Screen_System.c.obj
+[12/56] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_battery_png.c.obj
+[13/56] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_akb_png.c.obj
+[14/56] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_speed_png.c.obj
+[15/56] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_ofe_png.c.obj
+[16/56] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_h_l_png.c.obj
+[17/56] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_oil_level_png.c.obj
+[18/56] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_fuel_png.c.obj
+[19/56] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_twater_png.c.obj
+[20/56] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_water_temp2_png.c.obj
+[21/56] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_water_temp_png.c.obj
+[22/56] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_esp_png.c.obj
+[23/56] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_1173513873.c.obj
+[24/56] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_1279366634.c.obj
+[25/56] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_1173515923.c.obj
+[26/56] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_cooller2_png.c.obj
+[27/56] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_cooller1a_png.c.obj
+[28/56] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_cooller1_png.c.obj
+[29/56] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_cooller2a_png.c.obj
+[30/56] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_cyan_cat_png.c.obj
+[31/56] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_cooller3_png.c.obj
+[32/56] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_green_cat_png.c.obj
+[33/56] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_yellow_cat_png.c.obj
+[34/56] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_black_png.c.obj
+[35/56] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_red_cat_png.c.obj
+[36/56] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_grey_png.c.obj
+[37/56] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_red_png.c.obj
+[38/56] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/fonts/ui_font_BaseFont.c.obj
+[39/56] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/fonts/ui_font_BaseFont16.c.obj
+[40/56] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/fonts/ui_font_BaseFont20.c.obj
+[41/56] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/fonts/ui_font_Digital.c.obj
+[42/56] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/fonts/ui_font_LedSymbol.c.obj
+[43/56] Performing build step for 'bootloader'
+[1/1] cd /home/mrak/projects/soul_of_fiona/build/bootloader/esp-idf/esptool_py && /home/mrak/.espressif/python_env/idf5.4_py3.12_env/bin/python /home/mrak/esp-idf-stable/components/partition_table/check_sizes.py --offset 0x8000 bootloader 0x2000 /home/mrak/projects/soul_of_fiona/build/bootloader/bootloader.bin
+Bootloader binary size 0x5c90 bytes. 0x370 bytes (4%) free.
+[44/56] No install step for 'bootloader'
+[45/56] Completed 'bootloader'
+[46/56] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/fonts/ui_font_SSaverFont.c.obj
+[47/56] Building C object esp-idf/main/CMakeFiles/__idf_main.dir/main.c.obj
+[48/56] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_bg_red_png.c.obj
+[49/56] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_fordlogo_png.c.obj
+[50/56] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_global_bg_png.c.obj
+[51/56] Linking C static library esp-idf/gui/libgui.a
+[52/56] Linking C static library esp-idf/main/libmain.a
+[53/56] Generating ld/sections.ld
+info: INFO: Symbol BSP_I2S_NUM defined in multiple locations (see below). Please check if this is a correct behavior or a random name match:
+    /home/mrak/projects/soul_of_fiona/components/bsp_extra/Kconfig:2
+    /home/mrak/projects/soul_of_fiona/components/espressif__esp32_p4_function_ev_board/Kconfig:30
+[54/56] Linking CXX executable lvgl_demo_v9.elf
+[55/56] Generating binary image from built executable
+esptool.py v4.11.0
+Creating esp32p4 image...
+Merged 3 ELF sections
+Successfully created esp32p4 image.
+Generated /home/mrak/projects/soul_of_fiona/build/lvgl_demo_v9.bin
+[56/56] cd /home/mrak/projects/soul_of_fiona/build/esp-idf/esptool_py && /home/mrak/.espressif/python_env/idf5.4_py3.12_env/bin/python /home/mrak/esp-idf-stable/components/partition_table/check_sizes.py --offset 0x8000 partition --type app /home/mrak/projects/soul_of_fiona/build/partition_table/partition-table.bin /home/mrak/projects/soul_of_fiona/build/lvgl_demo_v9.bin
+lvgl_demo_v9.bin binary size 0x6e7b70 bytes. Smallest app partition is 0x800000 bytes. 0x118490 bytes (14%) free.

@@ -16,6 +16,8 @@ lv_obj_t * ui_ClimateControl_Slider_FlowSlider = NULL;
 lv_obj_t * ui_ClimateControl_Switch_TempSwitch = NULL;
 lv_obj_t * ui_ClimateControl_Switch_AlignSwitch = NULL;
 lv_obj_t * ui_ClimateControl_Switch_FlpwSwitch = NULL;
+lv_obj_t * ui_ClimateControl_Label_Temperatura = NULL;
+lv_obj_t * ui_ClimateControl_Label_FlowShim = NULL;
 // event funtions
 void ui_event_ClimateControl_Label_LabelCC(lv_event_t * e)
 {
@@ -123,11 +125,12 @@ void ui_Screen_ClimateControl_screen_init(void)
     lv_obj_set_style_text_font(ui_ClimateControl_Label_Label5, &ui_font_BaseFont, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_ClimateControl_Slider_TempSlider = lv_slider_create(ui_Screen_ClimateControl);
-    lv_slider_set_range(ui_ClimateControl_Slider_TempSlider, 0, 255);
-    lv_slider_set_value(ui_ClimateControl_Slider_TempSlider, 128, LV_ANIM_OFF);
+    lv_slider_set_range(ui_ClimateControl_Slider_TempSlider, -20, 20);
+    lv_slider_set_mode(ui_ClimateControl_Slider_TempSlider, LV_SLIDER_MODE_SYMMETRICAL);
+    lv_slider_set_value(ui_ClimateControl_Slider_TempSlider, 0, LV_ANIM_OFF);
     if(lv_slider_get_mode(ui_ClimateControl_Slider_TempSlider) == LV_SLIDER_MODE_RANGE) lv_slider_set_left_value(
             ui_ClimateControl_Slider_TempSlider, 0, LV_ANIM_OFF);
-    lv_obj_set_width(ui_ClimateControl_Slider_TempSlider, 900);
+    lv_obj_set_width(ui_ClimateControl_Slider_TempSlider, 850);
     lv_obj_set_height(ui_ClimateControl_Slider_TempSlider, 60);
     lv_obj_set_x(ui_ClimateControl_Slider_TempSlider, 35);
     lv_obj_set_y(ui_ClimateControl_Slider_TempSlider, -150);
@@ -161,7 +164,7 @@ void ui_Screen_ClimateControl_screen_init(void)
     lv_slider_set_value(ui_ClimateControl_Slider_AlignSlider, 128, LV_ANIM_OFF);
     if(lv_slider_get_mode(ui_ClimateControl_Slider_AlignSlider) == LV_SLIDER_MODE_RANGE) lv_slider_set_left_value(
             ui_ClimateControl_Slider_AlignSlider, 0, LV_ANIM_OFF);
-    lv_obj_set_width(ui_ClimateControl_Slider_AlignSlider, 900);
+    lv_obj_set_width(ui_ClimateControl_Slider_AlignSlider, 850);
     lv_obj_set_height(ui_ClimateControl_Slider_AlignSlider, 60);
     lv_obj_set_x(ui_ClimateControl_Slider_AlignSlider, 35);
     lv_obj_set_y(ui_ClimateControl_Slider_AlignSlider, 50);
@@ -194,7 +197,7 @@ void ui_Screen_ClimateControl_screen_init(void)
     lv_slider_set_value(ui_ClimateControl_Slider_FlowSlider, 128, LV_ANIM_OFF);
     if(lv_slider_get_mode(ui_ClimateControl_Slider_FlowSlider) == LV_SLIDER_MODE_RANGE) lv_slider_set_left_value(
             ui_ClimateControl_Slider_FlowSlider, 0, LV_ANIM_OFF);
-    lv_obj_set_width(ui_ClimateControl_Slider_FlowSlider, 900);
+    lv_obj_set_width(ui_ClimateControl_Slider_FlowSlider, 850);
     lv_obj_set_height(ui_ClimateControl_Slider_FlowSlider, 60);
     lv_obj_set_x(ui_ClimateControl_Slider_FlowSlider, 35);
     lv_obj_set_y(ui_ClimateControl_Slider_FlowSlider, 230);
@@ -246,6 +249,35 @@ void ui_Screen_ClimateControl_screen_init(void)
     lv_obj_set_style_bg_color(ui_ClimateControl_Switch_FlpwSwitch, lv_color_hex(0x00FF17), LV_PART_KNOB | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_ClimateControl_Switch_FlpwSwitch, 255, LV_PART_KNOB | LV_STATE_DEFAULT);
 
+    ui_ClimateControl_Label_Temperatura = lv_label_create(ui_Screen_ClimateControl);
+    lv_obj_set_width(ui_ClimateControl_Label_Temperatura, LV_SIZE_CONTENT);   /// 1024
+    lv_obj_set_height(ui_ClimateControl_Label_Temperatura, LV_SIZE_CONTENT);    /// 60
+    lv_obj_set_x(ui_ClimateControl_Label_Temperatura, 35);
+    lv_obj_set_y(ui_ClimateControl_Label_Temperatura, 134);
+    lv_obj_set_align(ui_ClimateControl_Label_Temperatura, LV_ALIGN_TOP_MID);
+    lv_label_set_text(ui_ClimateControl_Label_Temperatura, "000");
+    lv_obj_set_style_text_color(ui_ClimateControl_Label_Temperatura, lv_color_hex(0xFFFF00),
+                                LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_ClimateControl_Label_Temperatura, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_align(ui_ClimateControl_Label_Temperatura, LV_TEXT_ALIGN_AUTO, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_ClimateControl_Label_Temperatura, &ui_font_BaseFont, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui_ClimateControl_Label_Temperatura, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_ClimateControl_Label_Temperatura, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_ClimateControl_Label_FlowShim = lv_label_create(ui_Screen_ClimateControl);
+    lv_obj_set_width(ui_ClimateControl_Label_FlowShim, LV_SIZE_CONTENT);   /// 1024
+    lv_obj_set_height(ui_ClimateControl_Label_FlowShim, LV_SIZE_CONTENT);    /// 60
+    lv_obj_set_x(ui_ClimateControl_Label_FlowShim, 35);
+    lv_obj_set_y(ui_ClimateControl_Label_FlowShim, 516);
+    lv_obj_set_align(ui_ClimateControl_Label_FlowShim, LV_ALIGN_TOP_MID);
+    lv_label_set_text(ui_ClimateControl_Label_FlowShim, "000");
+    lv_obj_set_style_text_color(ui_ClimateControl_Label_FlowShim, lv_color_hex(0xFFFF00), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_ClimateControl_Label_FlowShim, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_align(ui_ClimateControl_Label_FlowShim, LV_TEXT_ALIGN_AUTO, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_ClimateControl_Label_FlowShim, &ui_font_BaseFont, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui_ClimateControl_Label_FlowShim, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_ClimateControl_Label_FlowShim, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+
     lv_obj_add_event_cb(ui_ClimateControl_Label_LabelCC, ui_event_ClimateControl_Label_LabelCC, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_ClimateControl_Slider_TempSlider, ui_event_ClimateControl_Slider_TempSlider, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_ClimateControl_Slider_AlignSlider, ui_event_ClimateControl_Slider_AlignSlider, LV_EVENT_ALL,
@@ -274,5 +306,7 @@ void ui_Screen_ClimateControl_screen_destroy(void)
     ui_ClimateControl_Switch_TempSwitch = NULL;
     ui_ClimateControl_Switch_AlignSwitch = NULL;
     ui_ClimateControl_Switch_FlpwSwitch = NULL;
+    ui_ClimateControl_Label_Temperatura = NULL;
+    ui_ClimateControl_Label_FlowShim = NULL;
 
 }

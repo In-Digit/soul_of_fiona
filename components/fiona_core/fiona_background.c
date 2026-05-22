@@ -2,7 +2,9 @@
  * @file fiona_background.c
  * @brief Фоновые таймеры и периодическая логика ядра.
  *
- * Управляет отображением «котов» (индикаторов стиля) и аварийного красного кота.
+ * Управляет отображением «котов», индикаторами вентиляторов/климата,
+ * отправкой команд Arduino (режимы охлаждения), подсчётом остановок,
+ * запросом телеметрии Arduino и климата, обновлением дебаг-виджетов.
  */
 
 #include "fiona_core.h"
@@ -95,6 +97,11 @@ extern lv_obj_t * ui_DashBoard_Image_ImageYellow;
 extern lv_obj_t * ui_DashBoard_Image_ImageRed;
 extern lv_obj_t * ui_DashBoard_Image_ImageSpeed;
 
+/* Новые метки дашборда (ШИМ печки и вентиляторов) */
+extern lv_obj_t * ui_DashBoard_Label_CondShim;
+extern lv_obj_t * ui_DashBoard_Label_VFirstShim;
+extern lv_obj_t * ui_DashBoard_Label_VSecondShim;
+
 extern lv_timer_t *poll_timer;
 extern lv_timer_t *clock_timer;
 extern bool screensaver_active;
@@ -133,6 +140,10 @@ bool calibration_active = false;
 
 // Для отслеживания состояния аварийного красного кота
 static bool red_alert_active = false;
+
+// Предыдущие значения режимов для отправки команд Arduino
+static uint8_t last_sent_fan_mode = 0;   // 0=ничего не отправляли
+//static uint8_t last_manual_style = 0;
 
 // Прототипы
 static void fast_timer_cb(lv_timer_t *timer);
@@ -182,7 +193,6 @@ static void fast_timer_cb(lv_timer_t *timer) {
     int light_raw = 0;
     adc_oneshot_read(adc1_handle, ADC_CHANNEL_4, &light_raw);
 
-    // Экспоненциальное сглаживание (α = 0.2)
     smooth_light = smooth_light + 0.2f * ((float)light_raw - smooth_light);
 
     uint8_t max_brightness = 80;
@@ -218,6 +228,13 @@ static void fast_timer_cb(lv_timer_t *timer) {
     // --- Дальше стандартный код, требующий связи со шлюзом ---
     CarData *data = CarData_Get();
     if (!data || !uart_is_gateway_alive()) {
+        // Запрашиваем телеметрию Arduino, даже если шлюз мёртв
+        if (uart_is_arduino_alive()) {
+            static uint8_t arduino_req_counter = 0;
+            if (++arduino_req_counter % 5 == 0) {  // раз в 500 мс
+                uart_send_to_arduino(MSG_FAN_TELEMETRY, NULL, 0);
+            }
+        }
         return;
     }
 
@@ -232,6 +249,18 @@ static void fast_timer_cb(lv_timer_t *timer) {
     if (fast_counter % 2 == 0) {
         uart_send_to_gateway(MSG_SPEED, NULL, 0);
         uart_send_to_gateway(MSG_INST_FUEL, NULL, 0);
+    }
+
+    // Запрос телеметрии климата раз в секунду (каждые 10 циклов по 100 мс)
+    if (fast_counter % 10 == 0) {
+        uart_send_to_gateway(MSG_CLIMATE_TELEMETRY, NULL, 0);
+    }
+
+    // Запрос телеметрии Arduino раз в 500 мс (каждые 5 циклов)
+    if (fast_counter % 5 == 0) {
+        if (uart_is_arduino_alive()) {
+            uart_send_to_arduino(MSG_FAN_TELEMETRY, NULL, 0);
+        }
     }
 
     if (fast_counter >= 10) fast_counter = 0;
@@ -296,7 +325,8 @@ static void clock_timer_cb(lv_timer_t *timer) {
                 state->long_trip = false;
                 state->very_long_trip = false;
             }
-            if (data->speedValue == 0 && data->rpmValue == 0) {
+            // Подсчёт остановок только по скорости
+            if (data->speedValue == 0) {
                 update_stop_history(now);
             }
         }
@@ -391,7 +421,6 @@ static void clock_timer_cb(lv_timer_t *timer) {
         }
 
         if (show) {
-            // Осмысленная реплика – в бегущую строку
             lv_label_set_text(ui_DashBoard_Label_EditionString, phrase.text);
             lv_subject_set_pointer(&subject_dash_message, (void*)phrase.text);
             g_current_tone = phrase.tone;
@@ -414,13 +443,11 @@ static void clock_timer_cb(lv_timer_t *timer) {
         float temp = data->tempValue;
         float lph  = data->lphValue;
         int   rpm  = data->rpmValue;
-        // Условие аварийного красного кота
         if ((temp > 112 && rpm > 400 && lph > 12) || (temp < 90 && lph > 12)) {
             red_condition = true;
         }
     }
 
-    // Всегда скрываем котов и ImageSpeed по умолчанию, потом покажем нужные
     lv_obj_add_flag(ui_DashBoard_Image_ImageCyan, LV_OBJ_FLAG_HIDDEN);
     lv_obj_add_flag(ui_DashBoard_Image_ImageGreen, LV_OBJ_FLAG_HIDDEN);
     lv_obj_add_flag(ui_DashBoard_Image_ImageYellow, LV_OBJ_FLAG_HIDDEN);
@@ -428,29 +455,131 @@ static void clock_timer_cb(lv_timer_t *timer) {
     lv_obj_add_flag(ui_DashBoard_Image_ImageSpeed, LV_OBJ_FLAG_HIDDEN);
 
     if (red_condition) {
-        // Показываем только красного кота
         lv_obj_remove_flag(ui_DashBoard_Image_ImageRed, LV_OBJ_FLAG_HIDDEN);
         red_alert_active = true;
     } else {
         red_alert_active = false;
-        // Нормальное отображение
         if (state) {
-            // Если есть ручной выбор, используем его; иначе берём автоопределение
             uint8_t style = state->manual_style ? state->manual_style : state->driving_style;
             lv_obj_t *cat_to_show = NULL;
-            if (style == 1) cat_to_show = ui_DashBoard_Image_ImageGreen;   // спокойный
-            else if (style == 2) cat_to_show = ui_DashBoard_Image_ImageYellow; // агрессивный
-            else if (style == 3) cat_to_show = ui_DashBoard_Image_ImageCyan;   // спорт
-            // style == 0 – не показываем ничего
+            if (style == 1) cat_to_show = ui_DashBoard_Image_ImageGreen;
+            else if (style == 2) cat_to_show = ui_DashBoard_Image_ImageYellow;
+            else if (style == 3) cat_to_show = ui_DashBoard_Image_ImageCyan;
 
             if (cat_to_show) {
                 lv_obj_remove_flag(cat_to_show, LV_OBJ_FLAG_HIDDEN);
             }
 
-            // Индикатор ручного режима
             if (state->manual_style != 0) {
                 lv_obj_remove_flag(ui_DashBoard_Image_ImageSpeed, LV_OBJ_FLAG_HIDDEN);
             }
+        }
+    }
+
+    // ============ ОТПРАВКА РЕЖИМА ARDUINO ============
+    if (uart_is_arduino_alive()) {
+        uint8_t desired_mode = 1; // Normal по умолчанию
+        // Определяем желаемый режим охлаждения на основе driving_mode/manual_style
+        if (state) {
+            if (state->manual_style != 0) {
+                // Ручной выбор стиля
+                if (state->manual_style == 3) desired_mode = 3;      // Спорт -> City
+                else desired_mode = 1;                               // Спокойный/Агрессивный -> Normal
+            } else {
+                // Автоматический режим
+                switch (state->driving_mode) {
+                    case 3: desired_mode = 2; break;   // HIGHWAY -> Highway
+                    case 2: desired_mode = 3; break;   // TRAFFIC -> City
+                    default: desired_mode = 1; break;   // остальные -> Normal
+                }
+            }
+        }
+
+        // Отправляем, только если режим изменился
+        if (desired_mode != last_sent_fan_mode) {
+            uint8_t mode_payload = desired_mode;
+            uart_send_to_arduino(MSG_FAN_SET_MODE, &mode_payload, 1);
+            last_sent_fan_mode = desired_mode;
+            // При отправке режима помечаем, что Arduino не в автономном режиме
+            CarData_Lock(10);
+            data->arduino_mode_from_screen = true;
+            CarData_Unlock();
+        }
+    } else {
+        last_sent_fan_mode = 0; // сброс при потере связи
+    }
+
+    // ============ ИНДИКАТОРЫ ВЕНТИЛЯТОРОВ И КЛИМАТА ============
+    CarData_Lock(10);
+    uint8_t fan1 = data->fanCurrentPWM1;
+    uint8_t fan2 = data->fanCurrentPWM2;
+    bool arduino_auto = !data->arduino_mode_from_screen;
+    float cabin_temp = data->cabin_temp;
+    float target_temp = data->climate_target_temp;
+    uint8_t heater_pwm = data->heater_pwm;
+    int speed_kmh = data->speedValue;
+    CarData_Unlock();
+
+    // Вентиляторы радиатора
+    lv_obj_add_flag(ui_DashBoard_Image_RFirstVent, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_add_flag(ui_DashBoard_Image_RSecondVent, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_add_flag(ui_DashBoard_Image_RFirstVentAlert, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_add_flag(ui_DashBoard_Image_RSecondVentAlert, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_add_flag(ui_DashBoard_Image_RSecondVentAlert1, LV_OBJ_FLAG_HIDDEN);
+
+    if (fan1 > 0) {
+        lv_obj_remove_flag(ui_DashBoard_Image_RFirstVent, LV_OBJ_FLAG_HIDDEN);
+        if (fan1 > 191) lv_obj_remove_flag(ui_DashBoard_Image_RFirstVentAlert, LV_OBJ_FLAG_HIDDEN);
+    }
+    if (fan2 > 0) {
+        lv_obj_remove_flag(ui_DashBoard_Image_RSecondVent, LV_OBJ_FLAG_HIDDEN);
+        if (fan2 > 191) lv_obj_remove_flag(ui_DashBoard_Image_RSecondVentAlert, LV_OBJ_FLAG_HIDDEN);
+    }
+    if (arduino_auto) {
+        lv_obj_remove_flag(ui_DashBoard_Image_RSecondVentAlert1, LV_OBJ_FLAG_HIDDEN);
+    }
+
+    // Иконки климата
+    lv_obj_add_flag(ui_DashBoard_Image_FreeWind, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_add_flag(ui_DashBoard_Image_ConditionHot, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_add_flag(ui_DashBoard_Image_ConditionCold, LV_OBJ_FLAG_HIDDEN);
+
+    // FreeWind: скорость >20 км/ч и печка выключена
+    if (speed_kmh > 20 && heater_pwm == 0) {
+        lv_obj_remove_flag(ui_DashBoard_Image_FreeWind, LV_OBJ_FLAG_HIDDEN);
+    }
+
+    // ConditionHot/ConditionCold: разница температур вне зоны [-5..+3]
+    float diff = cabin_temp - target_temp;
+    if (diff > 3.0f) {
+        lv_obj_remove_flag(ui_DashBoard_Image_ConditionCold, LV_OBJ_FLAG_HIDDEN);
+    } else if (diff < -5.0f) {
+        lv_obj_remove_flag(ui_DashBoard_Image_ConditionHot, LV_OBJ_FLAG_HIDDEN);
+    }
+
+    // ============ НОВЫЕ МЕТКИ ШИМ НА ДАШБОРДЕ ============
+    if (ui_DashBoard_Label_CondShim) {
+        if (heater_pwm > 0) {
+            lv_label_set_text_fmt(ui_DashBoard_Label_CondShim, "%d%%", (heater_pwm * 100) / 255);
+            lv_obj_remove_flag(ui_DashBoard_Label_CondShim, LV_OBJ_FLAG_HIDDEN);
+        } else {
+            lv_obj_add_flag(ui_DashBoard_Label_CondShim, LV_OBJ_FLAG_HIDDEN);
+        }
+    }
+    if (ui_DashBoard_Label_VFirstShim) {
+        if (fan1 > 0) {
+            lv_label_set_text_fmt(ui_DashBoard_Label_VFirstShim, "%d%%", (fan1 * 100) / 255);
+            lv_obj_remove_flag(ui_DashBoard_Label_VFirstShim, LV_OBJ_FLAG_HIDDEN);
+        } else {
+            lv_obj_add_flag(ui_DashBoard_Label_VFirstShim, LV_OBJ_FLAG_HIDDEN);
+        }
+    }
+    if (ui_DashBoard_Label_VSecondShim) {
+        if (fan2 > 0) {
+            lv_label_set_text_fmt(ui_DashBoard_Label_VSecondShim, "%d%%", (fan2 * 100) / 255);
+            lv_obj_remove_flag(ui_DashBoard_Label_VSecondShim, LV_OBJ_FLAG_HIDDEN);
+        } else {
+            lv_obj_add_flag(ui_DashBoard_Label_VSecondShim, LV_OBJ_FLAG_HIDDEN);
         }
     }
 
@@ -459,7 +588,6 @@ static void clock_timer_cb(lv_timer_t *timer) {
     float bat_voltage = data->batValue;
     float fuel_level = data->fuelValue;
     int temp_coolant = data->tempValue;
-    int speed_kmh = data->speedValue;
     int current_rpm = data->rpmValue;
     uint32_t odo_val = data->odoKm;
     bool arduino_alive = data->uartArduinoAlive;
@@ -478,7 +606,7 @@ static void clock_timer_cb(lv_timer_t *timer) {
     indicators_ok[4] = sd_stats_check();
     indicators_ok[5] = sd_presets_check();
 
-    // --- Новый формат виджета ESP32 ---
+    // --- Виджет ESP32 ---
     snprintf(esp32_status_text, sizeof(esp32_status_text),
              "Speed: %d km/h\n"
              "RPM: %d\n"
@@ -488,39 +616,62 @@ static void clock_timer_cb(lv_timer_t *timer) {
              "Accel X:%.2f Y:%.2f Z:%.2f m/s²\n"
              "Gyro X:%.2f Y:%.2f Z:%.2f °/s\n"
              "Tilt R:%d P:%d deg\n"
-             "Light: %d",
+             "Light: %d\n"
+             "Target T: %.1f°C\n"
+             "Cabin T: %.1f°C\n"
+             "Heater PWM: %d",
              speed_kmh, current_rpm,
              bat_voltage, fuel_level, odo_val,
              current_accel_x, current_accel_y, current_accel_z,
              data->gyro_x, data->gyro_y, data->gyro_z,
              data->tilt_roll, data->tilt_pitch,
-             light_raw);
+             light_raw,
+             data->climate_target_temp,
+             data->cabin_temp,
+             data->heater_pwm);
 
+    // --- Виджет Arduino ---
     snprintf(arduino_status_text, sizeof(arduino_status_text),
-             "Статус: %s", arduino_alive ? "На связи" : "Нет связи");
+             "Link: %s\n"
+             "Fan1 PWM: %d (%d%%)\n"
+             "Fan2 PWM: %d (%d%%)\n"
+             "Coolant: %.1f°C\n"
+             "Mode: %s\n"
+             "Auto: %s",
+             arduino_alive ? "OK" : "NO",
+             data->fanCurrentPWM1, (data->fanCurrentPWM1 * 100) / 255,
+             data->fanCurrentPWM2, (data->fanCurrentPWM2 * 100) / 255,
+             data->arduino_coolant_temp,
+             data->arduino_fan_mode == 1 ? "NORMAL" : (data->arduino_fan_mode == 2 ? "HIGHWAY" : "CITY"),
+             data->arduino_mode_from_screen ? "SCREEN" : "AUTO");
 
-    // --- Новый формат виджета Экран ---
     snprintf(screen_status_text, sizeof(screen_status_text),
              "Uptime: %lu sec\n"
              "SD: %s\n"
              "GW: %s\n"
+             "Ard: %s\n"
              "Speech: %s\n"
              "Stat: %s\n"
              "Preset: %s\n"
-             "Calib: 0x%02X",
+             "Calib: 0x%02X\n"
+             "DrvMode: %d\n"
+             "DrvStyle: %d",
              (uint32_t)(now - data->systemTime + 1),
              indicators_ok[0] ? "OK" : "ERR",
              indicators_ok[2] ? "OK" : "ERR",
+             indicators_ok[1] ? "OK" : "ERR",
              indicators_ok[3] ? "OK" : "ERR",
              indicators_ok[4] ? "OK" : "ERR",
              indicators_ok[5] ? "OK" : "ERR",
-             data->calib_status);
+             data->calib_status,
+             state ? state->driving_mode : -1,
+             state ? state->driving_style : -1);
 
     lv_textarea_set_text(ui_System_Textarea_TextAreaArduino, arduino_status_text);
     lv_textarea_set_text(ui_System_Textarea_TextAreaESP, esp32_status_text);
     lv_textarea_set_text(ui_System_Textarea_TextAreaScreen, screen_status_text);
 
-    // Индикаторы (мигание) – тоже всегда
+    // Индикаторы (мигание)
     static bool blink_toggle = false;
     blink_toggle = !blink_toggle;
     struct {

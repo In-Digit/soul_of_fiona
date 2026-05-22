@@ -31,6 +31,8 @@ extern void ui_event_ClimateControl_Switch_AlignSwitch(lv_event_t * e);
 extern lv_obj_t * ui_ClimateControl_Switch_AlignSwitch;
 extern void ui_event_ClimateControl_Switch_FlpwSwitch(lv_event_t * e);
 extern lv_obj_t * ui_ClimateControl_Switch_FlpwSwitch;
+extern lv_obj_t * ui_ClimateControl_Label_Temperatura;
+extern lv_obj_t * ui_ClimateControl_Label_FlowShim;
 // CUSTOM VARIABLES
 
 #ifdef __cplusplus

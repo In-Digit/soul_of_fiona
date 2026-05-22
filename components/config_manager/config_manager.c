@@ -1,3 +1,12 @@
+/**
+ * @file config_manager.c
+ * @brief Загрузка и сохранение конфигурации CarData в JSON на SD-карте.
+ *
+ * Обрабатывает настройки интерфейса, пороги, калибровки, а также новые поля:
+ *   - climateCalibStartPoint, climateCalibStopPoint, climateCalibNoiseLow, climateCalibNoiseHigh
+ *   - climate_target_temp, temp_offset_arduino (опционально)
+ */
+
 #include "config_manager.h"
 #include "cJSON.h"
 #include "esp_log.h"
@@ -112,6 +121,16 @@ static bool apply_json_to_car_data(CarData *data, const char *json_str) {
         if ((item = cJSON_GetObjectItem(clim, "climate_setpoint")))data->climateSetpoint = (float)item->valuedouble;
     }
 
+    // --------------- НОВЫЕ ПОЛЯ КАЛИБРОВКИ КЛИМАТА ---------------
+    cJSON *calib = cJSON_GetObjectItem(root, "climate_calib");
+    if (cJSON_IsObject(calib)) {
+        cJSON *item;
+        if ((item = cJSON_GetObjectItem(calib, "start_point")))    data->climateCalibStartPoint = (uint8_t)item->valueint;
+        if ((item = cJSON_GetObjectItem(calib, "stop_point")))     data->climateCalibStopPoint = (uint8_t)item->valueint;
+        if ((item = cJSON_GetObjectItem(calib, "noise_low")))      data->climateCalibNoiseLow = (uint8_t)item->valueint;
+        if ((item = cJSON_GetObjectItem(calib, "noise_high")))     data->climateCalibNoiseHigh = (uint8_t)item->valueint;
+    }
+
     cJSON *light = cJSON_GetObjectItem(root, "light");
     if (cJSON_IsObject(light)) {
         cJSON *item;
@@ -210,6 +229,13 @@ static cJSON *car_data_to_json(const CarData *data) {
     cJSON_AddNumberToObject(clim, "fan_ki", data->fanKi);
     cJSON_AddNumberToObject(clim, "fan_kd", data->fanKd);
     cJSON_AddNumberToObject(clim, "climate_setpoint", data->climateSetpoint);
+
+    // --------------- КАЛИБРОВОЧНЫЕ ТОЧКИ КЛИМАТА ---------------
+    cJSON *calib = cJSON_AddObjectToObject(root, "climate_calib");
+    cJSON_AddNumberToObject(calib, "start_point", data->climateCalibStartPoint);
+    cJSON_AddNumberToObject(calib, "stop_point", data->climateCalibStopPoint);
+    cJSON_AddNumberToObject(calib, "noise_low", data->climateCalibNoiseLow);
+    cJSON_AddNumberToObject(calib, "noise_high", data->climateCalibNoiseHigh);
 
     cJSON *light = cJSON_AddObjectToObject(root, "light");
     cJSON_AddNumberToObject(light, "brightness", data->backlight_brightness);

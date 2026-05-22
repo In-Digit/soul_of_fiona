@@ -1,6 +1,6 @@
 /**
  * @file uart_rx_dashboard.c
- * @brief Обработка пакетов с дашборд-данными (скорость, обороты, температура и т.д.)
+ * @brief Обработка пакетов с дашборд-данными (скорость, обороты, температура, климат и т.д.)
  */
 
 #include "uart_rx_dashboard.h"
@@ -175,6 +175,27 @@ void uart_rx_dashboard_process(uint8_t msg_id, const uint8_t *payload, uint8_t l
                 data->throttleDirty = true;
             }
             break;
+
+        // --------------- КЛИМАТ-ТЕЛЕМЕТРИЯ (0xC9) ---------------
+        case MSG_CLIMATE_TELEMETRY:
+            if (len >= 4) {
+                // Байт 0: желаемая температура (подтверждённая шлюзом)
+                float target = (float)payload[0];
+                // Байт 1: ШИМ печки (0..255)
+                uint8_t pwm = payload[1];
+                // Байты 2-3: температура салона ×10 (int16, little-endian)
+                int16_t cabin_raw = (int16_t)(payload[2] | (payload[3] << 8));
+                float cabin = cabin_raw / 10.0f;
+
+                data->climate_target_temp = target;
+                data->heater_pwm = pwm;
+                data->cabin_temp = cabin;
+                data->climate_target_dirty = true;
+                data->heater_pwm_dirty = true;
+                data->cabin_temp_dirty = true;
+            }
+            break;
+
         default:
             break;
     }

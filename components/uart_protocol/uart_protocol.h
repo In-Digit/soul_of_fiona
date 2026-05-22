@@ -1,6 +1,6 @@
 /**
  * @file uart_protocol.h
- * @brief Публичный API UART-протокола (асинхронный приём, отправка).
+ * @brief Публичный API UART-протокола (асинхронный приём, отправка, конфигурация).
  */
 
 #ifndef UART_PROTOCOL_H
@@ -20,8 +20,8 @@ typedef struct {
 } uart_pin_config_t;
 
 /**
- * @brief Инициализировать UART-порты с фиксированными пинами и скоростью 115200.
- * @param uart_pins Массив конфигураций пинов (2 элемента: UART1 для шлюза, UART2 для Arduino).
+ * @brief Инициализировать UART-порты (оба на 921600). Позже один из них будет переключён на 115200 для Arduino.
+ * @param uart_pins Массив конфигураций пинов (2 элемента).
  * @param count     Количество портов (обычно 2).
  * @return true при успешной инициализации.
  */
@@ -42,7 +42,7 @@ void uart_protocol_deinit(void);
 bool uart_send_broadcast(uint8_t msg_id, const uint8_t *payload, uint8_t len);
 
 /**
- * @brief Отправить пакет данных на шлюз.
+ * @brief Отправить пакет данных на шлюз (порт gateway).
  * @param msg_id  Тип сообщения.
  * @param payload Указатель на данные (до 4 байт).
  * @param len     Длина данных (0–4).
@@ -51,41 +51,56 @@ bool uart_send_broadcast(uint8_t msg_id, const uint8_t *payload, uint8_t len);
 bool uart_send_to_gateway(uint8_t msg_id, const uint8_t *payload, uint8_t len);
 
 /**
- * @brief Установить остаток топлива (MSG_SET_FUEL_LEVEL, 0x53).
- * @param liters Текущий остаток топлива в литрах (будет умножен на 100 и отправлен как uint16 в little-endian).
+ * @brief Отправить пакет данных на Arduino (порт arduino).
+ * @param msg_id  Тип сообщения.
+ * @param payload Указатель на данные (до 4 байт).
+ * @param len     Длина данных (0–4).
+ * @return true при успешной отправке.
+ */
+bool uart_send_to_arduino(uint8_t msg_id, const uint8_t *payload, uint8_t len);
+
+// ... (остальные объявления из предыдущей версии, плюс новые ниже)
+
+/**
+ * @brief Установить остаток топлива (MSG_SET_FUEL_LEVEL).
  */
 void uart_send_set_fuel_level(float liters);
-
-/**
- * @brief Установить одометр (MSG_SET_ODO, 0x54).
- * @param odo_km Пробег в километрах (отправляется как uint32 в little-endian).
- */
 void uart_send_set_odo(uint32_t odo_km);
-
-/**
- * @brief Отправить данные заправки (MSG_REFUEL_DATA, 0x50).
- * @param liters_added Количество добавленного топлива в литрах (умножается на 10).
- * @param price_per_liter Цена за литр в рублях (умножается на 100).
- */
 void uart_send_refuel_data(float liters_added, float price_per_liter);
-
-/**
- * @brief Отправить флаг полного бака (MSG_FULL_TANK_FLAG, 0x52).
- * @param flag 0 или 1.
- */
 void uart_send_full_tank_flag(uint8_t flag);
 
 /**
- * @brief Проверить, была ли активность на линии (получен любой пакет) за последние 6 секунд.
- * @return true, если связь есть.
+ * @brief Проверить, жив ли шлюз (последний успешный приём не старше 6 секунд).
  */
 bool uart_is_gateway_alive(void);
 
 /**
- * @brief Получить MsgID последнего успешно принятого кадра.
- * @return MsgID последнего принятого кадра (0, если не было).
+ * @brief Проверить, жива ли Arduino (аналогично).
  */
+bool uart_is_arduino_alive(void);
+
 uint8_t uart_get_last_rx_msgid(void);
+
+/**
+ * @brief Изменить скорость порта (например, для Arduino на 115200).
+ */
+void uart_set_port_baudrate(int uart_num, int baudrate);
+
+/**
+ * @brief Назначить указанный UART портом Arduino и переключить его на 115200.
+ */
+void uart_set_arduino_port(int uart_num);
+
+/**
+ * @brief Получить текущий номер UART-порта, назначенного Arduino.
+ * @return Номер порта (UART_NUM_1 или UART_NUM_2) или -1, если ещё не назначен.
+ */
+int uart_get_arduino_port(void);
+
+/**
+ * @brief Обновить временную метку последнего приёма от Arduino.
+ */
+void uart_notify_arduino_rx(void);
 
 #ifdef __cplusplus
 }

@@ -145,6 +145,43 @@
 #define MSG_REQ_TILT          0xA2
 #define MSG_CALIBRATE_ACCEL   0xA3
 #define MSG_REQ_CALIB_STATUS  0xA4
+
+// Управление вентиляторами и климатом
+#define MSG_FAN_SET_MODE           0xC0
+#define MSG_FAN_SET_PWM1           0xC1
+#define MSG_FAN_SET_PWM2           0xC2
+#define MSG_FAN_SET_AUTO           0xC3
+#define MSG_CLIMATE_SET_PRESET     0xC4
+#define MSG_CLIMATE_SET_TEMP       0xC5   // температура (int16, десятые доли °C)
+#define MSG_CLIMATE_SET_PWM        0xC6   // ШИМ печки 0-255
+#define MSG_CLIMATE_SET_AUTO       0xC7   // авто/ручной
+
+// Телеметрия климата (запрос/ответ)
+#define MSG_FAN_TELEMETRY          0xC8
+#define MSG_CLIMATE_TELEMETRY      0xC9
+
+// Калибровка вентиляторов радиатора
+#define MSG_FAN_CALIB_START        0xCA
+#define MSG_FAN_CALIB_STEP         0xCB
+#define MSG_FAN_CALIB_START_POINT  0xCC
+#define MSG_FAN_CALIB_STOP_POINT   0xCD
+#define MSG_FAN_CALIB_NOISE_LOW    0xCE
+#define MSG_FAN_CALIB_NOISE_HIGH   0xCF
+#define MSG_FAN_CALIB_SAVE         0xD0
+
+// Калибровка печки
+#define MSG_HEATER_CALIB_START       0xD1
+#define MSG_HEATER_CALIB_STEP        0xD2
+#define MSG_HEATER_CALIB_START_POINT 0xD3
+#define MSG_HEATER_CALIB_STOP_POINT  0xD4
+#define MSG_HEATER_CALIB_NOISE_LOW   0xD5
+#define MSG_HEATER_CALIB_NOISE_HIGH  0xD6
+#define MSG_HEATER_CALIB_SAVE        0xD7
+
+// Температурное смещение Arduino
+#define MSG_TEMP_OFFSET_SET   0xE0   // установить смещение (int16, десятые доли °C)
+#define MSG_TEMP_OFFSET_GET   0xE1   // запросить текущее смещение
+
 uint8_t crc8_calculate(const uint8_t *data, size_t len);
 
 #endif // PROTOCOL_H

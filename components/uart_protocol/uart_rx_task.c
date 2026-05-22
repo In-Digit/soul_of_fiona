@@ -2,6 +2,7 @@
  * @file uart_rx_task.c
  * @brief Задача приёма UART-пакетов и диспетчеризация по обработчикам.
  *        Классический приём кадров фиксированной длины (10 байт).
+ *        Пакеты с Arduino направляются в uart_rx_arduino_process.
  */
 
 #include "freertos/FreeRTOS.h"
@@ -49,6 +50,7 @@ void uart_rx_task(void *arg) {
                         uint8_t crc_calc = crc8_calculate(rx_buffer, FRAME_TOTAL_SIZE - 1);
                         if (crc_calc == rx_buffer[FRAME_TOTAL_SIZE - 1]) {
                             process_frame(uart_num, rx_buffer);
+                            // При любом успешном кадре сбрасываем таймаут шлюза
                             last_rx_time_us = esp_timer_get_time();
                         } else {
                             ESP_LOGW(TAG, "CRC error on UART%d", uart_num);
@@ -71,6 +73,13 @@ void process_frame(int uart_num, const uint8_t *frame) {
     const uint8_t *payload = &frame[5];
 
     last_rx_msg_id = msg_id;
+
+    // Если это порт Arduino – отправляем весь пакет в обработчик Arduino
+    int arduino_port = uart_get_arduino_port();
+    if (arduino_port >= 0 && uart_num == arduino_port) {
+        uart_rx_arduino_process(msg_id, payload, len);
+        return;
+    }
 
     // Heartbeat запрос от шлюза (теперь с временем)
     if (msg_id == MSG_HEARTBEAT_REQ) {
@@ -103,13 +112,12 @@ void process_frame(int uart_num, const uint8_t *frame) {
             CarData_Unlock();
         }
         uart_send_to_gateway(MSG_HEARTBEAT_RSP, &flags, 1);
-        last_rx_time_us = esp_timer_get_time();
         return;
     }
 
-    // Heartbeat ответ от шлюза
+    // Heartbeat ответ от шлюза (может приходить и от Arduino, но мы уже отсеяли по порту)
     if (msg_id == MSG_HEARTBEAT_RSP) {
-        last_rx_time_us = esp_timer_get_time();
+        // Этот путь только для шлюза (если порт не Arduino)
         return;
     }
 
@@ -124,7 +132,6 @@ void process_frame(int uart_num, const uint8_t *frame) {
                 CarData_Unlock();
             }
         }
-        last_rx_time_us = esp_timer_get_time();
         return;
     }
 
@@ -134,7 +141,6 @@ void process_frame(int uart_num, const uint8_t *frame) {
         msg_id == MSG_DRIVE_CYCLE_DATA || msg_id == MSG_DRIVE_CYCLE_END ||
         (msg_id >= 0x50 && msg_id <= 0x5C && s_in_drive_cycle)) {
         uart_rx_stats_process(msg_id, payload, len);
-        last_rx_time_us = esp_timer_get_time();
         return;
     }
 
@@ -142,14 +148,13 @@ void process_frame(int uart_num, const uint8_t *frame) {
     if (msg_id == MSG_REQ_ACCEL || msg_id == MSG_ACCEL_Z || msg_id == MSG_REQ_GYRO ||
         msg_id == MSG_REQ_TILT || msg_id == MSG_REQ_CALIB_STATUS) {
         uart_rx_imu_process(msg_id, payload, len);
-        last_rx_time_us = esp_timer_get_time();
         return;
     }
 
-    // Данные от Arduino
+    // Данные от Arduino (если по какой-то причине пакет пришёл не на порт Arduino, 
+    // но адресован от Arduino — запасной путь)
     if (src == ADDR_ARDUINO) {
         uart_rx_arduino_process(msg_id, payload, len);
-        last_rx_time_us = esp_timer_get_time();
         return;
     }
 
@@ -161,5 +166,4 @@ void process_frame(int uart_num, const uint8_t *frame) {
         msg_id == MSG_LIGHT_RAW) {
         uart_rx_dashboard_process(msg_id, payload, len);
     }
-    last_rx_time_us = esp_timer_get_time();
 }

@@ -1,6 +1,9 @@
 /**
  * @file uart_protocol.c
- * @brief Реализация публичного API UART-протокола (инициализация, отправка).
+ * @brief Реализация публичного API UART-протокола (инициализация, отправка, статус).
+ *
+ * Поддерживает два порта: gateway (шлюз) и arduino (вентиляторы радиатора).
+ * После обнаружения шлюза порт Arduino переводится на 115200 бод.
  */
 
 #include "uart_protocol.h"
@@ -16,15 +19,20 @@ static const char *TAG = "UART_PROTO";
 
 #define MAX_UART_PORTS 2
 #define UART_BAUD_RATE 921600
+#define UART_BAUD_ARDUINO 115200
 #define UART_RX_BUFFER_SIZE 1024
 
 static int gateway_uart_num = -1;
 static int arduino_uart_num = -1;
 volatile int64_t last_rx_time_us = 0;
+volatile int64_t last_rx_arduino_time_us = 0;
 volatile uint8_t last_rx_msg_id = 0;
 
 // Предварительное объявление внутренней функции отправки кадра
 static bool uart_send_frame(int uart_num, uint8_t msg_id, uint8_t dst, const uint8_t *payload, uint8_t len);
+
+// Внешние функции из uart_rx_task.c
+extern void uart_rx_task(void *arg);
 
 uint8_t crc8_calculate(const uint8_t *data, size_t len) {
     uint8_t crc = 0;
@@ -62,7 +70,7 @@ bool uart_protocol_init(const uart_pin_config_t *uart_pins, size_t count) {
         if (i == 0) {
             gateway_uart_num = uart_num;
         } else {
-            arduino_uart_num = uart_num;
+            arduino_uart_num = uart_num;  // временно, до обнаружения шлюза
         }
         ESP_LOGI(TAG, "UART%d initialized (TX:%d, RX:%d) at %d baud",
                  uart_num, uart_pins[i].tx, uart_pins[i].rx, UART_BAUD_RATE);
@@ -71,6 +79,7 @@ bool uart_protocol_init(const uart_pin_config_t *uart_pins, size_t count) {
     xTaskCreate(uart_rx_task, "uart_rx", 4096, (void*)(uintptr_t)count, 1, NULL);
 
     last_rx_time_us = esp_timer_get_time();
+    last_rx_arduino_time_us = esp_timer_get_time();
     return true;
 }
 
@@ -93,6 +102,11 @@ bool uart_send_broadcast(uint8_t msg_id, const uint8_t *payload, uint8_t len) {
 bool uart_send_to_gateway(uint8_t msg_id, const uint8_t *payload, uint8_t len) {
     if (gateway_uart_num < 0) return false;
     return uart_send_frame(gateway_uart_num, msg_id, ADDR_ESP32_GW, payload, len);
+}
+
+bool uart_send_to_arduino(uint8_t msg_id, const uint8_t *payload, uint8_t len) {
+    if (arduino_uart_num < 0) return false;
+    return uart_send_frame(arduino_uart_num, msg_id, ADDR_ARDUINO, payload, len);
 }
 
 static bool uart_send_frame(int uart_num, uint8_t msg_id, uint8_t dst, const uint8_t *payload, uint8_t len) {
@@ -149,6 +163,47 @@ bool uart_is_gateway_alive(void) {
     return (now - last_rx_time_us) < 6000000;
 }
 
+bool uart_is_arduino_alive(void) {
+    int64_t now = esp_timer_get_time();
+    return (now - last_rx_arduino_time_us) < 6000000;
+}
+
 uint8_t uart_get_last_rx_msgid(void) {
     return last_rx_msg_id;
+}
+
+/**
+ * @brief Переключить скорость UART-порта.
+ * @param uart_num Номер порта (UART_NUM_1 или UART_NUM_2).
+ * @param baudrate Желаемая скорость.
+ */
+void uart_set_port_baudrate(int uart_num, int baudrate) {
+    uart_set_baudrate(uart_num, baudrate);
+    ESP_LOGI(TAG, "UART%d baudrate changed to %d", uart_num, baudrate);
+}
+
+/**
+ * @brief Зафиксировать порт Arduino и переключить его на 115200.
+ * @param uart_num Номер порта, на котором обнаружена Arduino.
+ */
+void uart_set_arduino_port(int uart_num) {
+    arduino_uart_num = uart_num;
+    uart_set_port_baudrate(arduino_uart_num, UART_BAUD_ARDUINO);
+    ESP_LOGI(TAG, "Arduino assigned to UART%d", arduino_uart_num);
+}
+
+/**
+ * @brief Получить текущий номер UART-порта, назначенного Arduino.
+ * @return Номер порта или -1, если ещё не назначен.
+ */
+int uart_get_arduino_port(void) {
+    return arduino_uart_num;
+}
+
+/**
+ * @brief Обновить временную метку последнего приёма от Arduino.
+ * Вызывается из uart_rx_arduino при успешном приёме пакета.
+ */
+void uart_notify_arduino_rx(void) {
+    last_rx_arduino_time_us = esp_timer_get_time();
 }

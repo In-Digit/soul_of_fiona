@@ -1,3 +1,11 @@
+/**
+ * @file CarData.c
+ * @brief Реализация центрального хранилища данных автомобиля.
+ *
+ * Управление структурой CarData, включая инициализацию значений по умолчанию,
+ * потокобезопасный доступ и вычисление цветовых индексов.
+ */
+
 #include "CarData.h"
 #include <string.h>
 #include <stdio.h>
@@ -112,6 +120,26 @@ void CarData_init(CarData* data) {
     data->fanManualPWM = 0;
     data->climateManualPWM = 0;
 
+    // --------------- НОВЫЕ ПОЛЯ ARDUINO ---------------
+    data->arduino_coolant_temp = 0.0f;
+    data->arduino_coolant_dirty = false;
+    data->arduino_fan_mode = 1; // Normal по умолчанию
+    data->arduino_mode_from_screen = false;
+
+    // --------------- НОВЫЕ ПОЛЯ КЛИМАТА ---------------
+    data->climate_target_temp = 22.0f;
+    data->cabin_temp = 22.0f;
+    data->heater_pwm = 0;
+    data->climate_target_dirty = false;
+    data->cabin_temp_dirty = false;
+    data->heater_pwm_dirty = false;
+
+    // --------------- КАЛИБРОВОЧНЫЕ ТОЧКИ ---------------
+    data->climateCalibStartPoint = 0;
+    data->climateCalibStopPoint = 0;
+    data->climateCalibNoiseLow = 0;
+    data->climateCalibNoiseHigh = 0;
+
     strncpy(data->wifiSsid1, "Tri-Al(m)", sizeof(data->wifiSsid1)-1);
     strncpy(data->wifiPass1, "Ford-Fiona", sizeof(data->wifiPass1)-1);
     strncpy(data->wifiSsid2, "Tri-AL", sizeof(data->wifiSsid2)-1);
@@ -206,7 +234,6 @@ void CarData_init(CarData* data) {
     data->tilt_pitch = 0;
     data->calib_status = 0;
 
-    // Пиковые перегрузки – начинаем с нуля, дальше автообновление
     data->max_pos_accel_g = 0.0f;
     data->max_neg_accel_g = 0.0f;
 
