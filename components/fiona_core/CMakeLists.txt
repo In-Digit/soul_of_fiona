@@ -4,5 +4,5 @@ idf_component_register(
          "fiona_observers.c"
          "fiona_animations.c"
     INCLUDE_DIRS "."
-    REQUIRES nvs_flash spiffs car_data lvgl__lvgl uart_protocol sd_utils fiona_soul fiona_brain config_manager esp_timer driver esp_adc bsp_extra espressif__esp32_p4_function_ev_board
+    REQUIRES nvs_flash spiffs car_data lvgl__lvgl uart_protocol sd_utils fiona_soul fiona_brain config_manager esp_timer driver esp_adc bsp_extra espressif__esp32_p4_function_ev_board rtc_driver gui fiona_io_poller
 )

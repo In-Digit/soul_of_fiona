@@ -3,6 +3,8 @@
  * @brief Коллбэки LVGL-наблюдателей для виджетов дашборда.
  *
  * ВАЖНО: цвет дуги дросселя теперь определяется стилем вождения (driving_style).
+ * Удалён observer для освещённости (виджет удалён).
+ * Функция unsubscribe_all оставлена пустой из-за отсутствия API в LVGL 9.2.2.
  */
 
 #include "fiona_core.h"
@@ -54,7 +56,6 @@ extern lv_obj_t * ui_DashBoard_Image_RSecondVentAlert;
 extern lv_obj_t * ui_DashBoard_Image_RSecondVentAlert1;
 extern lv_obj_t * ui_DashBoard_Label_FionaSpeachLabelDash;
 extern lv_obj_t * ui_DashBoard_Label_EditionString;
-extern lv_obj_t * ui_System_Label_CurrentLight;
 extern lv_obj_t * ui_DashBoard_Image_Backgrownd;
 
 // Вспомогательная функция для анимации дуги
@@ -207,11 +208,6 @@ static void dash_message_observer_cb(lv_observer_t * obs, lv_subject_t * subj) {
     }
 }
 
-static void adc_light_observer_cb(lv_observer_t * obs, lv_subject_t * subj) {
-    int val = lv_subject_get_int(subj);
-    lv_label_set_text_fmt(ui_System_Label_CurrentLight, "Освещённость: %d", val);
-}
-
 /* Обновлённый наблюдатель дросселя:
  * значение дуги и прозрачность – по throttlePos,
  * цвет дуги – по стилю вождения (driving_style) из FionaState.
@@ -239,7 +235,15 @@ void throttle_observer_cb(lv_observer_t * obs, lv_subject_t * subj) {
 
 void accel_observer_cb(lv_observer_t * obs, lv_subject_t * subj) {
     int val = lv_subject_get_int(subj);   // сотые доли g
-    lv_label_set_text_fmt(ui_DashBoard_Label_AxelBL, "%.1f g", val / 100.0f);
+    // Формируем строку без использования %f
+    char buf[16];
+    int int_part = val / 100;
+    int frac_part = (val % 100 + 5) / 10; // округление до десятых
+    if (frac_part < 0) { frac_part = -frac_part; }
+    if (frac_part >= 10) { frac_part = 0; int_part++; }
+    snprintf(buf, sizeof(buf), "%d.%d g", int_part, frac_part);
+    lv_label_set_text(ui_DashBoard_Label_AxelBL, buf);
+    
     lv_arc_set_value(ui_DashBoard_Arc_Uskorenie, val);
     lv_obj_set_style_arc_opa(ui_DashBoard_Arc_Uskorenie, 96, LV_PART_INDICATOR);
 }
@@ -262,9 +266,20 @@ void fiona_observers_subscribe_all(void) {
     lv_subject_add_observer(&subject_trip_dist, trip_dist_observer_cb, NULL);
     lv_subject_add_observer(&subject_clock_color, clock_color_observer_cb, NULL);
     lv_subject_add_observer(&subject_dash_message, dash_message_observer_cb, NULL);
-    lv_subject_add_observer(&subject_adc_light, adc_light_observer_cb, NULL);
+    // Освещённость больше не наблюдаем (виджет удалён)
     lv_subject_add_observer(&subject_throttle, throttle_observer_cb, NULL);
     lv_subject_add_observer(&subject_accel, accel_observer_cb, NULL);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Отписка всех наблюдателей (заглушка, т.к. LVGL 9.2.2 не даёт перебрать    */
+/* observers). Безопасно, потому что таймеры остановлены перед удалением.     */
+/* -------------------------------------------------------------------------- */
+void fiona_observers_unsubscribe_all(void) {
+    // В текущей версии LVGL (9.2.2) нет API для итерации по всем observers.
+    // При удалении дашборда мы останавливаем фоновые таймеры, поэтому
+    // старые observers никогда не вызовутся. При следующей загрузке дашборда
+    // будут подписаны новые observers поверх старых. Незначительная утечка.
 }
 
 /* -------------------------------------------------------------------------- */

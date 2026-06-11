@@ -1,0 +1,36 @@
+[1/25] Building C object esp-idf/uart_protocol/CMakeFiles/__idf_uart_protocol.dir/uart_rx_imu.c.obj
+[2/25] Building C object esp-idf/uart_protocol/CMakeFiles/__idf_uart_protocol.dir/uart_rx_arduino.c.obj
+[3/25] Building C object esp-idf/uart_protocol/CMakeFiles/__idf_uart_protocol.dir/uart_rx_dashboard.c.obj
+[4/25] Building C object esp-idf/uart_protocol/CMakeFiles/__idf_uart_protocol.dir/uart_rx_stats.c.obj
+[5/25] Building C object esp-idf/uart_protocol/CMakeFiles/__idf_uart_protocol.dir/uart_rx_task.c.obj
+[6/25] Building C object esp-idf/uart_protocol/CMakeFiles/__idf_uart_protocol.dir/uart_protocol.c.obj
+[7/25] Linking C static library esp-idf/uart_protocol/libuart_protocol.a
+[8/25] Building C object esp-idf/system_actions/CMakeFiles/__idf_system_actions.dir/system_actions.c.obj
+[9/25] Linking C static library esp-idf/system_actions/libsystem_actions.a
+[10/25] Building C object esp-idf/fiona_core/CMakeFiles/__idf_fiona_core.dir/fiona_observers.c.obj
+[11/25] Building C object esp-idf/fiona_core/CMakeFiles/__idf_fiona_core.dir/fiona_animations.c.obj
+[12/25] Performing build step for 'bootloader'
+[1/1] cd /home/mrak/projects/soul_of_fiona/build/bootloader/esp-idf/esptool_py && /home/mrak/.espressif/python_env/idf5.4_py3.12_env/bin/python /home/mrak/esp-idf-stable/components/partition_table/check_sizes.py --offset 0xa000 bootloader 0x2000 /home/mrak/projects/soul_of_fiona/build/bootloader/bootloader.bin
+Bootloader binary size 0x5c90 bytes. 0x2370 bytes (28%) free.
+[13/25] No install step for 'bootloader'
+[14/25] Building C object esp-idf/fiona_core/CMakeFiles/__idf_fiona_core.dir/fiona_core.c.obj
+[15/25] Completed 'bootloader'
+[16/25] Building C object esp-idf/fiona_core/CMakeFiles/__idf_fiona_core.dir/fiona_background.c.obj
+[17/25] Building C object esp-idf/main/CMakeFiles/__idf_main.dir/main.c.obj
+[18/25] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/ui_events.c.obj
+[19/25] Linking C static library esp-idf/gui/libgui.a
+[20/25] Linking C static library esp-idf/fiona_core/libfiona_core.a
+[21/25] Linking C static library esp-idf/main/libmain.a
+[22/25] Generating ld/sections.ld
+info: INFO: Symbol BSP_I2S_NUM defined in multiple locations (see below). Please check if this is a correct behavior or a random name match:
+    /home/mrak/projects/soul_of_fiona/components/bsp_extra/Kconfig:2
+    /home/mrak/projects/soul_of_fiona/components/espressif__esp32_p4_function_ev_board/Kconfig:30
+[23/25] Linking CXX executable lvgl_demo_v9.elf
+[24/25] Generating binary image from built executable
+esptool.py v4.11.0
+Creating esp32p4 image...
+Merged 3 ELF sections
+Successfully created esp32p4 image.
+Generated /home/mrak/projects/soul_of_fiona/build/lvgl_demo_v9.bin
+[25/25] cd /home/mrak/projects/soul_of_fiona/build/esp-idf/esptool_py && /home/mrak/.espressif/python_env/idf5.4_py3.12_env/bin/python /home/mrak/esp-idf-stable/components/partition_table/check_sizes.py --offset 0xa000 partition --type app /home/mrak/projects/soul_of_fiona/build/partition_table/partition-table.bin /home/mrak/projects/soul_of_fiona/build/lvgl_demo_v9.bin
+lvgl_demo_v9.bin binary size 0x733ef0 bytes. Smallest app partition is 0xc00000 bytes. 0x4cc110 bytes (40%) free.

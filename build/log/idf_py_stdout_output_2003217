@@ -1,0 +1,87 @@
+[1/59] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/ui.c.obj
+[2/59] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/screens/ui_Screen_SplashScreen.c.obj
+[3/59] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/screens/ui_Screen_ScreenReFuel.c.obj
+[4/59] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/screens/ui_Screen_DebugScreen.c.obj
+[5/59] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/screens/ui_Screen_Setting.c.obj
+[6/59] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/ui_helpers.c.obj
+[7/59] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/screens/ui_Screen_DashBoard.c.obj
+[8/59] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_battery_png.c.obj
+[9/59] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_speed_png.c.obj
+[10/59] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_akb_png.c.obj
+[11/59] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_small_blue_png.c.obj
+[12/59] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/ui_events.c.obj
+[13/59] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_oil_level_png.c.obj
+[14/59] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_h_l_png.c.obj
+[15/59] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_fuel_png.c.obj
+[16/59] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_ofe_png.c.obj
+[17/59] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_twater_png.c.obj
+[18/59] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_water_temp_png.c.obj
+[19/59] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_esp_png.c.obj
+[20/59] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_water_temp2_png.c.obj
+[21/59] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_1173513873.c.obj
+[22/59] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_1279366634.c.obj
+[23/59] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_1173515923.c.obj
+[24/59] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_cooller2_png.c.obj
+[25/59] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_cooller1a_png.c.obj
+[26/59] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_cooller1_png.c.obj
+[27/59] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_cyan_cat_png.c.obj
+[28/59] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_green_cat_png.c.obj
+[29/59] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_cooller2a_png.c.obj
+[30/59] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_cooller3_png.c.obj
+[31/59] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_yellow_cat_png.c.obj
+[32/59] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_iconwifi_png.c.obj
+[33/59] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_gps_png.c.obj
+[34/59] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_serverwifi_png.c.obj
+[35/59] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_red_cat_png.c.obj
+[36/59] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_grey_png.c.obj
+[37/59] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_black_png.c.obj
+[38/59] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_red_png.c.obj
+[39/59] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/fonts/ui_font_BaseFont.c.obj
+[40/59] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/fonts/ui_font_BaseFont16.c.obj
+[41/59] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/fonts/ui_font_BaseFont20.c.obj
+[42/59] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/fonts/ui_font_Digital.c.obj
+[43/59] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/fonts/ui_font_LedSymbol.c.obj
+[44/59] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/fonts/ui_font_SSaverFont.c.obj
+[45/59] Performing build step for 'bootloader'
+[1/1] cd /home/mrak/projects/soul_of_fiona/build/bootloader/esp-idf/esptool_py && /home/mrak/.espressif/python_env/idf5.4_py3.12_env/bin/python /home/mrak/esp-idf-stable/components/partition_table/check_sizes.py --offset 0xa000 bootloader 0x2000 /home/mrak/projects/soul_of_fiona/build/bootloader/bootloader.bin
+Bootloader binary size 0x5c90 bytes. 0x2370 bytes (28%) free.
+[46/59] No install step for 'bootloader'
+[47/59] Completed 'bootloader'
+[48/59] Building C object esp-idf/fiona_core/CMakeFiles/__idf_fiona_core.dir/fiona_background.c.obj
+/home/mrak/projects/soul_of_fiona/components/fiona_core/fiona_background.c: In function 'clock_timer_cb':
+/home/mrak/projects/soul_of_fiona/components/fiona_core/fiona_background.c:193:47: warning: unused variable 'heater_pwm' [-Wunused-variable]
+  193 |     int speed_kmh = data->speedValue; uint8_t heater_pwm = data->heater_pwm;
+      |                                               ^~~~~~~~~~
+/home/mrak/projects/soul_of_fiona/components/fiona_core/fiona_background.c:193:9: warning: unused variable 'speed_kmh' [-Wunused-variable]
+  193 |     int speed_kmh = data->speedValue; uint8_t heater_pwm = data->heater_pwm;
+      |         ^~~~~~~~~
+/home/mrak/projects/soul_of_fiona/components/fiona_core/fiona_background.c:189:84: warning: unused variable 'arduino_auto' [-Wunused-variable]
+  189 |     uint8_t fan1 = data->fanCurrentPWM1; uint8_t fan2 = data->fanCurrentPWM2; bool arduino_auto = !data->arduino_mode_from_screen;
+      |                                                                                    ^~~~~~~~~~~~
+/home/mrak/projects/soul_of_fiona/components/fiona_core/fiona_background.c:189:50: warning: unused variable 'fan2' [-Wunused-variable]
+  189 |     uint8_t fan1 = data->fanCurrentPWM1; uint8_t fan2 = data->fanCurrentPWM2; bool arduino_auto = !data->arduino_mode_from_screen;
+      |                                                  ^~~~
+/home/mrak/projects/soul_of_fiona/components/fiona_core/fiona_background.c: At top level:
+/home/mrak/projects/soul_of_fiona/components/fiona_core/fiona_background.c:94:17: warning: 'last_ard_check_time' defined but not used [-Wunused-variable]
+   94 | static uint32_t last_ard_check_time = 0;
+      |                 ^~~~~~~~~~~~~~~~~~~
+[49/59] Building C object esp-idf/main/CMakeFiles/__idf_main.dir/main.c.obj
+[50/59] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_bg_red_png.c.obj
+[51/59] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_fordlogo_png.c.obj
+[52/59] Building C object esp-idf/gui/CMakeFiles/__idf_gui.dir/images/ui_img_global_bg_png.c.obj
+[53/59] Linking C static library esp-idf/gui/libgui.a
+[54/59] Linking C static library esp-idf/fiona_core/libfiona_core.a
+[55/59] Linking C static library esp-idf/main/libmain.a
+[56/59] Generating ld/sections.ld
+info: INFO: Symbol BSP_I2S_NUM defined in multiple locations (see below). Please check if this is a correct behavior or a random name match:
+    /home/mrak/projects/soul_of_fiona/components/bsp_extra/Kconfig:2
+    /home/mrak/projects/soul_of_fiona/components/espressif__esp32_p4_function_ev_board/Kconfig:30
+[57/59] Linking CXX executable lvgl_demo_v9.elf
+[58/59] Generating binary image from built executable
+esptool.py v4.11.0
+Creating esp32p4 image...
+Merged 3 ELF sections
+Successfully created esp32p4 image.
+Generated /home/mrak/projects/soul_of_fiona/build/lvgl_demo_v9.bin
+[59/59] cd /home/mrak/projects/soul_of_fiona/build/esp-idf/esptool_py && /home/mrak/.espressif/python_env/idf5.4_py3.12_env/bin/python /home/mrak/esp-idf-stable/components/partition_table/check_sizes.py --offset 0xa000 partition --type app /home/mrak/projects/soul_of_fiona/build/partition_table/partition-table.bin /home/mrak/projects/soul_of_fiona/build/lvgl_demo_v9.bin
+lvgl_demo_v9.bin binary size 0x734000 bytes. Smallest app partition is 0xc00000 bytes. 0x4cc000 bytes (40%) free.

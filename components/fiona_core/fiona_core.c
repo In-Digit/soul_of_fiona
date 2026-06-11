@@ -2,8 +2,11 @@
  * @file fiona_core.c
  * @brief Диспетчер и инициализация ядра Фионы.
  *
- * Управляет запуском, сохранением/загрузкой CarData, синхронизацией GUI
- * с актуальными данными при входе на экраны.
+ * Добавлена переменная engine_off_seconds, глобальный доступ к ней,
+ * обработчик загрузки дашборда (скрытие слоя климата),
+ * при загрузке дашборда инициализируются наблюдатели и таймеры.
+ * Добавлена проверка размера структуры CarData при загрузке из NVS.
+ * Теперь здесь же стартует фоновая задача опроса устройств (fiona_io_poller).
  */
 
 #include "fiona_core.h"
@@ -13,19 +16,23 @@
 #include "fiona_soul.h"
 #include "fiona_brain.h"
 #include "config_manager.h"
+#include "rx8025_rtc.h"
 #include "esp_log.h"
 #include <sys/time.h>
 #include <time.h>
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
+#include <sys/stat.h>
 #include "nvs_flash.h"
 #include "nvs.h"
 #include "bsp/esp-bsp.h"
 #include "driver/uart.h"
+#include "fiona_io_poller.h"   // <-- добавлено
 
 static const char *TAG = "FIONA_CORE";
 static void clock_color_reset_timer(lv_timer_t *t);
+
 // Внешние функции из других модулей ядра
 void fiona_background_init_timers(void);
 void fiona_background_start(void);
@@ -57,15 +64,17 @@ lv_timer_t *poll_timer = NULL;
 lv_timer_t *clock_timer = NULL;
 bool screensaver_active = false;
 
+// Глобальная переменная engine_off_seconds
+uint32_t engine_off_seconds = 0;
+uint32_t inactivity_seconds = 0;
+uint32_t boot_time = 0;
 // Внешние объекты экранов
-extern lv_obj_t * ui_Screen_ClimateControl;
-extern lv_obj_t * ui_ClimateControl_Slider_TempSlider;
-extern lv_obj_t * ui_ClimateControl_Slider_FlowSlider;
-extern lv_obj_t * ui_ClimateControl_Label_Temperatura;
-extern lv_obj_t * ui_ClimateControl_Label_FlowShim;
+extern lv_obj_t * ui_Screen_DashBoard;
+extern lv_obj_t * ui_DashBoard_Container_ContainerClimate;
+extern lv_obj_t * ui_DashBoard_Label_FionaSpeachLabelDash;
 
-// Прототип обработчика события загрузки экрана климата
-static void climate_screen_load_cb(lv_event_t * e);
+// Прототип обработчика события загрузки дашборда
+static void dashboard_screen_load_cb(lv_event_t * e);
 
 // -------------------- Инициализация --------------------
 static void fiona_core_init_timer_cb(lv_timer_t *t) {
@@ -76,6 +85,40 @@ static void fiona_core_init_timer_cb(lv_timer_t *t) {
 void fiona_core_init(void) {
     CarData *data = CarData_Get();
     if (!data) return;
+
+    // Инициализация внешнего RTC (не критично для работы)
+    esp_err_t rtc_ret = rtc_init();
+    if (rtc_ret != ESP_OK) {
+        ESP_LOGW(TAG, "RTC initialization failed (will rely on gateway time)");
+    }
+
+    // Если системное время ещё не было установлено, пробуем восстановить из RTC
+    if (!data->time_received_this_boot && rtc_ret == ESP_OK) {
+        rtc_time_t rtc_time;
+        if (rtc_get_time(&rtc_time) == ESP_OK) {
+            struct tm tm;
+            memset(&tm, 0, sizeof(tm));
+            tm.tm_year = rtc_time.year - 1900;
+            tm.tm_mon  = rtc_time.mon - 1;
+            tm.tm_mday = rtc_time.day;
+            tm.tm_hour = rtc_time.hour;
+            tm.tm_min  = rtc_time.min;
+            tm.tm_sec  = rtc_time.sec;
+            time_t rtc_unix = mktime(&tm);
+            if (rtc_unix > 0) {
+                struct timeval tv;
+                tv.tv_sec = rtc_unix;
+                tv.tv_usec = 0;
+                settimeofday(&tv, NULL);
+                CarData_Lock(10);
+                data->systemTime = (uint32_t)rtc_unix;
+                CarData_Unlock();
+                ESP_LOGI(TAG, "System time restored from RTC");
+                // Сохраняем время старта для расчёта uptime
+                boot_time = (uint32_t)rtc_unix;
+            }
+        }
+    }
 
     CarData_Lock(1000);
     lv_subject_init_int(&subject_speed, 0);
@@ -118,33 +161,62 @@ void fiona_core_init(void) {
     }
     CarData_Unlock();
 
-    // Назначаем второй UART для Arduino (фиксированно UART_NUM_2) и переключаем на 115200
-    uart_set_arduino_port(UART_NUM_2);
+    // Обнаружение шлюза и настройка порта Arduino
+    int gw_port = uart_discover_gateway();
+    if (gw_port >= 0) {
+        ESP_LOGI(TAG, "Gateway found on UART%d", gw_port);
+    } else {
+        ESP_LOGW(TAG, "Gateway not found, continuing without gateway");
+    }
+    if (uart_get_arduino_port() < 0) {
+        uart_set_arduino_port(UART_NUM_2);
+    }
 
     fiona_soul_init();
     fiona_brain_init();
 
-    // Подписываемся на событие загрузки экрана климата для синхронизации слайдеров
-    if (ui_Screen_ClimateControl) {
-        lv_obj_add_event_cb(ui_Screen_ClimateControl, climate_screen_load_cb, LV_EVENT_SCREEN_LOADED, NULL);
+    // Подписываемся на событие загрузки дашборда
+    if (ui_Screen_DashBoard) {
+        lv_obj_add_event_cb(ui_Screen_DashBoard, dashboard_screen_load_cb, LV_EVENT_SCREEN_LOADED, NULL);
     }
+
+    // Запрашиваем текущий tempOffset у Arduino, если она жива
+    if (uart_is_arduino_alive()) {
+        uart_send_to_arduino(MSG_TEMP_OFFSET_GET, NULL, 0);
+        CarData_Lock(10);
+        data->arduino_offset_pending = true;
+        CarData_Unlock();
+    }
+
+    // Запрашиваем стиль вождения у шлюза
+    if (uart_is_gateway_alive()) {
+        uart_send_to_gateway(MSG_REQ_DRIVING_STYLE, NULL, 0);
+    }
+
+    // Запускаем фоновую задачу опроса устройств
+    fiona_io_poller_start();   // <-- добавлено
 
     lv_timer_create(fiona_core_init_timer_cb, 0, NULL);
 }
 
 // -------------------- Загрузка дашборда --------------------
-void fiona_core_dashboard_on_load(void) {
+static void dashboard_screen_load_cb(lv_event_t * e) {
+    if (ui_DashBoard_Container_ContainerClimate) {
+        lv_obj_add_flag(ui_DashBoard_Container_ContainerClimate, LV_OBJ_FLAG_HIDDEN);
+    }
     fiona_observers_subscribe_all();
     fiona_observers_init_widgets();
     fiona_background_init_timers();
     fiona_core_refresh_dashboard();
 }
 
+void fiona_core_dashboard_on_load(void) {
+}
+
 void fiona_core_refresh_dashboard(void) {
     if (clock_timer) lv_timer_reset(clock_timer);
 }
 
-// -------------------- Интернет-время --------------------
 void fiona_core_request_internet_time(void) {
     CarData *data = CarData_Get();
     if (data) {
@@ -167,7 +239,6 @@ void fiona_core_set_clock_color(int color) {
     lv_subject_set_int(&subject_clock_color, color);
 }
 
-// -------------------- NVS --------------------
 static void save_car_data_to_nvs(void) {
     nvs_handle_t handle;
     if (nvs_open("fiona", NVS_READWRITE, &handle) == ESP_OK) {
@@ -190,44 +261,35 @@ void fiona_core_save_car_data_to_nvs(void) {
 
 static void load_car_data_from_nvs(void) {
     nvs_handle_t handle;
-    if (nvs_open("fiona", NVS_READONLY, &handle) == ESP_OK) {
-        CarData *data = CarData_Get();
-        size_t size = sizeof(CarData);
-        if (data && nvs_get_blob(handle, "cardata", data, &size) == ESP_OK) {
-            ESP_LOGI(TAG, "CarData loaded from NVS");
-        }
-        nvs_close(handle);
+    if (nvs_open("fiona", NVS_READONLY, &handle) != ESP_OK) {
+        return;
     }
+
+    CarData *data = CarData_Get();
+    if (!data) {
+        nvs_close(handle);
+        return;
+    }
+
+    size_t stored_size = 0;
+    esp_err_t err = nvs_get_blob(handle, "cardata", NULL, &stored_size);
+    if (err == ESP_OK && stored_size != CarData_get_size()) {
+        ESP_LOGW(TAG, "CarData size mismatch (NVS: %d, current: %d). Erasing NVS and SD config.",
+                 stored_size, CarData_get_size());
+        nvs_close(handle);
+        nvs_flash_erase();
+        nvs_flash_init();
+        remove("/sdcard/fiona/config.json");
+        return;
+    }
+
+    size_t size = sizeof(CarData);
+    if (nvs_get_blob(handle, "cardata", data, &size) == ESP_OK) {
+        ESP_LOGI(TAG, "CarData loaded from NVS");
+    }
+    nvs_close(handle);
 }
 
 void fiona_core_load_car_data_from_nvs(void) {
     load_car_data_from_nvs();
-}
-
-/* --------------------------------------------------------------------------
- * Обработчик загрузки экрана климата
- * -------------------------------------------------------------------------- */
-static void climate_screen_load_cb(lv_event_t * e) {
-    CarData *data = CarData_Get();
-    if (!data) return;
-
-    CarData_Lock(10);
-    float target = data->climate_target_temp;
-    uint8_t pwm = data->heater_pwm;
-    CarData_Unlock();
-
-    // Слайдер температуры: значение = target - 22
-    int slider_val = (int)(target - 22.0f);
-    if (slider_val < -20) slider_val = -20;
-    if (slider_val > 20) slider_val = 20;
-    lv_slider_set_value(ui_ClimateControl_Slider_TempSlider, slider_val, LV_ANIM_OFF);
-    if (ui_ClimateControl_Label_Temperatura) {
-        lv_label_set_text_fmt(ui_ClimateControl_Label_Temperatura, "%.1f°C", target);
-    }
-
-    // Слайдер потока (ШИМ печки)
-    lv_slider_set_value(ui_ClimateControl_Slider_FlowSlider, pwm, LV_ANIM_OFF);
-    if (ui_ClimateControl_Label_FlowShim) {
-        lv_label_set_text_fmt(ui_ClimateControl_Label_FlowShim, "%d%%", (pwm * 100) / 255);
-    }
 }

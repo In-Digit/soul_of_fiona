@@ -1,0 +1,29 @@
+[1/9] Performing build step for 'bootloader'
+[1/1] cd /home/mrak/projects/soul_of_fiona/build/bootloader/esp-idf/esptool_py && /home/mrak/.espressif/python_env/idf5.4_py3.12_env/bin/python /home/mrak/esp-idf-stable/components/partition_table/check_sizes.py --offset 0xa000 bootloader 0x2000 /home/mrak/projects/soul_of_fiona/build/bootloader/bootloader.bin
+Bootloader binary size 0x5c90 bytes. 0x2370 bytes (28%) free.
+[2/9] No install step for 'bootloader'
+[3/9] Completed 'bootloader'
+[4/9] Building C object esp-idf/fiona_core/CMakeFiles/__idf_fiona_core.dir/fiona_background.c.obj
+/home/mrak/projects/soul_of_fiona/components/fiona_core/fiona_background.c:132:13: warning: 'img_desired_state' defined but not used [-Wunused-variable]
+  132 | static bool img_desired_state[IMG_COUNT] = {false};   // желаемое состояние (true = видима)
+      |             ^~~~~~~~~~~~~~~~~
+/home/mrak/projects/soul_of_fiona/components/fiona_core/fiona_background.c:94:17: warning: 'last_ard_check_time' defined but not used [-Wunused-variable]
+   94 | static uint32_t last_ard_check_time = 0;
+      |                 ^~~~~~~~~~~~~~~~~~~
+/home/mrak/projects/soul_of_fiona/components/fiona_core/fiona_background.c:88:13: warning: 'red_alert_active' defined but not used [-Wunused-variable]
+   88 | static bool red_alert_active = false;
+      |             ^~~~~~~~~~~~~~~~
+[5/9] Linking C static library esp-idf/fiona_core/libfiona_core.a
+[6/9] Generating ld/sections.ld
+info: INFO: Symbol BSP_I2S_NUM defined in multiple locations (see below). Please check if this is a correct behavior or a random name match:
+    /home/mrak/projects/soul_of_fiona/components/espressif__esp32_p4_function_ev_board/Kconfig:30
+    /home/mrak/projects/soul_of_fiona/components/bsp_extra/Kconfig:2
+[7/9] Linking CXX executable lvgl_demo_v9.elf
+[8/9] Generating binary image from built executable
+esptool.py v4.11.0
+Creating esp32p4 image...
+Merged 3 ELF sections
+Successfully created esp32p4 image.
+Generated /home/mrak/projects/soul_of_fiona/build/lvgl_demo_v9.bin
+[9/9] cd /home/mrak/projects/soul_of_fiona/build/esp-idf/esptool_py && /home/mrak/.espressif/python_env/idf5.4_py3.12_env/bin/python /home/mrak/esp-idf-stable/components/partition_table/check_sizes.py --offset 0xa000 partition --type app /home/mrak/projects/soul_of_fiona/build/partition_table/partition-table.bin /home/mrak/projects/soul_of_fiona/build/lvgl_demo_v9.bin
+lvgl_demo_v9.bin binary size 0x734000 bytes. Smallest app partition is 0xc00000 bytes. 0x4cc000 bytes (40%) free.

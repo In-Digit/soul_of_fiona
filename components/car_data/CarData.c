@@ -120,13 +120,14 @@ void CarData_init(CarData* data) {
     data->fanManualPWM = 0;
     data->climateManualPWM = 0;
 
-    // --------------- НОВЫЕ ПОЛЯ ARDUINO ---------------
     data->arduino_coolant_temp = 0.0f;
     data->arduino_coolant_dirty = false;
-    data->arduino_fan_mode = 1; // Normal по умолчанию
+    data->arduino_fan_mode = 1;
     data->arduino_mode_from_screen = false;
+    data->arduino_temp_offset = 0.0f;
+    data->arduino_offset_received = false;
+    data->arduino_offset_pending = false;
 
-    // --------------- НОВЫЕ ПОЛЯ КЛИМАТА ---------------
     data->climate_target_temp = 22.0f;
     data->cabin_temp = 22.0f;
     data->heater_pwm = 0;
@@ -134,7 +135,6 @@ void CarData_init(CarData* data) {
     data->cabin_temp_dirty = false;
     data->heater_pwm_dirty = false;
 
-    // --------------- КАЛИБРОВОЧНЫЕ ТОЧКИ ---------------
     data->climateCalibStartPoint = 0;
     data->climateCalibStopPoint = 0;
     data->climateCalibNoiseLow = 0;
@@ -200,7 +200,6 @@ void CarData_init(CarData* data) {
     memset(&data->trip_rx, 0, sizeof(data->trip_rx));
     memset(&data->day_rx, 0, sizeof(data->day_rx));
 
-    // --------------- ЯРКОСТЬ ---------------
     data->backlight_brightness     = 80;
     data->backlight_min_brightness = 5;
     data->light_threshold_dark     = 20;
@@ -209,21 +208,16 @@ void CarData_init(CarData* data) {
     data->ambient_light_synth      = 50;
     data->ambient_light_raw        = 0;
 
-    // --------------- ТЕМА ФОНА ---------------
     data->bg_theme = 0;
 
-    // --------------- РУЧНАЯ УСТАНОВКА ВРЕМЕНИ ---------------
     data->time_set_manually = false;
 
-    // --------------- ТЕПЛОВАЯ ПАМЯТЬ ---------------
     data->last_valid_coolant_temp = INT_MIN;
 
-    // --------------- ЦВЕТА ТОНАЛЬНОСТЕЙ ---------------
     data->color_tone_neutral = 0x9EEFFC;
     data->color_tone_funny   = 0xFFB6C1;
     data->color_tone_serious = 0x00FF00;
 
-    // --------------- IMU ---------------
     data->accel_x = 0.0f;
     data->accel_y = 0.0f;
     data->accel_z = 0.0f;
@@ -240,6 +234,36 @@ void CarData_init(CarData* data) {
     data->accelDirty = false;
     data->gyroDirty  = false;
     data->tiltDirty  = false;
+
+    data->trip_force_active = false;
+
+    // ---------- GPS-ДАННЫЕ ----------
+    data->gps_lat = 0.0;
+    data->gps_lon = 0.0;
+    data->gps_speed = 0.0f;
+    data->gps_satellites = 0;
+    data->gps_valid = false;
+    data->gps_last_nmea[0] = '\0';
+    // Кольцевой буфер NMEA-строк
+    data->gps_nmea_buf_idx = 0;
+    data->gps_nmea_buf_count = 0;
+    memset(data->gps_nmea_buf, 0, sizeof(data->gps_nmea_buf));
+
+    // ---------- РУЧНЫЕ НАСТРОЙКИ UART ----------
+    data->gw_rx_pin = 47;
+    data->gw_tx_pin = 46;
+    data->gw_baud_rate = 921600;
+    data->gw_configured = false;
+
+    data->arduino_rx_pin = 33;
+    data->arduino_tx_pin = 32;
+    data->arduino_baud_rate = 115200;
+    data->arduino_configured = false;
+
+    data->gps_rx_pin = 27;
+    data->gps_tx_pin = 26;
+    data->gps_baud_rate = 9600;
+    data->gps_configured = false;
 }
 
 uint32_t CarData_getFuelColor(const CarData* data) {
@@ -331,6 +355,10 @@ void CarData_Unlock(void) {
     if (g_carDataMutex != NULL) {
         xSemaphoreGive(g_carDataMutex);
     }
+}
+
+size_t CarData_get_size(void) {
+    return sizeof(CarData);
 }
 
 void CarData_set_time_synced(bool synced) {

@@ -19,9 +19,10 @@ extern "C" {
 ///////////////////// SCREENS ////////////////////
 
 #include "screens/ui_Screen_DashBoard.h"
-#include "screens/ui_Screen_System.h"
-#include "screens/ui_Screen_ClimateControl.h"
 #include "screens/ui_Screen_SplashScreen.h"
+#include "screens/ui_Screen_ScreenReFuel.h"
+#include "screens/ui_Screen_Setting.h"
+#include "screens/ui_Screen_DebugScreen.h"
 
 ///////////////////// VARIABLES ////////////////////
 
@@ -56,19 +57,21 @@ LV_IMG_DECLARE(ui_img_cyan_cat_png);    // assets/cyan_cat.png
 LV_IMG_DECLARE(ui_img_green_cat_png);    // assets/green_cat.png
 LV_IMG_DECLARE(ui_img_yellow_cat_png);    // assets/yellow_cat.png
 LV_IMG_DECLARE(ui_img_red_cat_png);    // assets/red_cat.png
+LV_IMG_DECLARE(ui_img_iconwifi_png);    // assets/IconWiFi.png
+LV_IMG_DECLARE(ui_img_gps_png);    // assets/GPS.png
+LV_IMG_DECLARE(ui_img_serverwifi_png);    // assets/ServerWiFi.png
+LV_IMG_DECLARE(ui_img_fordlogo_png);    // assets/FordLogo.png
 LV_IMG_DECLARE(ui_img_global_bg_png);    // assets/global_bg.png
 LV_IMG_DECLARE(ui_img_black_png);    // assets/black.png
 LV_IMG_DECLARE(ui_img_grey_png);    // assets/grey.png
 LV_IMG_DECLARE(ui_img_red_png);    // assets/red.png
-LV_IMG_DECLARE(ui_img_fordlogo_png);    // assets/FordLogo.png
-
 
 // FONTS
 LV_FONT_DECLARE(ui_font_BaseFont);
+LV_FONT_DECLARE(ui_font_BaseFont16);
 LV_FONT_DECLARE(ui_font_BaseFont20);
 LV_FONT_DECLARE(ui_font_Digital);
 LV_FONT_DECLARE(ui_font_LedSymbol);
-LV_FONT_DECLARE(ui_font_BaseFont16);
 LV_FONT_DECLARE(ui_font_SSaverFont);
 
 // UI INIT

@@ -6,3 +6,8 @@ dependencies:
   espressif/esp_lcd_jd9165: "*"
   espressif/esp_h264: ^1.1.2
   espressif/esp-dsp: ^1.7.0
+  espressif/esp_lvgl_port: "2.7.2"
+  espressif/esp_wifi_remote:
+    version: '*'
+  espressif/esp_hosted:
+    version: '*'

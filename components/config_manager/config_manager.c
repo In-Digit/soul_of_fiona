@@ -5,6 +5,9 @@
  * Обрабатывает настройки интерфейса, пороги, калибровки, а также новые поля:
  *   - climateCalibStartPoint, climateCalibStopPoint, climateCalibNoiseLow, climateCalibNoiseHigh
  *   - climate_target_temp, temp_offset_arduino (опционально)
+ *   - trip_force_active (принудительная поездка)
+ *   - ручные настройки UART (gw_*, arduino_*, gps_*)
+ * Добавлена проверка _struct_size для автоматического сброса при изменении структуры CarData.
  */
 
 #include "config_manager.h"
@@ -32,9 +35,9 @@ static char *read_file_to_string(const char *path) {
     return buf;
 }
 
-static bool apply_json_to_car_data(CarData *data, const char *json_str) {
-    cJSON *root = cJSON_Parse(json_str);
-    if (!root) { ESP_LOGE(TAG, "Failed to parse JSON"); return false; }
+// Теперь apply_json_to_car_data принимает готовый cJSON-объект, а не строку
+static bool apply_json_to_car_data(CarData *data, cJSON *root) {
+    if (!root) return false;
 
     cJSON *colors = cJSON_GetObjectItem(root, "colors");
     if (cJSON_IsObject(colors)) {
@@ -121,7 +124,7 @@ static bool apply_json_to_car_data(CarData *data, const char *json_str) {
         if ((item = cJSON_GetObjectItem(clim, "climate_setpoint")))data->climateSetpoint = (float)item->valuedouble;
     }
 
-    // --------------- НОВЫЕ ПОЛЯ КАЛИБРОВКИ КЛИМАТА ---------------
+    // --------------- КАЛИБРОВОЧНЫЕ ТОЧКИ КЛИМАТА ---------------
     cJSON *calib = cJSON_GetObjectItem(root, "climate_calib");
     if (cJSON_IsObject(calib)) {
         cJSON *item;
@@ -138,7 +141,45 @@ static bool apply_json_to_car_data(CarData *data, const char *json_str) {
         if ((item = cJSON_GetObjectItem(light, "min_brightness")))   data->backlight_min_brightness = item->valueint;
     }
 
-    cJSON_Delete(root);
+    // --------------- ПРИНУДИТЕЛЬНАЯ ПОЕЗДКА ---------------
+    cJSON *trip = cJSON_GetObjectItem(root, "trip");
+    if (cJSON_IsObject(trip)) {
+        cJSON *item;
+        if ((item = cJSON_GetObjectItem(trip, "force_active"))) data->trip_force_active = item->valueint;
+    }
+
+    // --------------- РУЧНЫЕ НАСТРОЙКИ UART ---------------
+    cJSON *uart = cJSON_GetObjectItem(root, "uart");
+    if (cJSON_IsObject(uart)) {
+        cJSON *gw = cJSON_GetObjectItem(uart, "gateway");
+        if (cJSON_IsObject(gw)) {
+            cJSON *item;
+            if ((item = cJSON_GetObjectItem(gw, "rx")))   data->gw_rx_pin = item->valueint;
+            if ((item = cJSON_GetObjectItem(gw, "tx")))   data->gw_tx_pin = item->valueint;
+            if ((item = cJSON_GetObjectItem(gw, "baud"))) data->gw_baud_rate = item->valueint;
+            if ((item = cJSON_GetObjectItem(gw, "configured"))) data->gw_configured = item->valueint;
+        }
+
+        cJSON *ard = cJSON_GetObjectItem(uart, "arduino");
+        if (cJSON_IsObject(ard)) {
+            cJSON *item;
+            if ((item = cJSON_GetObjectItem(ard, "rx")))   data->arduino_rx_pin = item->valueint;
+            if ((item = cJSON_GetObjectItem(ard, "tx")))   data->arduino_tx_pin = item->valueint;
+            if ((item = cJSON_GetObjectItem(ard, "baud"))) data->arduino_baud_rate = item->valueint;
+            if ((item = cJSON_GetObjectItem(ard, "configured"))) data->arduino_configured = item->valueint;
+        }
+
+        cJSON *gps = cJSON_GetObjectItem(uart, "gps");
+        if (cJSON_IsObject(gps)) {
+            cJSON *item;
+            if ((item = cJSON_GetObjectItem(gps, "rx")))   data->gps_rx_pin = item->valueint;
+            if ((item = cJSON_GetObjectItem(gps, "tx")))   data->gps_tx_pin = item->valueint;
+            if ((item = cJSON_GetObjectItem(gps, "baud"))) data->gps_baud_rate = item->valueint;
+            if ((item = cJSON_GetObjectItem(gps, "configured"))) data->gps_configured = item->valueint;
+        }
+    }
+
+    // Не удаляем root, так как он будет удалён вызывающей функцией
     return true;
 }
 
@@ -151,14 +192,41 @@ bool config_load_from_sd(CarData *data) {
     }
     char *file_content = read_file_to_string(CONFIG_FILE_PATH);
     if (!file_content) { ESP_LOGE(TAG, "Failed to read config file"); return false; }
-    bool ok = apply_json_to_car_data(data, file_content);
+
+    cJSON *root = cJSON_Parse(file_content);
     free(file_content);
+    if (!root) { ESP_LOGE(TAG, "Failed to parse JSON"); return false; }
+
+    // Проверяем версию структуры
+    cJSON *struct_size_item = cJSON_GetObjectItem(root, "_struct_size");
+    if (cJSON_IsNumber(struct_size_item)) {
+        int stored_size = struct_size_item->valueint;
+        if (stored_size != (int)CarData_get_size()) {
+            ESP_LOGW(TAG, "Config struct size mismatch (config: %d, current: %d). Deleting config.",
+                     stored_size, (int)CarData_get_size());
+            cJSON_Delete(root);
+            remove(CONFIG_FILE_PATH);
+            return false;
+        }
+    } else {
+        // Поле отсутствует — старый конфиг, тоже удаляем
+        ESP_LOGW(TAG, "No _struct_size in config. Deleting old config.");
+        cJSON_Delete(root);
+        remove(CONFIG_FILE_PATH);
+        return false;
+    }
+
+    bool ok = apply_json_to_car_data(data, root);
+    cJSON_Delete(root);
     if (ok) ESP_LOGI(TAG, "Configuration loaded from SD");
     return ok;
 }
 
 static cJSON *car_data_to_json(const CarData *data) {
     cJSON *root = cJSON_CreateObject();
+    // Сохраняем размер структуры для проверки совместимости
+    cJSON_AddNumberToObject(root, "_struct_size", (int)CarData_get_size());
+
     cJSON *colors = cJSON_AddObjectToObject(root, "colors");
     char hex[16];
     snprintf(hex, sizeof(hex), "0x%06x", data->colorCyan);   cJSON_AddStringToObject(colors, "cyan", hex);
@@ -240,6 +308,31 @@ static cJSON *car_data_to_json(const CarData *data) {
     cJSON *light = cJSON_AddObjectToObject(root, "light");
     cJSON_AddNumberToObject(light, "brightness", data->backlight_brightness);
     cJSON_AddNumberToObject(light, "min_brightness", data->backlight_min_brightness);
+
+    // --------------- ПРИНУДИТЕЛЬНАЯ ПОЕЗДКА ---------------
+    cJSON *trip = cJSON_AddObjectToObject(root, "trip");
+    cJSON_AddBoolToObject(trip, "force_active", data->trip_force_active);
+
+    // --------------- РУЧНЫЕ НАСТРОЙКИ UART ---------------
+    cJSON *uart = cJSON_AddObjectToObject(root, "uart");
+
+    cJSON *gw = cJSON_AddObjectToObject(uart, "gateway");
+    cJSON_AddNumberToObject(gw, "rx", data->gw_rx_pin);
+    cJSON_AddNumberToObject(gw, "tx", data->gw_tx_pin);
+    cJSON_AddNumberToObject(gw, "baud", data->gw_baud_rate);
+    cJSON_AddBoolToObject(gw, "configured", data->gw_configured);
+
+    cJSON *ard = cJSON_AddObjectToObject(uart, "arduino");
+    cJSON_AddNumberToObject(ard, "rx", data->arduino_rx_pin);
+    cJSON_AddNumberToObject(ard, "tx", data->arduino_tx_pin);
+    cJSON_AddNumberToObject(ard, "baud", data->arduino_baud_rate);
+    cJSON_AddBoolToObject(ard, "configured", data->arduino_configured);
+
+    cJSON *gps = cJSON_AddObjectToObject(uart, "gps");
+    cJSON_AddNumberToObject(gps, "rx", data->gps_rx_pin);
+    cJSON_AddNumberToObject(gps, "tx", data->gps_tx_pin);
+    cJSON_AddNumberToObject(gps, "baud", data->gps_baud_rate);
+    cJSON_AddBoolToObject(gps, "configured", data->gps_configured);
 
     return root;
 }

@@ -1,10 +1,9 @@
 /**
  * @file fiona_background.c
- * @brief Фоновые таймеры и периодическая логика ядра.
+ * @brief Фоновые таймеры (хирургическая версия с закомментированными картинками)
  *
- * Управляет отображением «котов», индикаторами вентиляторов/климата,
- * отправкой команд Arduino (режимы охлаждения), подсчётом остановок,
- * запросом телеметрии Arduino и климата, обновлением дебаг-виджетов.
+ * Вентиляторы и климат закомментированы ПОСТРОЧНО.
+ * Коты и значки связи активны. Субъекты обновляются всегда.
  */
 
 #include "fiona_core.h"
@@ -23,6 +22,7 @@
 #include <math.h>
 #include "bsp/esp-bsp.h"
 #include "esp_adc/adc_oneshot.h"
+#include "ui.h"
 
 /* ========== Внешние UI-объекты ========== */
 extern lv_obj_t * ui_DashBoard_Label_SpeedDigit;
@@ -67,203 +67,89 @@ extern lv_obj_t * ui_Screen_DashBoard;
 extern lv_obj_t * ui_Screen_SplashScreen;
 extern lv_obj_t * ui_SplashScreen_Label_Clock;
 extern lv_obj_t * ui_SplashScreen_Label_FionaSpeachLabel;
-extern lv_obj_t * ui_System_Textarea_TextAreaArduino;
-extern lv_obj_t * ui_System_Textarea_TextAreaESP;
-extern lv_obj_t * ui_System_Textarea_TextAreaScreen;
-extern lv_obj_t * ui_System_Label_CurrentLight;
-extern lv_obj_t * ui_System_Image_SDBack;
-extern lv_obj_t * ui_System_Image_SDGrey;
-extern lv_obj_t * ui_System_Image_SDRed;
-extern lv_obj_t * ui_System_Image_ArduinoBack;
-extern lv_obj_t * ui_System_Image_ArduinoGrey;
-extern lv_obj_t * ui_System_Image_ArduinoRed;
-extern lv_obj_t * ui_System_Image_ESP32Back;
-extern lv_obj_t * ui_System_Image_ESP32Grey;
-extern lv_obj_t * ui_System_Image_ESP32Red;
-extern lv_obj_t * ui_System_Image_SpeachBack;
-extern lv_obj_t * ui_System_Image_SpeachGrey;
-extern lv_obj_t * ui_System_Image_SpeachRed;
-extern lv_obj_t * ui_System_Image_StatBack;
-extern lv_obj_t * ui_System_Image_StatGrey;
-extern lv_obj_t * ui_System_Image_StatRed;
-extern lv_obj_t * ui_System_Image_PresetBack;
-extern lv_obj_t * ui_System_Image_PresetGrey;
-extern lv_obj_t * ui_System_Image_PresetRed;
-
-/* Новые UI-объекты для «котов» */
 extern lv_obj_t * ui_DashBoard_Image_ImageCyan;
 extern lv_obj_t * ui_DashBoard_Image_ImageGreen;
 extern lv_obj_t * ui_DashBoard_Image_ImageYellow;
 extern lv_obj_t * ui_DashBoard_Image_ImageRed;
 extern lv_obj_t * ui_DashBoard_Image_ImageSpeed;
-
-/* Новые метки дашборда (ШИМ печки и вентиляторов) */
 extern lv_obj_t * ui_DashBoard_Label_CondShim;
 extern lv_obj_t * ui_DashBoard_Label_VFirstShim;
 extern lv_obj_t * ui_DashBoard_Label_VSecondShim;
+extern lv_obj_t * ui_DashBoard_Image_WiFi;
+extern lv_obj_t * ui_DashBoard_Image_GPS;
+extern lv_obj_t * ui_DashBoard_Image_ServerOn;
 
 extern lv_timer_t *poll_timer;
 extern lv_timer_t *clock_timer;
 extern bool screensaver_active;
 
-// -------------------- Локальные переменные --------------------
-static uint32_t engine_off_seconds = 0;
-static bool show_trip_cost = false;
-
-static char esp32_status_text[512] = {0};
-static char arduino_status_text[512] = {0};
-static char screen_status_text[512] = {0};
-static bool indicators_ok[6] = {false};
-
 uint8_t g_current_tone = 0;
+bool calibration_active = false;
+static bool red_alert_active = false;
 
-// Для подсчёта остановок: кольцевой буфер моментов остановок (Unix time)
-#define STOP_HISTORY_SIZE 8
-static uint32_t stop_history[STOP_HISTORY_SIZE] = {0};
+static float trip_max_pos_accel = 0.0f;
+static float trip_max_neg_accel = 0.0f;
+
+static uint32_t last_gw_check_time = 0;
+static uint32_t last_ard_check_time = 0;
+static bool gw_cached_alive = false;
+
+static uint32_t last_style_request_time = 0;
+
+static uint32_t stop_history[8] = {0};
 static int stop_history_idx = 0;
 
-// Для ограничения частоты вывода фраз
-static uint32_t last_important_phrase_time = 0;
-static uint32_t last_casual_phrase_time = 0;
-static uint32_t phrase_display_start_time = 0;
-static char last_displayed_text[256] = {0};
-
-// ADC для фоторезистора (GPIO20)
 static adc_oneshot_unit_handle_t adc1_handle = NULL;
-
-// Сглаженное значение освещённости и последняя установленная яркость
 static float smooth_light = 0.0f;
 static uint8_t last_set_brightness = 255;
 
-// Флаг активности калибровки
-bool calibration_active = false;
-
-// Для отслеживания состояния аварийного красного кота
-static bool red_alert_active = false;
-
-// Предыдущие значения режимов для отправки команд Arduino
-static uint8_t last_sent_fan_mode = 0;   // 0=ничего не отправляли
-//static uint8_t last_manual_style = 0;
-
-// Прототипы
 static void fast_timer_cb(lv_timer_t *timer);
 static void clock_timer_cb(lv_timer_t *timer);
 static void update_stop_history(uint32_t now);
-static int count_stops_last_5min(uint32_t now);
+static void format_float_1(char *buf, size_t size, float value);
 
 void fiona_background_init_timers(void) {
     if (clock_timer == NULL) clock_timer = lv_timer_create(clock_timer_cb, 1000, NULL);
-    if (poll_timer == NULL)   poll_timer   = lv_timer_create(fast_timer_cb, 100, NULL);
+    if (poll_timer == NULL)   poll_timer   = lv_timer_create(fast_timer_cb, 200, NULL);
 
-    // Инициализация ADC для фоторезистора (GPIO20) – только один раз
     if (adc1_handle == NULL) {
         adc_oneshot_unit_init_cfg_t init_config = {
-            .unit_id = ADC_UNIT_1,
-            .clk_src = ADC_DIGI_CLK_SRC_DEFAULT,
-            .ulp_mode = ADC_ULP_MODE_DISABLE,
-        };
+            .unit_id = ADC_UNIT_1, .clk_src = ADC_DIGI_CLK_SRC_DEFAULT, .ulp_mode = ADC_ULP_MODE_DISABLE };
         ESP_ERROR_CHECK(adc_oneshot_new_unit(&init_config, &adc1_handle));
-        adc_oneshot_chan_cfg_t chan_cfg = {
-            .bitwidth = ADC_BITWIDTH_DEFAULT,
-            .atten = ADC_ATTEN_DB_12,
-        };
+        adc_oneshot_chan_cfg_t chan_cfg = { .bitwidth = ADC_BITWIDTH_DEFAULT, .atten = ADC_ATTEN_DB_12 };
         ESP_ERROR_CHECK(adc_oneshot_config_channel(adc1_handle, ADC_CHANNEL_4, &chan_cfg));
     }
 }
 
-/* ---------- Подсчёт остановок ---------- */
 static void update_stop_history(uint32_t now) {
     stop_history[stop_history_idx] = now;
-    stop_history_idx = (stop_history_idx + 1) % STOP_HISTORY_SIZE;
+    stop_history_idx = (stop_history_idx + 1) % 8;
 }
 
-static int count_stops_last_5min(uint32_t now) {
-    int count = 0;
-    for (int i = 0; i < STOP_HISTORY_SIZE; i++) {
-        if (stop_history[i] != 0 && (now - stop_history[i]) <= 300) {
-            count++;
-        }
-    }
-    return count;
+static void format_float_1(char *buf, size_t size, float value) {
+    int int_part = (int)value;
+    int frac_part = (int)((value - int_part) * 10.0f + 0.5f);
+    if (frac_part < 0) frac_part = -frac_part;
+    if (frac_part >= 10) { frac_part = 0; int_part++; }
+    snprintf(buf, size, "%d.%d", int_part, frac_part);
 }
 
-/* ---------- Быстрый таймер (100 мс) ---------- */
+/* ==================== БЫСТРЫЙ ТАЙМЕР ==================== */
 static void fast_timer_cb(lv_timer_t *timer) {
-    // --- Автояркость по своему фоторезистору (GPIO20) – всегда, даже без шлюза ---
-    int light_raw = 0;
-    adc_oneshot_read(adc1_handle, ADC_CHANNEL_4, &light_raw);
-
+    int light_raw = 0; adc_oneshot_read(adc1_handle, ADC_CHANNEL_4, &light_raw);
     smooth_light = smooth_light + 0.2f * ((float)light_raw - smooth_light);
-
-    uint8_t max_brightness = 80;
-    uint8_t min_br = 5;
-    uint8_t dark_thr = 20;
-    uint8_t bright_thr = 80;
-
-    uint8_t new_duty;
+    uint8_t max_brightness = 80, min_br = 5, dark_thr = 20, bright_thr = 80, new_duty;
     if (dark_thr < bright_thr) {
-        if (smooth_light <= (float)dark_thr) {
-            new_duty = min_br;
-        } else if (smooth_light >= (float)bright_thr) {
-            new_duty = max_brightness;
-        } else {
-            float norm = (smooth_light - (float)dark_thr) / (float)(bright_thr - dark_thr);
-            float curved = powf(norm, 0.5f);
-            new_duty = min_br + (uint8_t)((max_brightness - min_br) * curved);
-        }
-    } else {
-        float norm = smooth_light / 4095.0f;
-        float curved = powf(norm, 0.5f);
-        new_duty = min_br + (uint8_t)((max_brightness - min_br) * curved);
-    }
-
+        if (smooth_light <= (float)dark_thr) new_duty = min_br;
+        else if (smooth_light >= (float)bright_thr) new_duty = max_brightness;
+        else { float norm = (smooth_light - (float)dark_thr) / (float)(bright_thr - dark_thr); new_duty = min_br + (uint8_t)((max_brightness - min_br) * powf(norm, 0.5f)); }
+    } else { float norm = smooth_light / 4095.0f; new_duty = min_br + (uint8_t)((max_brightness - min_br) * powf(norm, 0.5f)); }
     if (new_duty > 100) new_duty = 100;
     if (new_duty < min_br) new_duty = min_br;
+    if (new_duty != last_set_brightness) { bsp_display_brightness_set(new_duty); last_set_brightness = new_duty; }
 
-    if (new_duty != last_set_brightness) {
-        bsp_display_brightness_set(new_duty);
-        last_set_brightness = new_duty;
-    }
-
-    // --- Дальше стандартный код, требующий связи со шлюзом ---
     CarData *data = CarData_Get();
-    if (!data || !uart_is_gateway_alive()) {
-        // Запрашиваем телеметрию Arduino, даже если шлюз мёртв
-        if (uart_is_arduino_alive()) {
-            static uint8_t arduino_req_counter = 0;
-            if (++arduino_req_counter % 5 == 0) {  // раз в 500 мс
-                uart_send_to_arduino(MSG_FAN_TELEMETRY, NULL, 0);
-            }
-        }
-        return;
-    }
-
-    static uint8_t fast_counter = 0;
-    fast_counter++;
-
-    if (fast_counter % 5 == 0) {
-        uart_send_to_gateway(MSG_RPM, NULL, 0);
-        uart_send_to_gateway(MSG_THROTTLE, NULL, 0);
-    }
-    uart_send_to_gateway(MSG_REQ_ACCEL, NULL, 0);
-    if (fast_counter % 2 == 0) {
-        uart_send_to_gateway(MSG_SPEED, NULL, 0);
-        uart_send_to_gateway(MSG_INST_FUEL, NULL, 0);
-    }
-
-    // Запрос телеметрии климата раз в секунду (каждые 10 циклов по 100 мс)
-    if (fast_counter % 10 == 0) {
-        uart_send_to_gateway(MSG_CLIMATE_TELEMETRY, NULL, 0);
-    }
-
-    // Запрос телеметрии Arduino раз в 500 мс (каждые 5 циклов)
-    if (fast_counter % 5 == 0) {
-        if (uart_is_arduino_alive()) {
-            uart_send_to_arduino(MSG_FAN_TELEMETRY, NULL, 0);
-        }
-    }
-
-    if (fast_counter >= 10) fast_counter = 0;
+    if (!data) return;
 
     int speed_val, rpm_val, lph_val, throttle_val;
     float accel_x;
@@ -273,531 +159,170 @@ static void fast_timer_cb(lv_timer_t *timer) {
     lph_val = (int)(data->lphValue * 10);
     throttle_val = (int)data->throttlePos;
     accel_x = data->accel_x;
-
-    // Автоматическое обновление пиковых перегрузок
-    float accel_g = accel_x / 9.81f;
-    if (accel_g > data->max_pos_accel_g) {
-        data->max_pos_accel_g = accel_g;
-    }
-    if (accel_g < data->max_neg_accel_g) {
-        data->max_neg_accel_g = accel_g;
-    }
     CarData_Unlock();
+
+    float accel_g = accel_x / 9.81f;
+    if (accel_g > 0) { if (accel_g > trip_max_pos_accel) trip_max_pos_accel = accel_g; int accel_dg = (trip_max_pos_accel > 0.01f) ? (int)(accel_g * 300.0f / trip_max_pos_accel) : (int)(accel_g * 3000); if (accel_dg > 300) accel_dg = 300; lv_subject_set_int(&subject_accel, accel_dg); }
+    else if (accel_g < 0) { float neg = -accel_g; if (neg > trip_max_neg_accel) trip_max_neg_accel = neg; int accel_dg = (trip_max_neg_accel > 0.01f) ? (int)(accel_g * 300.0f / trip_max_neg_accel) : (int)(accel_g * 3000); if (accel_dg < -300) accel_dg = -300; lv_subject_set_int(&subject_accel, accel_dg); }
+    else lv_subject_set_int(&subject_accel, 0);
 
     lv_subject_set_int(&subject_speed, speed_val);
     lv_subject_set_int(&subject_rpm, rpm_val);
     lv_subject_set_int(&subject_lph, lph_val);
     lv_subject_set_int(&subject_throttle, throttle_val);
-
-    // Обновление дуги ускорения: переводим в сотые доли g и отправляем в субъект
-    int accel_dg = (int)(accel_g * 100.0f);
-    if (accel_dg > 300) accel_dg = 300;
-    if (accel_dg < -300) accel_dg = -300;
-    lv_subject_set_int(&subject_accel, accel_dg);
 }
 
-/* ---------- Медленный таймер (1 сек) ---------- */
+/* ==================== СЕКУНДНЫЙ ТАЙМЕР (ХИРУРГИЧЕСКАЯ ВЕРСИЯ) ==================== */
 static void clock_timer_cb(lv_timer_t *timer) {
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    struct tm *timeinfo = localtime(&tv.tv_sec);
-    char buf[64];
-    uint32_t now = (uint32_t)tv.tv_sec;
+    struct timeval tv; gettimeofday(&tv, NULL); struct tm *timeinfo = localtime(&tv.tv_sec); char buf[64]; uint32_t now = (uint32_t)tv.tv_sec;
+    lv_obj_t *act_scr = lv_scr_act(); bool dash_active = (ui_Screen_DashBoard && act_scr == ui_Screen_DashBoard);
+    CarData *data = CarData_Get(); if (!data) return;
 
-    CarData *data = CarData_Get();
-    if (data) {
-        CarData_Lock(10);
-        data->systemTime = now;
-        if (data->rpmValue > 400) {
-            data->last_valid_coolant_temp = data->tempValue;
-        }
-        // Управление длительностью заезда и остановками
-        FionaState *state = fiona_brain_get_state();
-        if (state) {
-            if (data->rpmValue > 400) {
-                if (state->engine_start_time == 0) {
-                    state->engine_start_time = now;
-                }
-                state->trip_duration_sec = now - state->engine_start_time;
-            } else {
-                state->engine_start_time = 0;
-                state->trip_duration_sec = 0;
-                state->long_trip = false;
-                state->very_long_trip = false;
-            }
-            // Подсчёт остановок только по скорости
-            if (data->speedValue == 0) {
-                update_stop_history(now);
-            }
-        }
-        CarData_Unlock();
-    }
-    
-    // Часы
-    strftime(buf, sizeof(buf), "%H:%M:%S", timeinfo);
-    lv_label_set_text(ui_DashBoard_Label_Time, buf);
-    if (screensaver_active || lv_scr_act() == ui_Screen_SplashScreen) {
-        const char *days[] = {"Воскресенье","Понедельник","Вторник","Среда","Четверг","Пятница","Суббота"};
-        strftime(buf, sizeof(buf), "%d.%m.%Y года\n%H:%M:%S\n", timeinfo);
-        strcat(buf, days[timeinfo->tm_wday]);
-        lv_label_set_text(ui_SplashScreen_Label_Clock, buf);
-    }
-
-    if (!data) return;
-
-    // --- Опрос статуса калибровки IMU (читаем из CarData) ---
-    if (calibration_active) {
-        uart_send_to_gateway(MSG_REQ_CALIB_STATUS, NULL, 0);
-        switch (data->calib_status) {
-            case 0x01:
-                lv_label_set_text(ui_DashBoard_Label_FionaSpeachLabelDash, "Калибровка: не двигайтесь");
-                break;
-            case 0x02:
-                lv_label_set_text(ui_DashBoard_Label_FionaSpeachLabelDash, "Разгонитесь, прокатитесь и затормозите");
-                break;
-            case 0x03:
-                lv_label_set_text(ui_DashBoard_Label_FionaSpeachLabelDash, "Калибровка завершена");
-                calibration_active = false;
-                break;
-            case 0x10:
-            case 0x11:
-            case 0x12:
-            case 0x13:
-                lv_label_set_text(ui_DashBoard_Label_FionaSpeachLabelDash, "Ошибка калибровки. Повторите.");
-                calibration_active = false;
-                break;
-            default:
-                break;
-        }
-    }
-
-    if (timeinfo->tm_hour == 0 && timeinfo->tm_min == 1 && timeinfo->tm_sec == 0) {
-        if (!data->day_requested_today) {
-            uart_send_to_gateway(MSG_REQ_DAY_STATS, NULL, 0);
-            CarData_Lock(10);
-            data->day_requested_today = true;
-            CarData_Unlock();
-        }
-    }
-    
-    if (timeinfo->tm_hour == 0 && timeinfo->tm_min == 0 && timeinfo->tm_sec == 1) {
-        CarData_Lock(10);
-        data->day_requested_today = false;
-        CarData_Unlock();
-    }
-
-    // Обновляем stop_count_5min в мозгу
+    /* === ЧТЕНИЕ ДАННЫХ ИЗ CarData === */
+    CarData_Lock(10);
+    data->systemTime = now;
+    if (data->rpmValue > 400) data->last_valid_coolant_temp = data->tempValue;
     FionaState *state = fiona_brain_get_state();
-    if (state) {
-        state->stop_count_5min = count_stops_last_5min(now);
-    }
-
-    fiona_brain_update();
-
-    // Получаем фразу и выводим с ограничением по частоте
-    state = fiona_brain_get_state();
-    if (state) {
-        FionaPhrase phrase = fiona_soul_get_phrase(state);
-        bool show = false;
-
-        if (phrase.text && phrase.text[0] != '\0') {
-            if (phrase.tone == FIONA_TONE_SERIOUS) {
-                if (now - last_important_phrase_time >= 10) {
-                    show = true;
-                    last_important_phrase_time = now;
-                }
-            } else {
-                uint8_t mode = state->driving_mode;
-                int min_interval = 10;
-                if (mode == 2) min_interval = 120;
-                else if (mode == 1) min_interval = 30;
-                else if (mode == 3) min_interval = 15;
-
-                if (now - last_casual_phrase_time >= min_interval) {
-                    show = true;
-                    last_casual_phrase_time = now;
-                }
-            }
-        }
-
-        if (show) {
-            lv_label_set_text(ui_DashBoard_Label_EditionString, phrase.text);
-            lv_subject_set_pointer(&subject_dash_message, (void*)phrase.text);
-            g_current_tone = phrase.tone;
-            lv_label_set_text(ui_DashBoard_Label_FionaSpeachLabelDash, "");
-            phrase_display_start_time = now;
-            strncpy(last_displayed_text, phrase.text, sizeof(last_displayed_text)-1);
-        } else {
-            if (phrase_display_start_time > 0 && (now - phrase_display_start_time) > 10) {
-                lv_subject_set_pointer(&subject_dash_message, (void*)"");
-                lv_label_set_text(ui_DashBoard_Label_FionaSpeachLabelDash, "");
-                phrase_display_start_time = 0;
-                last_displayed_text[0] = '\0';
-            }
-        }
-    }
-
-    // ============ УПРАВЛЕНИЕ «КОТАМИ» ============
-    bool red_condition = false;
-    if (data) {
-        float temp = data->tempValue;
-        float lph  = data->lphValue;
-        int   rpm  = data->rpmValue;
-        if ((temp > 112 && rpm > 400 && lph > 12) || (temp < 90 && lph > 12)) {
-            red_condition = true;
-        }
-    }
-
-    lv_obj_add_flag(ui_DashBoard_Image_ImageCyan, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_add_flag(ui_DashBoard_Image_ImageGreen, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_add_flag(ui_DashBoard_Image_ImageYellow, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_add_flag(ui_DashBoard_Image_ImageRed, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_add_flag(ui_DashBoard_Image_ImageSpeed, LV_OBJ_FLAG_HIDDEN);
-
-    if (red_condition) {
-        lv_obj_remove_flag(ui_DashBoard_Image_ImageRed, LV_OBJ_FLAG_HIDDEN);
-        red_alert_active = true;
-    } else {
-        red_alert_active = false;
-        if (state) {
-            uint8_t style = state->manual_style ? state->manual_style : state->driving_style;
-            lv_obj_t *cat_to_show = NULL;
-            if (style == 1) cat_to_show = ui_DashBoard_Image_ImageGreen;
-            else if (style == 2) cat_to_show = ui_DashBoard_Image_ImageYellow;
-            else if (style == 3) cat_to_show = ui_DashBoard_Image_ImageCyan;
-
-            if (cat_to_show) {
-                lv_obj_remove_flag(cat_to_show, LV_OBJ_FLAG_HIDDEN);
-            }
-
-            if (state->manual_style != 0) {
-                lv_obj_remove_flag(ui_DashBoard_Image_ImageSpeed, LV_OBJ_FLAG_HIDDEN);
-            }
-        }
-    }
-
-    // ============ ОТПРАВКА РЕЖИМА ARDUINO ============
-    if (uart_is_arduino_alive()) {
-        uint8_t desired_mode = 1; // Normal по умолчанию
-        // Определяем желаемый режим охлаждения на основе driving_mode/manual_style
-        if (state) {
-            if (state->manual_style != 0) {
-                // Ручной выбор стиля
-                if (state->manual_style == 3) desired_mode = 3;      // Спорт -> City
-                else desired_mode = 1;                               // Спокойный/Агрессивный -> Normal
-            } else {
-                // Автоматический режим
-                switch (state->driving_mode) {
-                    case 3: desired_mode = 2; break;   // HIGHWAY -> Highway
-                    case 2: desired_mode = 3; break;   // TRAFFIC -> City
-                    default: desired_mode = 1; break;   // остальные -> Normal
-                }
-            }
-        }
-
-        // Отправляем, только если режим изменился
-        if (desired_mode != last_sent_fan_mode) {
-            uint8_t mode_payload = desired_mode;
-            uart_send_to_arduino(MSG_FAN_SET_MODE, &mode_payload, 1);
-            last_sent_fan_mode = desired_mode;
-            // При отправке режима помечаем, что Arduino не в автономном режиме
-            CarData_Lock(10);
-            data->arduino_mode_from_screen = true;
-            CarData_Unlock();
-        }
-    } else {
-        last_sent_fan_mode = 0; // сброс при потере связи
-    }
-
-    // ============ ИНДИКАТОРЫ ВЕНТИЛЯТОРОВ И КЛИМАТА ============
-    CarData_Lock(10);
-    uint8_t fan1 = data->fanCurrentPWM1;
-    uint8_t fan2 = data->fanCurrentPWM2;
-    bool arduino_auto = !data->arduino_mode_from_screen;
-    float cabin_temp = data->cabin_temp;
-    float target_temp = data->climate_target_temp;
-    uint8_t heater_pwm = data->heater_pwm;
-    int speed_kmh = data->speedValue;
-    CarData_Unlock();
-
-    // Вентиляторы радиатора
-    lv_obj_add_flag(ui_DashBoard_Image_RFirstVent, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_add_flag(ui_DashBoard_Image_RSecondVent, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_add_flag(ui_DashBoard_Image_RFirstVentAlert, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_add_flag(ui_DashBoard_Image_RSecondVentAlert, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_add_flag(ui_DashBoard_Image_RSecondVentAlert1, LV_OBJ_FLAG_HIDDEN);
-
-    if (fan1 > 0) {
-        lv_obj_remove_flag(ui_DashBoard_Image_RFirstVent, LV_OBJ_FLAG_HIDDEN);
-        if (fan1 > 191) lv_obj_remove_flag(ui_DashBoard_Image_RFirstVentAlert, LV_OBJ_FLAG_HIDDEN);
-    }
-    if (fan2 > 0) {
-        lv_obj_remove_flag(ui_DashBoard_Image_RSecondVent, LV_OBJ_FLAG_HIDDEN);
-        if (fan2 > 191) lv_obj_remove_flag(ui_DashBoard_Image_RSecondVentAlert, LV_OBJ_FLAG_HIDDEN);
-    }
-    if (arduino_auto) {
-        lv_obj_remove_flag(ui_DashBoard_Image_RSecondVentAlert1, LV_OBJ_FLAG_HIDDEN);
-    }
-
-    // Иконки климата
-    lv_obj_add_flag(ui_DashBoard_Image_FreeWind, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_add_flag(ui_DashBoard_Image_ConditionHot, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_add_flag(ui_DashBoard_Image_ConditionCold, LV_OBJ_FLAG_HIDDEN);
-
-    // FreeWind: скорость >20 км/ч и печка выключена
-    if (speed_kmh > 20 && heater_pwm == 0) {
-        lv_obj_remove_flag(ui_DashBoard_Image_FreeWind, LV_OBJ_FLAG_HIDDEN);
-    }
-
-    // ConditionHot/ConditionCold: разница температур вне зоны [-5..+3]
-    float diff = cabin_temp - target_temp;
-    if (diff > 3.0f) {
-        lv_obj_remove_flag(ui_DashBoard_Image_ConditionCold, LV_OBJ_FLAG_HIDDEN);
-    } else if (diff < -5.0f) {
-        lv_obj_remove_flag(ui_DashBoard_Image_ConditionHot, LV_OBJ_FLAG_HIDDEN);
-    }
-
-    // ============ НОВЫЕ МЕТКИ ШИМ НА ДАШБОРДЕ ============
-    if (ui_DashBoard_Label_CondShim) {
-        if (heater_pwm > 0) {
-            lv_label_set_text_fmt(ui_DashBoard_Label_CondShim, "%d%%", (heater_pwm * 100) / 255);
-            lv_obj_remove_flag(ui_DashBoard_Label_CondShim, LV_OBJ_FLAG_HIDDEN);
-        } else {
-            lv_obj_add_flag(ui_DashBoard_Label_CondShim, LV_OBJ_FLAG_HIDDEN);
-        }
-    }
-    if (ui_DashBoard_Label_VFirstShim) {
-        if (fan1 > 0) {
-            lv_label_set_text_fmt(ui_DashBoard_Label_VFirstShim, "%d%%", (fan1 * 100) / 255);
-            lv_obj_remove_flag(ui_DashBoard_Label_VFirstShim, LV_OBJ_FLAG_HIDDEN);
-        } else {
-            lv_obj_add_flag(ui_DashBoard_Label_VFirstShim, LV_OBJ_FLAG_HIDDEN);
-        }
-    }
-    if (ui_DashBoard_Label_VSecondShim) {
-        if (fan2 > 0) {
-            lv_label_set_text_fmt(ui_DashBoard_Label_VSecondShim, "%d%%", (fan2 * 100) / 255);
-            lv_obj_remove_flag(ui_DashBoard_Label_VSecondShim, LV_OBJ_FLAG_HIDDEN);
-        } else {
-            lv_obj_add_flag(ui_DashBoard_Label_VSecondShim, LV_OBJ_FLAG_HIDDEN);
-        }
-    }
-
-    // ============ ИНДИКАТОРЫ И ДИАГНОСТИКА (ВСЕГДА) ============
-    CarData_Lock(10);
-    float bat_voltage = data->batValue;
-    float fuel_level = data->fuelValue;
-    int temp_coolant = data->tempValue;
+    if (state) { static bool was_engine_off = true; if (data->rpmValue > 400) { if (was_engine_off) { trip_max_pos_accel = 0; trip_max_neg_accel = 0; was_engine_off = false; } if (state->engine_start_time == 0) state->engine_start_time = now; state->trip_duration_sec = now - state->engine_start_time; } else { state->engine_start_time = 0; state->trip_duration_sec = 0; state->long_trip = false; state->very_long_trip = false; was_engine_off = true; } if (data->speedValue == 0) update_stop_history(now); }
+    bool trip_force = data->trip_force_active; int tempValue = data->tempValue; int rpmValue = data->rpmValue; float lphValue = data->lphValue;
+    float arduino_coolant_temp = data->arduino_coolant_temp; uint8_t arduino_fan_mode = data->arduino_fan_mode; bool arduino_mode_from_screen = data->arduino_mode_from_screen;
+    uint8_t fan1 = data->fanCurrentPWM1; uint8_t fan2 = data->fanCurrentPWM2; bool arduino_auto = !data->arduino_mode_from_screen;
+    float cabin_temp = data->cabin_temp; float target_temp = data->climate_target_temp;
+    float batValue = data->batValue; float fuelValue = data->fuelValue; int rangeValue = data->rangeValue;
+    bool uartArduinoAlive = data->uartArduinoAlive;
+    int speed_kmh = data->speedValue; uint8_t heater_pwm = data->heater_pwm;
     int current_rpm = data->rpmValue;
-    uint32_t odo_val = data->odoKm;
-    bool arduino_alive = data->uartArduinoAlive;
-    bool trip_state = data->tripState;
-    float current_accel_x = data->accel_x;
-    float current_accel_y = data->accel_y;
-    float current_accel_z = data->accel_z;
-    uint16_t light_raw = (uint16_t)smooth_light;
+    bool wifi_connected = data->wifiConnected;
+    bool gps_valid = data->gps_valid;
     CarData_Unlock();
 
-    // Обновляем массив индикаторов
-    indicators_ok[0] = sd_card_mounted();
-    indicators_ok[1] = arduino_alive;
-    indicators_ok[2] = uart_is_gateway_alive();
-    indicators_ok[3] = fiona_soul_phrases_check();
-    indicators_ok[4] = sd_stats_check();
-    indicators_ok[5] = sd_presets_check();
+    /* === ПРОВЕРКА СВЯЗИ === */
+    if (now - last_gw_check_time >= 5) { gw_cached_alive = uart_is_gateway_alive(); last_gw_check_time = now; }
 
-    // --- Виджет ESP32 ---
-    snprintf(esp32_status_text, sizeof(esp32_status_text),
-             "Speed: %d km/h\n"
-             "RPM: %d\n"
-             "Battery: %.1f V\n"
-             "Fuel: %.1f L\n"
-             "ODO: %u km\n"
-             "Accel X:%.2f Y:%.2f Z:%.2f m/s²\n"
-             "Gyro X:%.2f Y:%.2f Z:%.2f °/s\n"
-             "Tilt R:%d P:%d deg\n"
-             "Light: %d\n"
-             "Target T: %.1f°C\n"
-             "Cabin T: %.1f°C\n"
-             "Heater PWM: %d",
-             speed_kmh, current_rpm,
-             bat_voltage, fuel_level, odo_val,
-             current_accel_x, current_accel_y, current_accel_z,
-             data->gyro_x, data->gyro_y, data->gyro_z,
-             data->tilt_roll, data->tilt_pitch,
-             light_raw,
-             data->climate_target_temp,
-             data->cabin_temp,
-             data->heater_pwm);
+    /* === ВРЕМЯ === */
+    if (dash_active) { strftime(buf, sizeof(buf), "%H:%M:%S", timeinfo); lv_label_set_text(ui_DashBoard_Label_Time, buf); lv_obj_set_style_text_color(ui_DashBoard_Label_Time, lv_color_hex(trip_force ? 0x00FF00 : 0x9EEFFC), LV_PART_MAIN); }
 
-    // --- Виджет Arduino ---
-    snprintf(arduino_status_text, sizeof(arduino_status_text),
-             "Link: %s\n"
-             "Fan1 PWM: %d (%d%%)\n"
-             "Fan2 PWM: %d (%d%%)\n"
-             "Coolant: %.1f°C\n"
-             "Mode: %s\n"
-             "Auto: %s",
-             arduino_alive ? "OK" : "NO",
-             data->fanCurrentPWM1, (data->fanCurrentPWM1 * 100) / 255,
-             data->fanCurrentPWM2, (data->fanCurrentPWM2 * 100) / 255,
-             data->arduino_coolant_temp,
-             data->arduino_fan_mode == 1 ? "NORMAL" : (data->arduino_fan_mode == 2 ? "HIGHWAY" : "CITY"),
-             data->arduino_mode_from_screen ? "SCREEN" : "AUTO");
+    /* === СПЛЕШ-СКРИН === */
+    if (screensaver_active || act_scr == ui_Screen_SplashScreen) { const char *days[] = {"Воскресенье","Понедельник","Вторник","Среда","Четверг","Пятница","Суббота"}; strftime(buf, sizeof(buf), "%d.%m.%Y года\n%H:%M:%S\n", timeinfo); strcat(buf, days[timeinfo->tm_wday]); lv_label_set_text(ui_SplashScreen_Label_Clock, buf); }
 
-    snprintf(screen_status_text, sizeof(screen_status_text),
-             "Uptime: %lu sec\n"
-             "SD: %s\n"
-             "GW: %s\n"
-             "Ard: %s\n"
-             "Speech: %s\n"
-             "Stat: %s\n"
-             "Preset: %s\n"
-             "Calib: 0x%02X\n"
-             "DrvMode: %d\n"
-             "DrvStyle: %d",
-             (uint32_t)(now - data->systemTime + 1),
-             indicators_ok[0] ? "OK" : "ERR",
-             indicators_ok[2] ? "OK" : "ERR",
-             indicators_ok[1] ? "OK" : "ERR",
-             indicators_ok[3] ? "OK" : "ERR",
-             indicators_ok[4] ? "OK" : "ERR",
-             indicators_ok[5] ? "OK" : "ERR",
-             data->calib_status,
-             state ? state->driving_mode : -1,
-             state ? state->driving_style : -1);
+    /* === ЗАПРОС СТИЛЯ === */
+    if (gw_cached_alive && (now - last_style_request_time >= 5)) { uart_send_to_gateway(MSG_REQ_DRIVING_STYLE, NULL, 0); last_style_request_time = now; }
 
-    lv_textarea_set_text(ui_System_Textarea_TextAreaArduino, arduino_status_text);
-    lv_textarea_set_text(ui_System_Textarea_TextAreaESP, esp32_status_text);
-    lv_textarea_set_text(ui_System_Textarea_TextAreaScreen, screen_status_text);
-
-    // Индикаторы (мигание)
-    static bool blink_toggle = false;
-    blink_toggle = !blink_toggle;
-    struct {
-        lv_obj_t *back;
-        lv_obj_t *grey;
-        lv_obj_t *red;
-    } indicator_widgets[6] = {
-        { ui_System_Image_SDBack, ui_System_Image_SDGrey, ui_System_Image_SDRed },
-        { ui_System_Image_ArduinoBack, ui_System_Image_ArduinoGrey, ui_System_Image_ArduinoRed },
-        { ui_System_Image_ESP32Back, ui_System_Image_ESP32Grey, ui_System_Image_ESP32Red },
-        { ui_System_Image_SpeachBack, ui_System_Image_SpeachGrey, ui_System_Image_SpeachRed },
-        { ui_System_Image_StatBack, ui_System_Image_StatGrey, ui_System_Image_StatRed },
-        { ui_System_Image_PresetBack, ui_System_Image_PresetGrey, ui_System_Image_PresetRed }
-    };
-    for (int i = 0; i < 6; i++) {
-        bool ok = indicators_ok[i];
-        lv_obj_add_flag(indicator_widgets[i].back, LV_OBJ_FLAG_HIDDEN);
-        lv_obj_add_flag(indicator_widgets[i].grey, LV_OBJ_FLAG_HIDDEN);
-        lv_obj_add_flag(indicator_widgets[i].red, LV_OBJ_FLAG_HIDDEN);
-        if (ok) {
-            lv_obj_remove_flag(indicator_widgets[i].back, LV_OBJ_FLAG_HIDDEN);
-        } else {
-            if (blink_toggle) {
-                lv_obj_remove_flag(indicator_widgets[i].red, LV_OBJ_FLAG_HIDDEN);
-            } else {
-                lv_obj_remove_flag(indicator_widgets[i].grey, LV_OBJ_FLAG_HIDDEN);
-            }
-        }
-    }
-
-    // Запросы к шлюзу (раз в секунду)
-    if (!screensaver_active && lv_scr_act() == ui_Screen_DashBoard && uart_is_gateway_alive()) {
-        uart_send_to_gateway(MSG_COOLANT_TEMP, NULL, 0);
-        uart_send_to_gateway(MSG_VOLTAGE, NULL, 0);
-        uart_send_to_gateway(MSG_FUEL_LEVEL, NULL, 0);
-        uart_send_to_gateway(MSG_ODO, NULL, 0);
-        uart_send_to_gateway(MSG_RANGE, NULL, 0);
-        uart_send_to_gateway(MSG_TRIP_TIME, NULL, 0);
-        uart_send_to_gateway(MSG_TRIP_PAUSE, NULL, 0);
-        uart_send_to_gateway(MSG_TRIP_FUEL, NULL, 0);
-        uart_send_to_gateway(MSG_TRIP_COST, NULL, 0);
-        uart_send_to_gateway(MSG_TRIP_STATUS, NULL, 0);
-        uart_send_to_gateway(MSG_TRIP_DIST, NULL, 0);
-
+    /* ========== СУБЪЕКТЫ (ВСЕГДА при активном дашборде) ========== */
+    if (dash_active) {
         CarData_Lock(10);
-        int temp_val = data->tempValue;
-        int bat_val  = (int)(data->batValue * 10);
-        int fuel_val = (int)(data->fuelValue * 10);
-        odo_val      = data->odoKm;
-        int range_val       = data->rangeValue;
-        int trip_time_val   = data->tripValue;
-        int trip_pause_val  = data->tripPauseValue;
-        int trip_fuel_val   = (int)(data->tripFuelUsed * 10);
-        int trip_dist_val   = (int)(data->tripDistanceKm * 10);
-        float trip_cost     = data->tripMValue;
-        float trip_fuel_litres = data->tripFuelUsed;
+        int bat_val = (int)(data->batValue * 10); int fuel_val = (int)(data->fuelValue * 10); uint32_t odo_val = data->odoKm;
+        int range_val = data->rangeValue; int trip_time_val = data->tripValue; int trip_pause_val = data->tripPauseValue;
+        int trip_fuel_val = (int)(data->tripFuelUsed * 10); int trip_dist_val = (int)(data->tripDistanceKm * 10);
         CarData_Unlock();
 
-        lv_subject_set_int(&subject_temp, temp_val);
-        lv_subject_set_int(&subject_bat, bat_val);
-        lv_subject_set_int(&subject_fuel, fuel_val);
-        lv_subject_set_int(&subject_odo, odo_val);
-        lv_subject_set_int(&subject_range, range_val);
-        lv_subject_set_int(&subject_trip_time, trip_time_val);
-        lv_subject_set_int(&subject_trip_pause, trip_pause_val);
-        lv_subject_set_int(&subject_trip_fuel, trip_fuel_val);
-        lv_subject_set_int(&subject_trip_dist, trip_dist_val);
-
-        show_trip_cost = !show_trip_cost;
-        if (show_trip_cost) {
-            lv_label_set_text_fmt(ui_DashBoard_Label_TripLitr, "%.2fр", trip_cost);
-        } else {
-            int lit_int = (int)(trip_fuel_litres * 10);
-            lv_label_set_text_fmt(ui_DashBoard_Label_TripLitr, "%d.%dл", lit_int / 10, lit_int % 10);
-        }
-
-        if (uart_is_gateway_alive()) {
-            lv_obj_remove_flag(ui_DashBoard_Image_BlueRing, LV_OBJ_FLAG_HIDDEN);
-        } else {
-            lv_obj_add_flag(ui_DashBoard_Image_BlueRing, LV_OBJ_FLAG_HIDDEN);
-        }
-        if (bat_voltage < BATT_LOW_THRESHOLD || bat_voltage > BATT_HIGH_THRESHOLD) {
-            lv_obj_remove_flag(ui_DashBoard_Image_Batallert, LV_OBJ_FLAG_HIDDEN);
-        } else {
-            lv_obj_add_flag(ui_DashBoard_Image_Batallert, LV_OBJ_FLAG_HIDDEN);
-        }
-        if (fuel_level < data->fuelRedThreshold) {
-            lv_obj_remove_flag(ui_DashBoard_Image_FuelAllert, LV_OBJ_FLAG_HIDDEN);
-        } else {
-            lv_obj_add_flag(ui_DashBoard_Image_FuelAllert, LV_OBJ_FLAG_HIDDEN);
-        }
-        if (temp_coolant > TEMP_COLD && temp_coolant <= TEMP_NORMAL) {
-            lv_obj_remove_flag(ui_DashBoard_Image_CoolNorm, LV_OBJ_FLAG_HIDDEN);
-        } else {
-            lv_obj_add_flag(ui_DashBoard_Image_CoolNorm, LV_OBJ_FLAG_HIDDEN);
-        }
-        if (temp_coolant > TEMP_WARM) {
-            lv_obj_remove_flag(ui_DashBoard_Image_CoolHigh, LV_OBJ_FLAG_HIDDEN);
-        } else {
-            lv_obj_add_flag(ui_DashBoard_Image_CoolHigh, LV_OBJ_FLAG_HIDDEN);
-        }
-        if (trip_state) {
-            lv_obj_remove_flag(ui_DashBoard_Image_TripImg, LV_OBJ_FLAG_HIDDEN);
-        } else {
-            lv_obj_add_flag(ui_DashBoard_Image_TripImg, LV_OBJ_FLAG_HIDDEN);
-        }
-        if (speed_kmh > 20) {
-            lv_obj_remove_flag(ui_DashBoard_Image_FreeWind, LV_OBJ_FLAG_HIDDEN);
-        } else {
-            lv_obj_add_flag(ui_DashBoard_Image_FreeWind, LV_OBJ_FLAG_HIDDEN);
-        }
+        lv_subject_set_int(&subject_temp, tempValue); lv_subject_set_int(&subject_bat, bat_val); lv_subject_set_int(&subject_fuel, fuel_val);
+        lv_subject_set_int(&subject_odo, odo_val); lv_subject_set_int(&subject_range, range_val); lv_subject_set_int(&subject_trip_time, trip_time_val);
+        lv_subject_set_int(&subject_trip_pause, trip_pause_val); lv_subject_set_int(&subject_trip_fuel, trip_fuel_val); lv_subject_set_int(&subject_trip_dist, trip_dist_val);
     }
 
-    // Скринсейвер
-    if (!screensaver_active) {
-        if (current_rpm < 400) {
-            engine_off_seconds++;
+    /* ========== ВИДЖЕТЫ, ЗАВИСЯЩИЕ ОТ ДАННЫХ ШЛЮЗА ========== */
+    if (dash_active && gw_cached_alive) {
+        /* --- КОТЫ (АКТИВНЫ) --- */
+        bool red_condition = (tempValue > 112 && rpmValue > 400 && lphValue > 12) || (tempValue < 90 && lphValue > 12);
+        lv_obj_add_flag(ui_DashBoard_Image_ImageCyan, LV_OBJ_FLAG_HIDDEN); lv_obj_add_flag(ui_DashBoard_Image_ImageGreen, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_add_flag(ui_DashBoard_Image_ImageYellow, LV_OBJ_FLAG_HIDDEN); lv_obj_add_flag(ui_DashBoard_Image_ImageRed, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_add_flag(ui_DashBoard_Image_ImageSpeed, LV_OBJ_FLAG_HIDDEN);
+        if (red_condition) {
+            if (lv_obj_has_flag(ui_DashBoard_Image_ImageRed, LV_OBJ_FLAG_HIDDEN)) lv_obj_remove_flag(ui_DashBoard_Image_ImageRed, LV_OBJ_FLAG_HIDDEN);
+            red_alert_active = true;
         } else {
-            engine_off_seconds = 0;
+            red_alert_active = false;
+            if (state) {
+                uint8_t style = state->manual_style ? state->manual_style : state->driving_style;
+                if (style == 1 && lv_obj_has_flag(ui_DashBoard_Image_ImageGreen, LV_OBJ_FLAG_HIDDEN)) lv_obj_remove_flag(ui_DashBoard_Image_ImageGreen, LV_OBJ_FLAG_HIDDEN);
+                else if (style == 2 && lv_obj_has_flag(ui_DashBoard_Image_ImageYellow, LV_OBJ_FLAG_HIDDEN)) lv_obj_remove_flag(ui_DashBoard_Image_ImageYellow, LV_OBJ_FLAG_HIDDEN);
+                else if (style == 3 && lv_obj_has_flag(ui_DashBoard_Image_ImageCyan, LV_OBJ_FLAG_HIDDEN)) lv_obj_remove_flag(ui_DashBoard_Image_ImageCyan, LV_OBJ_FLAG_HIDDEN);
+                if (state->manual_style != 0 && lv_obj_has_flag(ui_DashBoard_Image_ImageSpeed, LV_OBJ_FLAG_HIDDEN)) lv_obj_remove_flag(ui_DashBoard_Image_ImageSpeed, LV_OBJ_FLAG_HIDDEN);
+            }
         }
-        if (engine_off_seconds >= data->screensaver_timeout_sec) {
-            fiona_core_activate_screensaver();
+
+        /* --- ВЕНТИЛЯТОРЫ (ЗАКОММЕНТИРОВАНЫ ПОСТРОЧНО) --- */
+         lv_obj_add_flag(ui_DashBoard_Image_RFirstVent, LV_OBJ_FLAG_HIDDEN);
+        // lv_obj_add_flag(ui_DashBoard_Image_RSecondVent, LV_OBJ_FLAG_HIDDEN);
+        // lv_obj_add_flag(ui_DashBoard_Image_RFirstVentAlert, LV_OBJ_FLAG_HIDDEN);
+        // lv_obj_add_flag(ui_DashBoard_Image_RSecondVentAlert, LV_OBJ_FLAG_HIDDEN);
+        // lv_obj_add_flag(ui_DashBoard_Image_RSecondVentAlert1, LV_OBJ_FLAG_HIDDEN);
+        // if (fan1 > 0) {
+        //     if (lv_obj_has_flag(ui_DashBoard_Image_RFirstVent, LV_OBJ_FLAG_HIDDEN)) lv_obj_remove_flag(ui_DashBoard_Image_RFirstVent, LV_OBJ_FLAG_HIDDEN);
+        //     if (fan1 > 191 && lv_obj_has_flag(ui_DashBoard_Image_RFirstVentAlert, LV_OBJ_FLAG_HIDDEN)) lv_obj_remove_flag(ui_DashBoard_Image_RFirstVentAlert, LV_OBJ_FLAG_HIDDEN);
+        // }
+        // if (fan2 > 0) {
+        //     if (lv_obj_has_flag(ui_DashBoard_Image_RSecondVent, LV_OBJ_FLAG_HIDDEN)) lv_obj_remove_flag(ui_DashBoard_Image_RSecondVent, LV_OBJ_FLAG_HIDDEN);
+        //     if (fan2 > 191 && lv_obj_has_flag(ui_DashBoard_Image_RSecondVentAlert, LV_OBJ_FLAG_HIDDEN)) lv_obj_remove_flag(ui_DashBoard_Image_RSecondVentAlert, LV_OBJ_FLAG_HIDDEN);
+        // }
+        // if (arduino_auto && lv_obj_has_flag(ui_DashBoard_Image_RSecondVentAlert1, LV_OBJ_FLAG_HIDDEN)) lv_obj_remove_flag(ui_DashBoard_Image_RSecondVentAlert1, LV_OBJ_FLAG_HIDDEN);
+
+        /* --- КЛИМАТ (ЗАКОММЕНТИРОВАН ПОСТРОЧНО) --- */
+        // lv_obj_add_flag(ui_DashBoard_Image_FreeWind, LV_OBJ_FLAG_HIDDEN);
+        // lv_obj_add_flag(ui_DashBoard_Image_ConditionHot, LV_OBJ_FLAG_HIDDEN);
+        // lv_obj_add_flag(ui_DashBoard_Image_ConditionCold, LV_OBJ_FLAG_HIDDEN);
+        // if (speed_kmh > 20 && heater_pwm == 0 && lv_obj_has_flag(ui_DashBoard_Image_FreeWind, LV_OBJ_FLAG_HIDDEN)) lv_obj_remove_flag(ui_DashBoard_Image_FreeWind, LV_OBJ_FLAG_HIDDEN);
+        // float diff = cabin_temp - target_temp;
+        // if (diff > 3.0f && lv_obj_has_flag(ui_DashBoard_Image_ConditionCold, LV_OBJ_FLAG_HIDDEN)) lv_obj_remove_flag(ui_DashBoard_Image_ConditionCold, LV_OBJ_FLAG_HIDDEN);
+        // else if (diff < -5.0f && lv_obj_has_flag(ui_DashBoard_Image_ConditionHot, LV_OBJ_FLAG_HIDDEN)) lv_obj_remove_flag(ui_DashBoard_Image_ConditionHot, LV_OBJ_FLAG_HIDDEN);
+
+        /* --- МЕТКИ (АКТИВНЫ) --- */
+        if (ui_DashBoard_Label_VFirstShim) {
+            if (arduino_coolant_temp > 0 || fan1 > 0) { char temp_buf[16]; format_float_1(temp_buf, sizeof(temp_buf), arduino_coolant_temp); lv_label_set_text_fmt(ui_DashBoard_Label_VFirstShim, "%s C", temp_buf); if (lv_obj_has_flag(ui_DashBoard_Label_VFirstShim, LV_OBJ_FLAG_HIDDEN)) lv_obj_remove_flag(ui_DashBoard_Label_VFirstShim, LV_OBJ_FLAG_HIDDEN); }
+            else lv_obj_add_flag(ui_DashBoard_Label_VFirstShim, LV_OBJ_FLAG_HIDDEN);
         }
-    } else {
-        if (current_rpm >= 400) {
-            fiona_core_deactivate_screensaver();
+        if (ui_DashBoard_Label_VSecondShim) {
+            const char *m = (arduino_fan_mode==1)?"Nrm":(arduino_fan_mode==2)?"Hwy":"Cty"; lv_label_set_text(ui_DashBoard_Label_VSecondShim, m);
+            if (lv_obj_has_flag(ui_DashBoard_Label_VSecondShim, LV_OBJ_FLAG_HIDDEN)) lv_obj_remove_flag(ui_DashBoard_Label_VSecondShim, LV_OBJ_FLAG_HIDDEN);
         }
+        if (ui_DashBoard_Label_CondShim) { char temp_buf[16]; format_float_1(temp_buf, sizeof(temp_buf), cabin_temp); lv_label_set_text_fmt(ui_DashBoard_Label_CondShim, "%s C", temp_buf); if (lv_obj_has_flag(ui_DashBoard_Label_CondShim, LV_OBJ_FLAG_HIDDEN)) lv_obj_remove_flag(ui_DashBoard_Label_CondShim, LV_OBJ_FLAG_HIDDEN); }
+
+        /* --- СТАТУСНАЯ СТРОКА (АКТИВНА) --- */
+        if (!calibration_active) {
+            char line[512] = {0}; char temp[128] = {0};
+            if (state && state->trip_duration_sec > 0) { uint16_t h = state->trip_duration_sec / 3600; uint8_t m = (state->trip_duration_sec % 3600) / 60; snprintf(temp, sizeof(temp), "Мы в пути %u ч %u мин. ", h, m); strcat(line, temp); }
+            char tbuf[16]; format_float_1(tbuf, sizeof(tbuf), cabin_temp);
+            if (cabin_temp > target_temp + 3.0f) snprintf(temp, sizeof(temp), "В салоне жарковато (%s°C). ", tbuf);
+            else if (cabin_temp < target_temp - 5.0f) snprintf(temp, sizeof(temp), "В салоне прохладно (%s°C). ", tbuf);
+            else snprintf(temp, sizeof(temp), "В салоне комфортно (%s°C). ", tbuf);
+            strcat(line, temp);
+            strcat(line, uartArduinoAlive ? (arduino_mode_from_screen ? "Охлаждение под контролем. " : "Охлаждение работает самостоятельно. ") : "Охлаждение недоступно. ");
+            if (state) {
+                const char *style_str = "Не определён";
+                if (state->manual_style) { style_str = (state->manual_style==1)?"Спокойный":(state->manual_style==2)?"Агрессивный":"Спорт"; snprintf(temp, sizeof(temp), "Стиль (ручной): %s. ", style_str); }
+                else { style_str = (state->driving_style==1)?"Спокойный":(state->driving_style==2)?"Агрессивный":(state->driving_style==3)?"Спорт":"Не определён"; snprintf(temp, sizeof(temp), "Стиль: %s. ", style_str); }
+                strcat(line, temp);
+                const char *mode_str = (state->driving_mode==1)?"Город":(state->driving_mode==2)?"Пробка":(state->driving_mode==3)?"Трасса":"Спокойно";
+                snprintf(temp, sizeof(temp), "Режим: %s. ", mode_str); strcat(line, temp);
+            }
+            char fbuf[16]; format_float_1(fbuf, sizeof(fbuf), fuelValue);
+            snprintf(temp, sizeof(temp), "Остаток в баке %s л, ", fbuf); strcat(line, temp);
+            if (rangeValue > 0) snprintf(temp, sizeof(temp), "хватит на %d км. ", rangeValue); else snprintf(temp, sizeof(temp), "расчёт хода недоступен. "); strcat(line, temp);
+            bool all_ok = true;
+            if (batValue < BATT_LOW_THRESHOLD || batValue > BATT_HIGH_THRESHOLD) { strcat(line, "Внимание: проблема с напряжением АКБ! "); all_ok = false; }
+            if (tempValue > TEMP_HOT) { strcat(line, "Перегрев двигателя! "); all_ok = false; }
+            if (fuelValue < FUEL_RED_THRESHOLD) { strcat(line, "Критический остаток топлива! "); all_ok = false; }
+            if (all_ok) strcat(line, "Все системы в норме.");
+            if (ui_DashBoard_Label_FionaSpeachLabelDash) lv_label_set_text(ui_DashBoard_Label_FionaSpeachLabelDash, line);
+        }
+
+        /* --- ИНДИКАТОРЫ СВЯЗИ (АКТИВНЫ) --- */
+        if (gw_cached_alive) { if (lv_obj_has_flag(ui_DashBoard_Image_BlueRing, LV_OBJ_FLAG_HIDDEN)) lv_obj_remove_flag(ui_DashBoard_Image_BlueRing, LV_OBJ_FLAG_HIDDEN); }
+        else lv_obj_add_flag(ui_DashBoard_Image_BlueRing, LV_OBJ_FLAG_HIDDEN);
+        if (wifi_connected) { if (lv_obj_has_flag(ui_DashBoard_Image_WiFi, LV_OBJ_FLAG_HIDDEN)) lv_obj_remove_flag(ui_DashBoard_Image_WiFi, LV_OBJ_FLAG_HIDDEN); }
+        else lv_obj_add_flag(ui_DashBoard_Image_WiFi, LV_OBJ_FLAG_HIDDEN);
+        if (gps_valid) { if (lv_obj_has_flag(ui_DashBoard_Image_GPS, LV_OBJ_FLAG_HIDDEN)) lv_obj_remove_flag(ui_DashBoard_Image_GPS, LV_OBJ_FLAG_HIDDEN); }
+        else lv_obj_add_flag(ui_DashBoard_Image_GPS, LV_OBJ_FLAG_HIDDEN);
     }
+
+    /* === АВТОВОЗВРАТ === */
+    if (!screensaver_active && act_scr != ui_Screen_DashBoard && act_scr != ui_Screen_SplashScreen) {
+        inactivity_seconds++;
+        if (inactivity_seconds >= data->screensaver_timeout_sec) { inactivity_seconds = 0; _ui_screen_change(&ui_Screen_DashBoard, LV_SCR_LOAD_ANIM_FADE_ON, 500, 0, &ui_Screen_DashBoard_screen_init); }
+    } else inactivity_seconds = 0;
+
+    /* === СКРИНСЕЙВЕР === */
+    if (!screensaver_active) { if (current_rpm < 400) engine_off_seconds++; else engine_off_seconds = 0; if (engine_off_seconds >= data->screensaver_timeout_sec) fiona_core_activate_screensaver(); }
+    else if (current_rpm >= 400) fiona_core_deactivate_screensaver();
 }

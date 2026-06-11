@@ -1,7 +1,7 @@
 {
     "version":            "1.2",
     "project_name":       "lvgl_demo_v9",
-    "project_version":    "v27.3-2-gb027ce6-dirty",
+    "project_version":    "v27.3-3-g7434a9f-dirty",
     "project_path":       "/home/mrak/projects/soul_of_fiona",
     "idf_path":           "/home/mrak/esp-idf-stable",
     "build_dir":          "/home/mrak/projects/soul_of_fiona/build",
@@ -14,19 +14,19 @@
     "git_revision":       "v5.4.3-1245-gbdc4dc5e9e-dirty",
     "target":             "esp32p4",
     "rev":                "",
-    "min_rev":            "1",
+    "min_rev":            "100",
     "max_rev":            "199",
     "phy_data_partition": "",
     "monitor_baud" :      "115200",
     "monitor_toolprefix": "riscv32-esp-elf-",
     "c_compiler":         "/home/mrak/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20260121/riscv32-esp-elf/bin/riscv32-esp-elf-gcc",
     "config_environment" : {
-        "COMPONENT_KCONFIGS" : "/home/mrak/esp-idf-stable/components/app_trace/Kconfig;/home/mrak/esp-idf-stable/components/bt/Kconfig;/home/mrak/esp-idf-stable/components/console/Kconfig;/home/mrak/esp-idf-stable/components/driver/Kconfig;/home/mrak/esp-idf-stable/components/efuse/Kconfig;/home/mrak/esp-idf-stable/components/esp-tls/Kconfig;/home/mrak/esp-idf-stable/components/esp_adc/Kconfig;/home/mrak/esp-idf-stable/components/esp_coex/Kconfig;/home/mrak/esp-idf-stable/components/esp_common/Kconfig;/home/mrak/esp-idf-stable/components/esp_driver_ana_cmpr/Kconfig;/home/mrak/esp-idf-stable/components/esp_driver_cam/Kconfig;/home/mrak/esp-idf-stable/components/esp_driver_dac/Kconfig;/home/mrak/esp-idf-stable/components/esp_driver_gpio/Kconfig;/home/mrak/esp-idf-stable/components/esp_driver_gptimer/Kconfig;/home/mrak/esp-idf-stable/components/esp_driver_i2c/Kconfig;/home/mrak/esp-idf-stable/components/esp_driver_i2s/Kconfig;/home/mrak/esp-idf-stable/components/esp_driver_isp/Kconfig;/home/mrak/esp-idf-stable/components/esp_driver_jpeg/Kconfig;/home/mrak/esp-idf-stable/components/esp_driver_ledc/Kconfig;/home/mrak/esp-idf-stable/components/esp_driver_mcpwm/Kconfig;/home/mrak/esp-idf-stable/components/esp_driver_parlio/Kconfig;/home/mrak/esp-idf-stable/components/esp_driver_pcnt/Kconfig;/home/mrak/esp-idf-stable/components/esp_driver_rmt/Kconfig;/home/mrak/esp-idf-stable/components/esp_driver_sdm/Kconfig;/home/mrak/esp-idf-stable/components/esp_driver_spi/Kconfig;/home/mrak/esp-idf-stable/components/esp_driver_touch_sens/Kconfig;/home/mrak/esp-idf-stable/components/esp_driver_tsens/Kconfig;/home/mrak/esp-idf-stable/components/esp_driver_uart/Kconfig;/home/mrak/esp-idf-stable/components/esp_driver_usb_serial_jtag/Kconfig;/home/mrak/esp-idf-stable/components/esp_eth/Kconfig;/home/mrak/esp-idf-stable/components/esp_event/Kconfig;/home/mrak/esp-idf-stable/components/esp_gdbstub/Kconfig;/home/mrak/esp-idf-stable/components/esp_hid/Kconfig;/home/mrak/esp-idf-stable/components/esp_http_client/Kconfig;/home/mrak/esp-idf-stable/components/esp_http_server/Kconfig;/home/mrak/esp-idf-stable/components/esp_https_server/Kconfig;/home/mrak/esp-idf-stable/components/esp_hw_support/Kconfig;/home/mrak/esp-idf-stable/components/esp_lcd/Kconfig;/home/mrak/esp-idf-stable/components/esp_mm/Kconfig;/home/mrak/esp-idf-stable/components/esp_netif/Kconfig;/home/mrak/esp-idf-stable/components/esp_partition/Kconfig;/home/mrak/esp-idf-stable/components/esp_phy/Kconfig;/home/mrak/esp-idf-stable/components/esp_pm/Kconfig;/home/mrak/esp-idf-stable/components/esp_psram/Kconfig;/home/mrak/esp-idf-stable/components/esp_ringbuf/Kconfig;/home/mrak/esp-idf-stable/components/esp_security/Kconfig;/home/mrak/esp-idf-stable/components/esp_system/Kconfig;/home/mrak/esp-idf-stable/components/esp_timer/Kconfig;/home/mrak/esp-idf-stable/components/esp_wifi/Kconfig;/home/mrak/esp-idf-stable/components/espcoredump/Kconfig;/home/mrak/esp-idf-stable/components/fatfs/Kconfig;/home/mrak/esp-idf-stable/components/freertos/Kconfig;/home/mrak/esp-idf-stable/components/hal/Kconfig;/home/mrak/esp-idf-stable/components/heap/Kconfig;/home/mrak/esp-idf-stable/components/ieee802154/Kconfig;/home/mrak/esp-idf-stable/components/log/Kconfig;/home/mrak/esp-idf-stable/components/lwip/Kconfig;/home/mrak/esp-idf-stable/components/mbedtls/Kconfig;/home/mrak/esp-idf-stable/components/mqtt/esp-mqtt/Kconfig;/home/mrak/esp-idf-stable/components/newlib/Kconfig;/home/mrak/esp-idf-stable/components/nvs_flash/Kconfig;/home/mrak/esp-idf-stable/components/nvs_sec_provider/Kconfig;/home/mrak/esp-idf-stable/components/openthread/Kconfig;/home/mrak/esp-idf-stable/components/protocomm/Kconfig;/home/mrak/esp-idf-stable/components/pthread/Kconfig;/home/mrak/esp-idf-stable/components/soc/Kconfig;/home/mrak/esp-idf-stable/components/spi_flash/Kconfig;/home/mrak/esp-idf-stable/components/spiffs/Kconfig;/home/mrak/esp-idf-stable/components/tcp_transport/Kconfig;/home/mrak/esp-idf-stable/components/ulp/Kconfig;/home/mrak/esp-idf-stable/components/unity/Kconfig;/home/mrak/esp-idf-stable/components/usb/Kconfig;/home/mrak/esp-idf-stable/components/vfs/Kconfig;/home/mrak/esp-idf-stable/components/wear_levelling/Kconfig;/home/mrak/esp-idf-stable/components/wifi_provisioning/Kconfig;/home/mrak/projects/soul_of_fiona/components/bsp_extra/Kconfig;/home/mrak/projects/soul_of_fiona/components/espressif__esp32_p4_function_ev_board/Kconfig;/home/mrak/projects/soul_of_fiona/managed_components/espressif__cjson/Kconfig;/home/mrak/projects/soul_of_fiona/managed_components/espressif__cmake_utilities/Kconfig;/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp-dsp/Kconfig;/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_codec_dev/Kconfig;/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_h264/Kconfig;/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_lcd_touch/Kconfig;/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_lvgl_port/Kconfig;/home/mrak/projects/soul_of_fiona/managed_components/lvgl__lvgl/Kconfig",
+        "COMPONENT_KCONFIGS" : "/home/mrak/esp-idf-stable/components/app_trace/Kconfig;/home/mrak/esp-idf-stable/components/bt/Kconfig;/home/mrak/esp-idf-stable/components/console/Kconfig;/home/mrak/esp-idf-stable/components/driver/Kconfig;/home/mrak/esp-idf-stable/components/efuse/Kconfig;/home/mrak/esp-idf-stable/components/esp-tls/Kconfig;/home/mrak/esp-idf-stable/components/esp_adc/Kconfig;/home/mrak/esp-idf-stable/components/esp_coex/Kconfig;/home/mrak/esp-idf-stable/components/esp_common/Kconfig;/home/mrak/esp-idf-stable/components/esp_driver_ana_cmpr/Kconfig;/home/mrak/esp-idf-stable/components/esp_driver_cam/Kconfig;/home/mrak/esp-idf-stable/components/esp_driver_dac/Kconfig;/home/mrak/esp-idf-stable/components/esp_driver_gpio/Kconfig;/home/mrak/esp-idf-stable/components/esp_driver_gptimer/Kconfig;/home/mrak/esp-idf-stable/components/esp_driver_i2c/Kconfig;/home/mrak/esp-idf-stable/components/esp_driver_i2s/Kconfig;/home/mrak/esp-idf-stable/components/esp_driver_isp/Kconfig;/home/mrak/esp-idf-stable/components/esp_driver_jpeg/Kconfig;/home/mrak/esp-idf-stable/components/esp_driver_ledc/Kconfig;/home/mrak/esp-idf-stable/components/esp_driver_mcpwm/Kconfig;/home/mrak/esp-idf-stable/components/esp_driver_parlio/Kconfig;/home/mrak/esp-idf-stable/components/esp_driver_pcnt/Kconfig;/home/mrak/esp-idf-stable/components/esp_driver_rmt/Kconfig;/home/mrak/esp-idf-stable/components/esp_driver_sdm/Kconfig;/home/mrak/esp-idf-stable/components/esp_driver_spi/Kconfig;/home/mrak/esp-idf-stable/components/esp_driver_touch_sens/Kconfig;/home/mrak/esp-idf-stable/components/esp_driver_tsens/Kconfig;/home/mrak/esp-idf-stable/components/esp_driver_uart/Kconfig;/home/mrak/esp-idf-stable/components/esp_driver_usb_serial_jtag/Kconfig;/home/mrak/esp-idf-stable/components/esp_eth/Kconfig;/home/mrak/esp-idf-stable/components/esp_event/Kconfig;/home/mrak/esp-idf-stable/components/esp_gdbstub/Kconfig;/home/mrak/esp-idf-stable/components/esp_hid/Kconfig;/home/mrak/esp-idf-stable/components/esp_http_client/Kconfig;/home/mrak/esp-idf-stable/components/esp_http_server/Kconfig;/home/mrak/esp-idf-stable/components/esp_https_server/Kconfig;/home/mrak/esp-idf-stable/components/esp_hw_support/Kconfig;/home/mrak/esp-idf-stable/components/esp_lcd/Kconfig;/home/mrak/esp-idf-stable/components/esp_mm/Kconfig;/home/mrak/esp-idf-stable/components/esp_netif/Kconfig;/home/mrak/esp-idf-stable/components/esp_partition/Kconfig;/home/mrak/esp-idf-stable/components/esp_phy/Kconfig;/home/mrak/esp-idf-stable/components/esp_pm/Kconfig;/home/mrak/esp-idf-stable/components/esp_psram/Kconfig;/home/mrak/esp-idf-stable/components/esp_ringbuf/Kconfig;/home/mrak/esp-idf-stable/components/esp_security/Kconfig;/home/mrak/esp-idf-stable/components/esp_system/Kconfig;/home/mrak/esp-idf-stable/components/esp_timer/Kconfig;/home/mrak/esp-idf-stable/components/esp_wifi/Kconfig;/home/mrak/esp-idf-stable/components/espcoredump/Kconfig;/home/mrak/esp-idf-stable/components/fatfs/Kconfig;/home/mrak/esp-idf-stable/components/freertos/Kconfig;/home/mrak/esp-idf-stable/components/hal/Kconfig;/home/mrak/esp-idf-stable/components/heap/Kconfig;/home/mrak/esp-idf-stable/components/ieee802154/Kconfig;/home/mrak/esp-idf-stable/components/log/Kconfig;/home/mrak/esp-idf-stable/components/lwip/Kconfig;/home/mrak/esp-idf-stable/components/mbedtls/Kconfig;/home/mrak/esp-idf-stable/components/mqtt/esp-mqtt/Kconfig;/home/mrak/esp-idf-stable/components/newlib/Kconfig;/home/mrak/esp-idf-stable/components/nvs_flash/Kconfig;/home/mrak/esp-idf-stable/components/nvs_sec_provider/Kconfig;/home/mrak/esp-idf-stable/components/openthread/Kconfig;/home/mrak/esp-idf-stable/components/protocomm/Kconfig;/home/mrak/esp-idf-stable/components/pthread/Kconfig;/home/mrak/esp-idf-stable/components/soc/Kconfig;/home/mrak/esp-idf-stable/components/spi_flash/Kconfig;/home/mrak/esp-idf-stable/components/spiffs/Kconfig;/home/mrak/esp-idf-stable/components/tcp_transport/Kconfig;/home/mrak/esp-idf-stable/components/ulp/Kconfig;/home/mrak/esp-idf-stable/components/unity/Kconfig;/home/mrak/esp-idf-stable/components/usb/Kconfig;/home/mrak/esp-idf-stable/components/vfs/Kconfig;/home/mrak/esp-idf-stable/components/wear_levelling/Kconfig;/home/mrak/esp-idf-stable/components/wifi_provisioning/Kconfig;/home/mrak/projects/soul_of_fiona/components/bsp_extra/Kconfig;/home/mrak/projects/soul_of_fiona/components/espressif__esp32_p4_function_ev_board/Kconfig;/home/mrak/projects/soul_of_fiona/managed_components/espressif__cjson/Kconfig;/home/mrak/projects/soul_of_fiona/managed_components/espressif__cmake_utilities/Kconfig;/home/mrak/projects/soul_of_fiona/managed_components/espressif__eppp_link/Kconfig;/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp-dsp/Kconfig;/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_codec_dev/Kconfig;/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_h264/Kconfig;/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_hosted/Kconfig;/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_lcd_touch/Kconfig;/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_lvgl_port/Kconfig;/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_wifi_remote/Kconfig;/home/mrak/projects/soul_of_fiona/managed_components/espressif__wifi_remote_over_eppp/Kconfig;/home/mrak/projects/soul_of_fiona/managed_components/lvgl__lvgl/Kconfig",
         "COMPONENT_KCONFIGS_PROJBUILD" : "/home/mrak/esp-idf-stable/components/bootloader/Kconfig.projbuild;/home/mrak/esp-idf-stable/components/esp_app_format/Kconfig.projbuild;/home/mrak/esp-idf-stable/components/esp_rom/Kconfig.projbuild;/home/mrak/esp-idf-stable/components/esptool_py/Kconfig.projbuild;/home/mrak/esp-idf-stable/components/partition_table/Kconfig.projbuild"
     },
     "common_component_reqs": [ "cxx", "newlib", "freertos", "esp_hw_support", "heap", "log", "soc", "hal", "esp_rom", "esp_common", "esp_system", "riscv" ],
-    "build_components" : [ "app_trace", "app_update", "bootloader", "bootloader_support", "bsp_extra", "bt", "car_data", "cmock", "config_manager", "console", "cxx", "driver", "efuse", "esp-tls", "esp_adc", "esp_app_format", "esp_bootloader_format", "esp_coex", "esp_common", "esp_driver_ana_cmpr", "esp_driver_cam", "esp_driver_dac", "esp_driver_gpio", "esp_driver_gptimer", "esp_driver_i2c", "esp_driver_i2s", "esp_driver_isp", "esp_driver_jpeg", "esp_driver_ledc", "esp_driver_mcpwm", "esp_driver_parlio", "esp_driver_pcnt", "esp_driver_ppa", "esp_driver_rmt", "esp_driver_sdio", "esp_driver_sdm", "esp_driver_sdmmc", "esp_driver_sdspi", "esp_driver_spi", "esp_driver_touch_sens", "esp_driver_tsens", "esp_driver_uart", "esp_driver_usb_serial_jtag", "esp_eth", "esp_event", "esp_gdbstub", "esp_hal_ieee802154", "esp_hid", "esp_http_client", "esp_http_server", "esp_https_server", "esp_hw_support", "esp_lcd", "esp_local_ctrl", "esp_mm", "esp_netif", "esp_netif_stack", "esp_partition", "esp_phy", "esp_pm", "esp_psram", "esp_ringbuf", "esp_rom", "esp_security", "esp_system", "esp_timer", "esp_vfs_console", "esp_wifi", "espcoredump", "espressif__cjson", "espressif__cmake_utilities", "espressif__esp-dsp", "espressif__esp32_p4_function_ev_board", "espressif__esp_codec_dev", "espressif__esp_h264", "espressif__esp_lcd_ek79007", "espressif__esp_lcd_ili9881c", "espressif__esp_lcd_jd9165", "espressif__esp_lcd_touch", "espressif__esp_lcd_touch_gt911", "espressif__esp_lvgl_port", "esptool_py", "fatfs", "fiona_brain", "fiona_core", "fiona_phrase_loader", "fiona_soul", "freertos", "gui", "hal", "heap", "http_parser", "idf_test", "ieee802154", "json", "log", "lvgl__lvgl", "lwip", "main", "mbedtls", "mqtt", "newlib", "nvs_flash", "nvs_sec_provider", "openthread", "partition_table", "protobuf-c", "protocomm", "pthread", "riscv", "rt", "sd_utils", "sdmmc", "soc", "spi_flash", "spiffs", "system_actions", "tcp_transport", "uart_protocol", "ulp", "unity", "usb", "vfs", "wear_levelling", "wifi_provisioning", "wpa_supplicant", "" ],
-    "build_component_paths" : [ "/home/mrak/esp-idf-stable/components/app_trace", "/home/mrak/esp-idf-stable/components/app_update", "/home/mrak/esp-idf-stable/components/bootloader", "/home/mrak/esp-idf-stable/components/bootloader_support", "/home/mrak/projects/soul_of_fiona/components/bsp_extra", "/home/mrak/esp-idf-stable/components/bt", "/home/mrak/projects/soul_of_fiona/components/car_data", "/home/mrak/esp-idf-stable/components/cmock", "/home/mrak/projects/soul_of_fiona/components/config_manager", "/home/mrak/esp-idf-stable/components/console", "/home/mrak/esp-idf-stable/components/cxx", "/home/mrak/esp-idf-stable/components/driver", "/home/mrak/esp-idf-stable/components/efuse", "/home/mrak/esp-idf-stable/components/esp-tls", "/home/mrak/esp-idf-stable/components/esp_adc", "/home/mrak/esp-idf-stable/components/esp_app_format", "/home/mrak/esp-idf-stable/components/esp_bootloader_format", "/home/mrak/esp-idf-stable/components/esp_coex", "/home/mrak/esp-idf-stable/components/esp_common", "/home/mrak/esp-idf-stable/components/esp_driver_ana_cmpr", "/home/mrak/esp-idf-stable/components/esp_driver_cam", "/home/mrak/esp-idf-stable/components/esp_driver_dac", "/home/mrak/esp-idf-stable/components/esp_driver_gpio", "/home/mrak/esp-idf-stable/components/esp_driver_gptimer", "/home/mrak/esp-idf-stable/components/esp_driver_i2c", "/home/mrak/esp-idf-stable/components/esp_driver_i2s", "/home/mrak/esp-idf-stable/components/esp_driver_isp", "/home/mrak/esp-idf-stable/components/esp_driver_jpeg", "/home/mrak/esp-idf-stable/components/esp_driver_ledc", "/home/mrak/esp-idf-stable/components/esp_driver_mcpwm", "/home/mrak/esp-idf-stable/components/esp_driver_parlio", "/home/mrak/esp-idf-stable/components/esp_driver_pcnt", "/home/mrak/esp-idf-stable/components/esp_driver_ppa", "/home/mrak/esp-idf-stable/components/esp_driver_rmt", "/home/mrak/esp-idf-stable/components/esp_driver_sdio", "/home/mrak/esp-idf-stable/components/esp_driver_sdm", "/home/mrak/esp-idf-stable/components/esp_driver_sdmmc", "/home/mrak/esp-idf-stable/components/esp_driver_sdspi", "/home/mrak/esp-idf-stable/components/esp_driver_spi", "/home/mrak/esp-idf-stable/components/esp_driver_touch_sens", "/home/mrak/esp-idf-stable/components/esp_driver_tsens", "/home/mrak/esp-idf-stable/components/esp_driver_uart", "/home/mrak/esp-idf-stable/components/esp_driver_usb_serial_jtag", "/home/mrak/esp-idf-stable/components/esp_eth", "/home/mrak/esp-idf-stable/components/esp_event", "/home/mrak/esp-idf-stable/components/esp_gdbstub", "/home/mrak/esp-idf-stable/components/esp_hal_ieee802154", "/home/mrak/esp-idf-stable/components/esp_hid", "/home/mrak/esp-idf-stable/components/esp_http_client", "/home/mrak/esp-idf-stable/components/esp_http_server", "/home/mrak/esp-idf-stable/components/esp_https_server", "/home/mrak/esp-idf-stable/components/esp_hw_support", "/home/mrak/esp-idf-stable/components/esp_lcd", "/home/mrak/esp-idf-stable/components/esp_local_ctrl", "/home/mrak/esp-idf-stable/components/esp_mm", "/home/mrak/esp-idf-stable/components/esp_netif", "/home/mrak/esp-idf-stable/components/esp_netif_stack", "/home/mrak/esp-idf-stable/components/esp_partition", "/home/mrak/esp-idf-stable/components/esp_phy", "/home/mrak/esp-idf-stable/components/esp_pm", "/home/mrak/esp-idf-stable/components/esp_psram", "/home/mrak/esp-idf-stable/components/esp_ringbuf", "/home/mrak/esp-idf-stable/components/esp_rom", "/home/mrak/esp-idf-stable/components/esp_security", "/home/mrak/esp-idf-stable/components/esp_system", "/home/mrak/esp-idf-stable/components/esp_timer", "/home/mrak/esp-idf-stable/components/esp_vfs_console", "/home/mrak/esp-idf-stable/components/esp_wifi", "/home/mrak/esp-idf-stable/components/espcoredump", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__cjson", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__cmake_utilities", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp-dsp", "/home/mrak/projects/soul_of_fiona/components/espressif__esp32_p4_function_ev_board", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_codec_dev", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_h264", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_lcd_ek79007", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_lcd_ili9881c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_lcd_jd9165", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_lcd_touch", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_lcd_touch_gt911", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_lvgl_port", "/home/mrak/esp-idf-stable/components/esptool_py", "/home/mrak/esp-idf-stable/components/fatfs", "/home/mrak/projects/soul_of_fiona/components/fiona_brain", "/home/mrak/projects/soul_of_fiona/components/fiona_core", "/home/mrak/projects/soul_of_fiona/components/fiona_phrase_loader", "/home/mrak/projects/soul_of_fiona/components/fiona_soul", "/home/mrak/esp-idf-stable/components/freertos", "/home/mrak/projects/soul_of_fiona/components/gui", "/home/mrak/esp-idf-stable/components/hal", "/home/mrak/esp-idf-stable/components/heap", "/home/mrak/esp-idf-stable/components/http_parser", "/home/mrak/esp-idf-stable/components/idf_test", "/home/mrak/esp-idf-stable/components/ieee802154", "/home/mrak/esp-idf-stable/components/json", "/home/mrak/esp-idf-stable/components/log", "/home/mrak/projects/soul_of_fiona/managed_components/lvgl__lvgl", "/home/mrak/esp-idf-stable/components/lwip", "/home/mrak/projects/soul_of_fiona/main", "/home/mrak/esp-idf-stable/components/mbedtls", "/home/mrak/esp-idf-stable/components/mqtt", "/home/mrak/esp-idf-stable/components/newlib", "/home/mrak/esp-idf-stable/components/nvs_flash", "/home/mrak/esp-idf-stable/components/nvs_sec_provider", "/home/mrak/esp-idf-stable/components/openthread", "/home/mrak/esp-idf-stable/components/partition_table", "/home/mrak/esp-idf-stable/components/protobuf-c", "/home/mrak/esp-idf-stable/components/protocomm", "/home/mrak/esp-idf-stable/components/pthread", "/home/mrak/esp-idf-stable/components/riscv", "/home/mrak/esp-idf-stable/components/rt", "/home/mrak/projects/soul_of_fiona/components/sd_utils", "/home/mrak/esp-idf-stable/components/sdmmc", "/home/mrak/esp-idf-stable/components/soc", "/home/mrak/esp-idf-stable/components/spi_flash", "/home/mrak/esp-idf-stable/components/spiffs", "/home/mrak/projects/soul_of_fiona/components/system_actions", "/home/mrak/esp-idf-stable/components/tcp_transport", "/home/mrak/projects/soul_of_fiona/components/uart_protocol", "/home/mrak/esp-idf-stable/components/ulp", "/home/mrak/esp-idf-stable/components/unity", "/home/mrak/esp-idf-stable/components/usb", "/home/mrak/esp-idf-stable/components/vfs", "/home/mrak/esp-idf-stable/components/wear_levelling", "/home/mrak/esp-idf-stable/components/wifi_provisioning", "/home/mrak/esp-idf-stable/components/wpa_supplicant", "" ],
+    "build_components" : [ "app_trace", "app_update", "bootloader", "bootloader_support", "bsp_extra", "bt", "car_data", "cmock", "config_manager", "console", "cxx", "driver", "efuse", "esp-tls", "esp_adc", "esp_app_format", "esp_bootloader_format", "esp_coex", "esp_common", "esp_driver_ana_cmpr", "esp_driver_cam", "esp_driver_dac", "esp_driver_gpio", "esp_driver_gptimer", "esp_driver_i2c", "esp_driver_i2s", "esp_driver_isp", "esp_driver_jpeg", "esp_driver_ledc", "esp_driver_mcpwm", "esp_driver_parlio", "esp_driver_pcnt", "esp_driver_ppa", "esp_driver_rmt", "esp_driver_sdio", "esp_driver_sdm", "esp_driver_sdmmc", "esp_driver_sdspi", "esp_driver_spi", "esp_driver_touch_sens", "esp_driver_tsens", "esp_driver_uart", "esp_driver_usb_serial_jtag", "esp_eth", "esp_event", "esp_gdbstub", "esp_hal_ieee802154", "esp_hid", "esp_http_client", "esp_http_server", "esp_https_server", "esp_hw_support", "esp_lcd", "esp_local_ctrl", "esp_mm", "esp_netif", "esp_netif_stack", "esp_partition", "esp_phy", "esp_pm", "esp_psram", "esp_ringbuf", "esp_rom", "esp_security", "esp_system", "esp_timer", "esp_vfs_console", "esp_wifi", "espcoredump", "espressif__cjson", "espressif__cmake_utilities", "espressif__eppp_link", "espressif__esp-dsp", "espressif__esp32_p4_function_ev_board", "espressif__esp_codec_dev", "espressif__esp_h264", "espressif__esp_hosted", "espressif__esp_lcd_ek79007", "espressif__esp_lcd_ili9881c", "espressif__esp_lcd_jd9165", "espressif__esp_lcd_touch", "espressif__esp_lcd_touch_gt911", "espressif__esp_lvgl_port", "espressif__esp_serial_slave_link", "espressif__esp_wifi_remote", "espressif__wifi_remote_over_eppp", "esptool_py", "fatfs", "fiona_brain", "fiona_core", "fiona_io_poller", "fiona_phrase_loader", "fiona_soul", "freertos", "gps_parser", "gui", "hal", "heap", "http_parser", "idf_test", "ieee802154", "json", "log", "lvgl__lvgl", "lwip", "main", "mbedtls", "mqtt", "newlib", "ntp_sync", "nvs_flash", "nvs_sec_provider", "openthread", "partition_table", "protobuf-c", "protocomm", "pthread", "riscv", "rt", "rtc_driver", "sd_utils", "sdmmc", "soc", "spi_flash", "spiffs", "system_actions", "tcp_transport", "uart_protocol", "ulp", "unity", "usb", "vfs", "wear_levelling", "wifi_manager", "wifi_provisioning", "wpa_supplicant", "" ],
+    "build_component_paths" : [ "/home/mrak/esp-idf-stable/components/app_trace", "/home/mrak/esp-idf-stable/components/app_update", "/home/mrak/esp-idf-stable/components/bootloader", "/home/mrak/esp-idf-stable/components/bootloader_support", "/home/mrak/projects/soul_of_fiona/components/bsp_extra", "/home/mrak/esp-idf-stable/components/bt", "/home/mrak/projects/soul_of_fiona/components/car_data", "/home/mrak/esp-idf-stable/components/cmock", "/home/mrak/projects/soul_of_fiona/components/config_manager", "/home/mrak/esp-idf-stable/components/console", "/home/mrak/esp-idf-stable/components/cxx", "/home/mrak/esp-idf-stable/components/driver", "/home/mrak/esp-idf-stable/components/efuse", "/home/mrak/esp-idf-stable/components/esp-tls", "/home/mrak/esp-idf-stable/components/esp_adc", "/home/mrak/esp-idf-stable/components/esp_app_format", "/home/mrak/esp-idf-stable/components/esp_bootloader_format", "/home/mrak/esp-idf-stable/components/esp_coex", "/home/mrak/esp-idf-stable/components/esp_common", "/home/mrak/esp-idf-stable/components/esp_driver_ana_cmpr", "/home/mrak/esp-idf-stable/components/esp_driver_cam", "/home/mrak/esp-idf-stable/components/esp_driver_dac", "/home/mrak/esp-idf-stable/components/esp_driver_gpio", "/home/mrak/esp-idf-stable/components/esp_driver_gptimer", "/home/mrak/esp-idf-stable/components/esp_driver_i2c", "/home/mrak/esp-idf-stable/components/esp_driver_i2s", "/home/mrak/esp-idf-stable/components/esp_driver_isp", "/home/mrak/esp-idf-stable/components/esp_driver_jpeg", "/home/mrak/esp-idf-stable/components/esp_driver_ledc", "/home/mrak/esp-idf-stable/components/esp_driver_mcpwm", "/home/mrak/esp-idf-stable/components/esp_driver_parlio", "/home/mrak/esp-idf-stable/components/esp_driver_pcnt", "/home/mrak/esp-idf-stable/components/esp_driver_ppa", "/home/mrak/esp-idf-stable/components/esp_driver_rmt", "/home/mrak/esp-idf-stable/components/esp_driver_sdio", "/home/mrak/esp-idf-stable/components/esp_driver_sdm", "/home/mrak/esp-idf-stable/components/esp_driver_sdmmc", "/home/mrak/esp-idf-stable/components/esp_driver_sdspi", "/home/mrak/esp-idf-stable/components/esp_driver_spi", "/home/mrak/esp-idf-stable/components/esp_driver_touch_sens", "/home/mrak/esp-idf-stable/components/esp_driver_tsens", "/home/mrak/esp-idf-stable/components/esp_driver_uart", "/home/mrak/esp-idf-stable/components/esp_driver_usb_serial_jtag", "/home/mrak/esp-idf-stable/components/esp_eth", "/home/mrak/esp-idf-stable/components/esp_event", "/home/mrak/esp-idf-stable/components/esp_gdbstub", "/home/mrak/esp-idf-stable/components/esp_hal_ieee802154", "/home/mrak/esp-idf-stable/components/esp_hid", "/home/mrak/esp-idf-stable/components/esp_http_client", "/home/mrak/esp-idf-stable/components/esp_http_server", "/home/mrak/esp-idf-stable/components/esp_https_server", "/home/mrak/esp-idf-stable/components/esp_hw_support", "/home/mrak/esp-idf-stable/components/esp_lcd", "/home/mrak/esp-idf-stable/components/esp_local_ctrl", "/home/mrak/esp-idf-stable/components/esp_mm", "/home/mrak/esp-idf-stable/components/esp_netif", "/home/mrak/esp-idf-stable/components/esp_netif_stack", "/home/mrak/esp-idf-stable/components/esp_partition", "/home/mrak/esp-idf-stable/components/esp_phy", "/home/mrak/esp-idf-stable/components/esp_pm", "/home/mrak/esp-idf-stable/components/esp_psram", "/home/mrak/esp-idf-stable/components/esp_ringbuf", "/home/mrak/esp-idf-stable/components/esp_rom", "/home/mrak/esp-idf-stable/components/esp_security", "/home/mrak/esp-idf-stable/components/esp_system", "/home/mrak/esp-idf-stable/components/esp_timer", "/home/mrak/esp-idf-stable/components/esp_vfs_console", "/home/mrak/esp-idf-stable/components/esp_wifi", "/home/mrak/esp-idf-stable/components/espcoredump", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__cjson", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__cmake_utilities", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__eppp_link", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp-dsp", "/home/mrak/projects/soul_of_fiona/components/espressif__esp32_p4_function_ev_board", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_codec_dev", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_h264", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_hosted", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_lcd_ek79007", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_lcd_ili9881c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_lcd_jd9165", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_lcd_touch", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_lcd_touch_gt911", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_lvgl_port", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_serial_slave_link", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_wifi_remote", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__wifi_remote_over_eppp", "/home/mrak/esp-idf-stable/components/esptool_py", "/home/mrak/esp-idf-stable/components/fatfs", "/home/mrak/projects/soul_of_fiona/components/fiona_brain", "/home/mrak/projects/soul_of_fiona/components/fiona_core", "/home/mrak/projects/soul_of_fiona/components/fiona_io_poller", "/home/mrak/projects/soul_of_fiona/components/fiona_phrase_loader", "/home/mrak/projects/soul_of_fiona/components/fiona_soul", "/home/mrak/esp-idf-stable/components/freertos", "/home/mrak/projects/soul_of_fiona/components/gps_parser", "/home/mrak/projects/soul_of_fiona/components/gui", "/home/mrak/esp-idf-stable/components/hal", "/home/mrak/esp-idf-stable/components/heap", "/home/mrak/esp-idf-stable/components/http_parser", "/home/mrak/esp-idf-stable/components/idf_test", "/home/mrak/esp-idf-stable/components/ieee802154", "/home/mrak/esp-idf-stable/components/json", "/home/mrak/esp-idf-stable/components/log", "/home/mrak/projects/soul_of_fiona/managed_components/lvgl__lvgl", "/home/mrak/esp-idf-stable/components/lwip", "/home/mrak/projects/soul_of_fiona/main", "/home/mrak/esp-idf-stable/components/mbedtls", "/home/mrak/esp-idf-stable/components/mqtt", "/home/mrak/esp-idf-stable/components/newlib", "/home/mrak/projects/soul_of_fiona/components/ntp_sync", "/home/mrak/esp-idf-stable/components/nvs_flash", "/home/mrak/esp-idf-stable/components/nvs_sec_provider", "/home/mrak/esp-idf-stable/components/openthread", "/home/mrak/esp-idf-stable/components/partition_table", "/home/mrak/esp-idf-stable/components/protobuf-c", "/home/mrak/esp-idf-stable/components/protocomm", "/home/mrak/esp-idf-stable/components/pthread", "/home/mrak/esp-idf-stable/components/riscv", "/home/mrak/esp-idf-stable/components/rt", "/home/mrak/projects/soul_of_fiona/components/rtc_driver", "/home/mrak/projects/soul_of_fiona/components/sd_utils", "/home/mrak/esp-idf-stable/components/sdmmc", "/home/mrak/esp-idf-stable/components/soc", "/home/mrak/esp-idf-stable/components/spi_flash", "/home/mrak/esp-idf-stable/components/spiffs", "/home/mrak/projects/soul_of_fiona/components/system_actions", "/home/mrak/esp-idf-stable/components/tcp_transport", "/home/mrak/projects/soul_of_fiona/components/uart_protocol", "/home/mrak/esp-idf-stable/components/ulp", "/home/mrak/esp-idf-stable/components/unity", "/home/mrak/esp-idf-stable/components/usb", "/home/mrak/esp-idf-stable/components/vfs", "/home/mrak/esp-idf-stable/components/wear_levelling", "/home/mrak/projects/soul_of_fiona/components/wifi_manager", "/home/mrak/esp-idf-stable/components/wifi_provisioning", "/home/mrak/esp-idf-stable/components/wpa_supplicant", "" ],
     "build_component_info" : {
         "app_trace": {
             "alias": "idf::app_trace",
@@ -678,15 +678,15 @@
             "target": "___idf_esp_eth",
             "prefix": "idf",
             "dir": "/home/mrak/esp-idf-stable/components/esp_eth",
-            "type": "CONFIG_ONLY",
+            "type": "LIBRARY",
             "lib": "__idf_esp_eth",
             "reqs": [ "esp_event" ],
             "priv_reqs": [ "log", "esp_timer", "esp_driver_spi", "esp_driver_gpio" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "",
-            "sources": [],
-            "include_dirs": []
+            "file": "/home/mrak/projects/soul_of_fiona/build/esp-idf/esp_eth/libesp_eth.a",
+            "sources": [ "/home/mrak/esp-idf-stable/components/esp_eth/src/esp_eth.c", "/home/mrak/esp-idf-stable/components/esp_eth/src/phy/esp_eth_phy_802_3.c", "/home/mrak/esp-idf-stable/components/esp_eth/src/esp_eth_netif_glue.c", "/home/mrak/esp-idf-stable/components/esp_eth/src/mac/esp_eth_mac_esp.c", "/home/mrak/esp-idf-stable/components/esp_eth/src/mac/esp_eth_mac_esp_dma.c", "/home/mrak/esp-idf-stable/components/esp_eth/src/mac/esp_eth_mac_esp_gpio.c", "/home/mrak/esp-idf-stable/components/esp_eth/src/phy/esp_eth_phy_generic.c", "/home/mrak/esp-idf-stable/components/esp_eth/src/phy/esp_eth_phy_dp83848.c", "/home/mrak/esp-idf-stable/components/esp_eth/src/phy/esp_eth_phy_ip101.c", "/home/mrak/esp-idf-stable/components/esp_eth/src/phy/esp_eth_phy_ksz80xx.c", "/home/mrak/esp-idf-stable/components/esp_eth/src/phy/esp_eth_phy_lan87xx.c", "/home/mrak/esp-idf-stable/components/esp_eth/src/phy/esp_eth_phy_rtl8201.c" ],
+            "include_dirs": [ "include" ]
         },
         "esp_event": {
             "alias": "idf::esp_event",
@@ -865,7 +865,7 @@
             "managed_reqs": [],
             "managed_priv_reqs": [],
             "file": "/home/mrak/projects/soul_of_fiona/build/esp-idf/esp_netif/libesp_netif.a",
-            "sources": [ "/home/mrak/esp-idf-stable/components/esp_netif/esp_netif_handlers.c", "/home/mrak/esp-idf-stable/components/esp_netif/esp_netif_objects.c", "/home/mrak/esp-idf-stable/components/esp_netif/esp_netif_defaults.c", "/home/mrak/esp-idf-stable/components/esp_netif/loopback/esp_netif_loopback.c" ],
+            "sources": [ "/home/mrak/esp-idf-stable/components/esp_netif/esp_netif_handlers.c", "/home/mrak/esp-idf-stable/components/esp_netif/esp_netif_objects.c", "/home/mrak/esp-idf-stable/components/esp_netif/esp_netif_defaults.c", "/home/mrak/esp-idf-stable/components/esp_netif/lwip/esp_netif_lwip.c", "/home/mrak/esp-idf-stable/components/esp_netif/lwip/esp_netif_sntp.c", "/home/mrak/esp-idf-stable/components/esp_netif/lwip/esp_netif_lwip_defaults.c", "/home/mrak/esp-idf-stable/components/esp_netif/lwip/netif/wlanif.c", "/home/mrak/esp-idf-stable/components/esp_netif/lwip/netif/ethernetif.c", "/home/mrak/esp-idf-stable/components/esp_netif/lwip/netif/esp_pbuf_ref.c" ],
             "include_dirs": [ "include" ]
         },
         "esp_netif_stack": {
@@ -1045,7 +1045,7 @@
             "managed_reqs": [],
             "managed_priv_reqs": [],
             "file": "/home/mrak/projects/soul_of_fiona/build/esp-idf/esp_wifi/libesp_wifi.a",
-            "sources": [ "/home/mrak/esp-idf-stable/components/esp_wifi/src/wifi_default.c", "/home/mrak/esp-idf-stable/components/esp_wifi/src/wifi_netif.c", "/home/mrak/esp-idf-stable/components/esp_wifi/src/wifi_default_ap.c" ],
+            "sources": [ "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_wifi_remote/dummy_src.c" ],
             "include_dirs": [ "include", "wifi_apps/nan_app/include" ]
         },
         "espcoredump": {
@@ -1092,6 +1092,21 @@
             "file": "",
             "sources": [],
             "include_dirs": []
+        },
+        "espressif__eppp_link": {
+            "alias": "idf::espressif__eppp_link",
+            "target": "___idf_espressif__eppp_link",
+            "prefix": "idf",
+            "dir": "/home/mrak/projects/soul_of_fiona/managed_components/espressif__eppp_link",
+            "type": "LIBRARY",
+            "lib": "__idf_espressif__eppp_link",
+            "reqs": [],
+            "priv_reqs": [ "esp_netif", "esp_timer", "esp_eth", "esp_driver_gpio", "esp_driver_spi", "esp_driver_uart", "esp_driver_sdio", "espressif__esp_serial_slave_link" ],
+            "managed_reqs": [],
+            "managed_priv_reqs": [ "espressif__esp_serial_slave_link" ],
+            "file": "/home/mrak/projects/soul_of_fiona/build/esp-idf/espressif__eppp_link/libespressif__eppp_link.a",
+            "sources": [ "/home/mrak/projects/soul_of_fiona/managed_components/espressif__eppp_link/eppp_link.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__eppp_link/eppp_link_netif.cpp", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__eppp_link/eppp_uart.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__eppp_link/eppp_netif_tun.c" ],
+            "include_dirs": [ "include" ]
         },
         "espressif__esp-dsp": {
             "alias": "idf::espressif__esp-dsp",
@@ -1152,6 +1167,21 @@
             "file": "/home/mrak/projects/soul_of_fiona/build/esp-idf/espressif__esp_h264/libespressif__esp_h264.a",
             "sources": [ "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_h264/port/src/esp_h264_alloc.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_h264/port/src/esp_h264_cache.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_h264/interface/src/esp_h264_dec.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_h264/interface/src/esp_h264_dec_param.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_h264/interface/src/esp_h264_enc_dual.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_h264/interface/src/esp_h264_enc_param.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_h264/interface/src/esp_h264_enc_param_hw.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_h264/interface/src/esp_h264_enc_single.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_h264/interface/src/esp_h264_version.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_h264/sw/src/esp_h264_dec_sw.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_h264/sw/src/esp_h264_enc_single_sw.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_h264/sw/src/esp_h264_enc_sw_param.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_h264/sw/src/h264_color_convert.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_h264/hw/src/esp_h264_enc_dual_hw.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_h264/hw/src/esp_h264_enc_hw_param.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_h264/hw/src/esp_h264_enc_single_hw.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_h264/hw/src/h264_nal.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_h264/hw/src/h264_rc.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_h264/hw/hal/esp32p4/h264_dma_hal.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_h264/hw/hal/esp32p4/h264_hal.c" ],
             "include_dirs": [ "./interface/include", "./sw/include", "./port/include/", "./hw/include" ]
+        },
+        "espressif__esp_hosted": {
+            "alias": "idf::espressif__esp_hosted",
+            "target": "___idf_espressif__esp_hosted",
+            "prefix": "idf",
+            "dir": "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_hosted",
+            "type": "LIBRARY",
+            "lib": "__idf_espressif__esp_hosted",
+            "reqs": [ "esp_driver_sdmmc", "esp_driver_spi", "esp_driver_uart", "esp_driver_gpio", "esp_event" ],
+            "priv_reqs": [ "soc", "esp_netif", "esp_timer", "driver", "esp_wifi", "bt", "esp_http_client", "console", "wpa_supplicant", "openthread" ],
+            "managed_reqs": [],
+            "managed_priv_reqs": [],
+            "file": "/home/mrak/projects/soul_of_fiona/build/esp-idf/espressif__esp_hosted/libespressif__esp_hosted.a",
+            "sources": [ "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_hosted/host/api/src/esp_wifi_weak.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_hosted/host/api/src/esp_hosted_api.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_hosted/host/api/src/esp_hosted_transport_config.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_hosted/host/api/src/esp_hosted_ota_api.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_hosted/host/drivers/transport/transport_drv.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_hosted/host/drivers/transport/transport_util.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_hosted/host/drivers/serial/serial_ll_if.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_hosted/host/utils/stats.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_hosted/host/drivers/serial/serial_drv.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_hosted/host/drivers/rpc/core/rpc_core.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_hosted/host/drivers/rpc/core/rpc_req.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_hosted/host/drivers/rpc/core/rpc_rsp.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_hosted/host/drivers/rpc/core/rpc_evt.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_hosted/host/drivers/rpc/core/rpc_utils.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_hosted/host/drivers/rpc/slaveif/rpc_slave_if.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_hosted/host/drivers/rpc/wrap/rpc_wrap.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_hosted/host/drivers/virtual_serial_if/serial_if.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_hosted/common/protobuf-c/protobuf-c/protobuf-c.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_hosted/common/proto/esp_hosted_rpc.pb-c.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_hosted/common/mempool/mempool_ll.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_hosted/common/mempool/mempool.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_hosted/common/utils/esp_hosted_cli.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_hosted/host/drivers/bt/hci_stub_drv.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_hosted/host/drivers/power_save/power_save_drv.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_hosted/host/drivers/transport/sdio/sdio_drv.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_hosted/host/port/esp/freertos/src/port_esp_hosted_host_init.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_hosted/host/port/esp/freertos/src/port_esp_hosted_host_os.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_hosted/host/port/esp/freertos/src/port_esp_hosted_host_transport_defaults.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_hosted/host/port/esp/freertos/src/port_esp_hosted_host_sdio.c" ],
+            "include_dirs": [ "./host", "./host/api/include" ]
         },
         "espressif__esp_lcd_ek79007": {
             "alias": "idf::espressif__esp_lcd_ek79007",
@@ -1243,6 +1273,51 @@
             "sources": [],
             "include_dirs": [ "include" ]
         },
+        "espressif__esp_serial_slave_link": {
+            "alias": "idf::espressif__esp_serial_slave_link",
+            "target": "___idf_espressif__esp_serial_slave_link",
+            "prefix": "idf",
+            "dir": "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_serial_slave_link",
+            "type": "LIBRARY",
+            "lib": "__idf_espressif__esp_serial_slave_link",
+            "reqs": [ "sdmmc", "esp_driver_sdspi", "esp_driver_sdmmc" ],
+            "priv_reqs": [],
+            "managed_reqs": [],
+            "managed_priv_reqs": [],
+            "file": "/home/mrak/projects/soul_of_fiona/build/esp-idf/espressif__esp_serial_slave_link/libespressif__esp_serial_slave_link.a",
+            "sources": [ "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_serial_slave_link/essl.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_serial_slave_link/essl_sdio.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_serial_slave_link/essl_spi.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_serial_slave_link/essl_sdio_defs.c" ],
+            "include_dirs": [ "include" ]
+        },
+        "espressif__esp_wifi_remote": {
+            "alias": "idf::espressif__esp_wifi_remote",
+            "target": "___idf_espressif__esp_wifi_remote",
+            "prefix": "idf",
+            "dir": "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_wifi_remote",
+            "type": "LIBRARY",
+            "lib": "__idf_espressif__esp_wifi_remote",
+            "reqs": [ "esp_event", "esp_netif" ],
+            "priv_reqs": [ "esp_wifi", "esp-tls", "vfs", "espressif__esp_hosted", "espressif__wifi_remote_over_eppp" ],
+            "managed_reqs": [],
+            "managed_priv_reqs": [ "espressif__esp_hosted", "espressif__wifi_remote_over_eppp" ],
+            "file": "/home/mrak/projects/soul_of_fiona/build/esp-idf/espressif__esp_wifi_remote/libespressif__esp_wifi_remote.a",
+            "sources": [ "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_wifi_remote/esp_wifi_remote.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_wifi_remote/esp_wifi_remote_net.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_wifi_remote/idf_v5.4/esp_wifi_remote_weak.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_wifi_remote/idf_v5.4/esp_eap_client_remote_weak.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_wifi_remote/idf_v5.4/esp_wifi_with_remote.c", "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_wifi_remote/idf_v5.4/esp_eap_client_with_remote.c", "/home/mrak/esp-idf-stable/components/esp_wifi/src/wifi_default.c", "/home/mrak/esp-idf-stable/components/esp_wifi/src/wifi_netif.c", "/home/mrak/esp-idf-stable/components/esp_wifi/src/wifi_default_ap.c" ],
+            "include_dirs": [ "include" ]
+        },
+        "espressif__wifi_remote_over_eppp": {
+            "alias": "idf::espressif__wifi_remote_over_eppp",
+            "target": "___idf_espressif__wifi_remote_over_eppp",
+            "prefix": "idf",
+            "dir": "/home/mrak/projects/soul_of_fiona/managed_components/espressif__wifi_remote_over_eppp",
+            "type": "CONFIG_ONLY",
+            "lib": "__idf_espressif__wifi_remote_over_eppp",
+            "reqs": [],
+            "priv_reqs": [ "esp_event", "esp_netif", "espressif__eppp_link", "esp-tls", "esp_wifi", "vfs" ],
+            "managed_reqs": [],
+            "managed_priv_reqs": [ "espressif__eppp_link" ],
+            "file": "",
+            "sources": [],
+            "include_dirs": []
+        },
         "esptool_py": {
             "alias": "idf::esptool_py",
             "target": "___idf_esptool_py",
@@ -1295,12 +1370,27 @@
             "dir": "/home/mrak/projects/soul_of_fiona/components/fiona_core",
             "type": "LIBRARY",
             "lib": "__idf_fiona_core",
-            "reqs": [ "nvs_flash", "spiffs", "car_data", "lvgl__lvgl", "uart_protocol", "sd_utils", "fiona_soul", "fiona_brain", "config_manager", "esp_timer", "driver", "esp_adc", "bsp_extra", "espressif__esp32_p4_function_ev_board" ],
+            "reqs": [ "nvs_flash", "spiffs", "car_data", "lvgl__lvgl", "uart_protocol", "sd_utils", "fiona_soul", "fiona_brain", "config_manager", "esp_timer", "driver", "esp_adc", "bsp_extra", "espressif__esp32_p4_function_ev_board", "rtc_driver", "gui", "fiona_io_poller" ],
             "priv_reqs": [],
             "managed_reqs": [],
             "managed_priv_reqs": [],
             "file": "/home/mrak/projects/soul_of_fiona/build/esp-idf/fiona_core/libfiona_core.a",
             "sources": [ "/home/mrak/projects/soul_of_fiona/components/fiona_core/fiona_core.c", "/home/mrak/projects/soul_of_fiona/components/fiona_core/fiona_background.c", "/home/mrak/projects/soul_of_fiona/components/fiona_core/fiona_observers.c", "/home/mrak/projects/soul_of_fiona/components/fiona_core/fiona_animations.c" ],
+            "include_dirs": [ "." ]
+        },
+        "fiona_io_poller": {
+            "alias": "idf::fiona_io_poller",
+            "target": "___idf_fiona_io_poller",
+            "prefix": "idf",
+            "dir": "/home/mrak/projects/soul_of_fiona/components/fiona_io_poller",
+            "type": "LIBRARY",
+            "lib": "__idf_fiona_io_poller",
+            "reqs": [ "freertos", "car_data", "uart_protocol" ],
+            "priv_reqs": [],
+            "managed_reqs": [],
+            "managed_priv_reqs": [],
+            "file": "/home/mrak/projects/soul_of_fiona/build/esp-idf/fiona_io_poller/libfiona_io_poller.a",
+            "sources": [ "/home/mrak/projects/soul_of_fiona/components/fiona_io_poller/fiona_io_poller.c" ],
             "include_dirs": [ "." ]
         },
         "fiona_phrase_loader": {
@@ -1348,6 +1438,21 @@
             "sources": [ "/home/mrak/esp-idf-stable/components/freertos/heap_idf.c", "/home/mrak/esp-idf-stable/components/freertos/app_startup.c", "/home/mrak/esp-idf-stable/components/freertos/port_common.c", "/home/mrak/esp-idf-stable/components/freertos/port_systick.c", "/home/mrak/esp-idf-stable/components/freertos/FreeRTOS-Kernel/list.c", "/home/mrak/esp-idf-stable/components/freertos/FreeRTOS-Kernel/queue.c", "/home/mrak/esp-idf-stable/components/freertos/FreeRTOS-Kernel/tasks.c", "/home/mrak/esp-idf-stable/components/freertos/FreeRTOS-Kernel/timers.c", "/home/mrak/esp-idf-stable/components/freertos/FreeRTOS-Kernel/event_groups.c", "/home/mrak/esp-idf-stable/components/freertos/FreeRTOS-Kernel/stream_buffer.c", "/home/mrak/esp-idf-stable/components/freertos/FreeRTOS-Kernel/portable/riscv/port.c", "/home/mrak/esp-idf-stable/components/freertos/FreeRTOS-Kernel/portable/riscv/portasm.S", "/home/mrak/esp-idf-stable/components/freertos/esp_additions/freertos_compatibility.c", "/home/mrak/esp-idf-stable/components/freertos/esp_additions/idf_additions_event_groups.c", "/home/mrak/esp-idf-stable/components/freertos/esp_additions/idf_additions.c" ],
             "include_dirs": [ "config/include", "config/include/freertos", "config/riscv/include", "FreeRTOS-Kernel/include", "FreeRTOS-Kernel/portable/riscv/include", "FreeRTOS-Kernel/portable/riscv/include/freertos", "esp_additions/include" ]
         },
+        "gps_parser": {
+            "alias": "idf::gps_parser",
+            "target": "___idf_gps_parser",
+            "prefix": "idf",
+            "dir": "/home/mrak/projects/soul_of_fiona/components/gps_parser",
+            "type": "LIBRARY",
+            "lib": "__idf_gps_parser",
+            "reqs": [ "driver", "car_data" ],
+            "priv_reqs": [],
+            "managed_reqs": [],
+            "managed_priv_reqs": [],
+            "file": "/home/mrak/projects/soul_of_fiona/build/esp-idf/gps_parser/libgps_parser.a",
+            "sources": [ "/home/mrak/projects/soul_of_fiona/components/gps_parser/gps_parser.c" ],
+            "include_dirs": [ "." ]
+        },
         "gui": {
             "alias": "idf::gui",
             "target": "___idf_gui",
@@ -1355,12 +1460,12 @@
             "dir": "/home/mrak/projects/soul_of_fiona/components/gui",
             "type": "LIBRARY",
             "lib": "__idf_gui",
-            "reqs": [ "lvgl__lvgl", "car_data", "uart_protocol", "sd_utils", "fatfs", "fiona_core", "system_actions" ],
+            "reqs": [ "lvgl__lvgl", "car_data", "uart_protocol", "sd_utils", "fatfs", "fiona_core", "system_actions", "ntp_sync", "gps_parser" ],
             "priv_reqs": [],
             "managed_reqs": [],
             "managed_priv_reqs": [],
             "file": "/home/mrak/projects/soul_of_fiona/build/esp-idf/gui/libgui.a",
-            "sources": [ "/home/mrak/projects/soul_of_fiona/components/gui/screens/ui_Screen_DashBoard.c", "/home/mrak/projects/soul_of_fiona/components/gui/screens/ui_Screen_System.c", "/home/mrak/projects/soul_of_fiona/components/gui/screens/ui_Screen_ClimateControl.c", "/home/mrak/projects/soul_of_fiona/components/gui/screens/ui_Screen_SplashScreen.c", "/home/mrak/projects/soul_of_fiona/components/gui/ui.c", "/home/mrak/projects/soul_of_fiona/components/gui/components/ui_comp_hook.c", "/home/mrak/projects/soul_of_fiona/components/gui/ui_helpers.c", "/home/mrak/projects/soul_of_fiona/components/gui/ui_debug_helpers.c", "/home/mrak/projects/soul_of_fiona/components/gui/ui_events.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_bg_red_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_small_blue_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_speed_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_akb_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_battery_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_h_l_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_fuel_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_ofe_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_oil_level_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_twater_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_water_temp2_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_water_temp_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_esp_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_1173513873.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_1279366634.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_1173515923.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_cooller2_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_cooller1a_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_cooller1_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_cooller2a_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_cooller3_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_cyan_cat_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_green_cat_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_yellow_cat_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_red_cat_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_global_bg_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_black_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_grey_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_red_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_fordlogo_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/fonts/ui_font_BaseFont.c", "/home/mrak/projects/soul_of_fiona/components/gui/fonts/ui_font_BaseFont16.c", "/home/mrak/projects/soul_of_fiona/components/gui/fonts/ui_font_BaseFont20.c", "/home/mrak/projects/soul_of_fiona/components/gui/fonts/ui_font_Digital.c", "/home/mrak/projects/soul_of_fiona/components/gui/fonts/ui_font_LedSymbol.c", "/home/mrak/projects/soul_of_fiona/components/gui/fonts/ui_font_SSaverFont.c" ],
+            "sources": [ "/home/mrak/projects/soul_of_fiona/components/gui/screens/ui_Screen_DashBoard.c", "/home/mrak/projects/soul_of_fiona/components/gui/screens/ui_Screen_SplashScreen.c", "/home/mrak/projects/soul_of_fiona/components/gui/screens/ui_Screen_ScreenReFuel.c", "/home/mrak/projects/soul_of_fiona/components/gui/screens/ui_Screen_Setting.c", "/home/mrak/projects/soul_of_fiona/components/gui/screens/ui_Screen_DebugScreen.c", "/home/mrak/projects/soul_of_fiona/components/gui/ui.c", "/home/mrak/projects/soul_of_fiona/components/gui/components/ui_comp_hook.c", "/home/mrak/projects/soul_of_fiona/components/gui/ui_helpers.c", "/home/mrak/projects/soul_of_fiona/components/gui/ui_events.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_bg_red_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_small_blue_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_speed_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_akb_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_battery_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_h_l_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_fuel_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_ofe_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_oil_level_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_twater_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_water_temp2_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_water_temp_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_esp_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_1173513873.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_1279366634.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_1173515923.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_cooller2_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_cooller1a_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_cooller1_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_cooller2a_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_cooller3_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_cyan_cat_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_green_cat_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_yellow_cat_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_red_cat_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_iconwifi_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_gps_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_serverwifi_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_fordlogo_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_global_bg_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_black_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_grey_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/images/ui_img_red_png.c", "/home/mrak/projects/soul_of_fiona/components/gui/fonts/ui_font_BaseFont.c", "/home/mrak/projects/soul_of_fiona/components/gui/fonts/ui_font_BaseFont16.c", "/home/mrak/projects/soul_of_fiona/components/gui/fonts/ui_font_BaseFont20.c", "/home/mrak/projects/soul_of_fiona/components/gui/fonts/ui_font_Digital.c", "/home/mrak/projects/soul_of_fiona/components/gui/fonts/ui_font_LedSymbol.c", "/home/mrak/projects/soul_of_fiona/components/gui/fonts/ui_font_SSaverFont.c" ],
             "include_dirs": [ ".", "screens", "fonts" ]
         },
         "hal": {
@@ -1375,7 +1480,7 @@
             "managed_reqs": [],
             "managed_priv_reqs": [],
             "file": "/home/mrak/projects/soul_of_fiona/build/esp-idf/hal/libhal.a",
-            "sources": [ "/home/mrak/esp-idf-stable/components/hal/hal_utils.c", "/home/mrak/esp-idf-stable/components/hal/efuse_hal.c", "/home/mrak/esp-idf-stable/components/hal/esp32p4/efuse_hal.c", "/home/mrak/esp-idf-stable/components/hal/lp_timer_hal.c", "/home/mrak/esp-idf-stable/components/hal/mmu_hal.c", "/home/mrak/esp-idf-stable/components/hal/cache_hal.c", "/home/mrak/esp-idf-stable/components/hal/color_hal.c", "/home/mrak/esp-idf-stable/components/hal/spi_flash_hal.c", "/home/mrak/esp-idf-stable/components/hal/spi_flash_hal_iram.c", "/home/mrak/esp-idf-stable/components/hal/spi_flash_encrypt_hal_iram.c", "/home/mrak/esp-idf-stable/components/hal/esp32p4/clk_tree_hal.c", "/home/mrak/esp-idf-stable/components/hal/uart_hal.c", "/home/mrak/esp-idf-stable/components/hal/uart_hal_iram.c", "/home/mrak/esp-idf-stable/components/hal/gpio_hal.c", "/home/mrak/esp-idf-stable/components/hal/rtc_io_hal.c", "/home/mrak/esp-idf-stable/components/hal/timer_hal.c", "/home/mrak/esp-idf-stable/components/hal/ledc_hal.c", "/home/mrak/esp-idf-stable/components/hal/ledc_hal_iram.c", "/home/mrak/esp-idf-stable/components/hal/i2c_hal.c", "/home/mrak/esp-idf-stable/components/hal/i2c_hal_iram.c", "/home/mrak/esp-idf-stable/components/hal/isp_hal.c", "/home/mrak/esp-idf-stable/components/hal/lp_i2s_hal.c", "/home/mrak/esp-idf-stable/components/hal/rmt_hal.c", "/home/mrak/esp-idf-stable/components/hal/pcnt_hal.c", "/home/mrak/esp-idf-stable/components/hal/mcpwm_hal.c", "/home/mrak/esp-idf-stable/components/hal/uhci_hal.c", "/home/mrak/esp-idf-stable/components/hal/twai_hal.c", "/home/mrak/esp-idf-stable/components/hal/twai_hal_iram.c", "/home/mrak/esp-idf-stable/components/hal/gdma_hal_top.c", "/home/mrak/esp-idf-stable/components/hal/gdma_hal_crc_gen.c", "/home/mrak/esp-idf-stable/components/hal/gdma_hal_ahb_v2.c", "/home/mrak/esp-idf-stable/components/hal/gdma_hal_axi.c", "/home/mrak/esp-idf-stable/components/hal/dw_gdma_hal.c", "/home/mrak/esp-idf-stable/components/hal/dma2d_hal.c", "/home/mrak/esp-idf-stable/components/hal/i2s_hal.c", "/home/mrak/esp-idf-stable/components/hal/sdm_hal.c", "/home/mrak/esp-idf-stable/components/hal/sdmmc_hal.c", "/home/mrak/esp-idf-stable/components/hal/etm_hal.c", "/home/mrak/esp-idf-stable/components/hal/parlio_hal.c", "/home/mrak/esp-idf-stable/components/hal/adc_hal_common.c", "/home/mrak/esp-idf-stable/components/hal/adc_oneshot_hal.c", "/home/mrak/esp-idf-stable/components/hal/adc_hal.c", "/home/mrak/esp-idf-stable/components/hal/lcd_hal.c", "/home/mrak/esp-idf-stable/components/hal/mipi_dsi_hal.c", "/home/mrak/esp-idf-stable/components/hal/mipi_csi_hal.c", "/home/mrak/esp-idf-stable/components/hal/ecc_hal.c", "/home/mrak/esp-idf-stable/components/hal/mpi_hal.c", "/home/mrak/esp-idf-stable/components/hal/sha_hal.c", "/home/mrak/esp-idf-stable/components/hal/aes_hal.c", "/home/mrak/esp-idf-stable/components/hal/esp32p4/pau_hal.c", "/home/mrak/esp-idf-stable/components/hal/brownout_hal.c", "/home/mrak/esp-idf-stable/components/hal/jpeg_hal.c", "/home/mrak/esp-idf-stable/components/hal/ppa_hal.c", "/home/mrak/esp-idf-stable/components/hal/spi_hal.c", "/home/mrak/esp-idf-stable/components/hal/spi_hal_iram.c", "/home/mrak/esp-idf-stable/components/hal/spi_slave_hal.c", "/home/mrak/esp-idf-stable/components/hal/spi_slave_hal_iram.c", "/home/mrak/esp-idf-stable/components/hal/spi_slave_hd_hal.c", "/home/mrak/esp-idf-stable/components/hal/spi_flash_hal_gpspi.c", "/home/mrak/esp-idf-stable/components/hal/esp32p4/pmu_hal.c", "/home/mrak/esp-idf-stable/components/hal/apm_hal.c", "/home/mrak/esp-idf-stable/components/hal/hmac_hal.c", "/home/mrak/esp-idf-stable/components/hal/ds_hal.c", "/home/mrak/esp-idf-stable/components/hal/cam_hal.c", "/home/mrak/esp-idf-stable/components/hal/usb_serial_jtag_hal.c", "/home/mrak/esp-idf-stable/components/hal/usb_utmi_hal.c", "/home/mrak/esp-idf-stable/components/hal/usb_dwc_hal.c", "/home/mrak/esp-idf-stable/components/hal/usb_wrap_hal.c", "/home/mrak/esp-idf-stable/components/hal/esp32p4/touch_sensor_hal.c" ],
+            "sources": [ "/home/mrak/esp-idf-stable/components/hal/hal_utils.c", "/home/mrak/esp-idf-stable/components/hal/efuse_hal.c", "/home/mrak/esp-idf-stable/components/hal/esp32p4/efuse_hal.c", "/home/mrak/esp-idf-stable/components/hal/lp_timer_hal.c", "/home/mrak/esp-idf-stable/components/hal/mmu_hal.c", "/home/mrak/esp-idf-stable/components/hal/cache_hal.c", "/home/mrak/esp-idf-stable/components/hal/color_hal.c", "/home/mrak/esp-idf-stable/components/hal/spi_flash_hal.c", "/home/mrak/esp-idf-stable/components/hal/spi_flash_hal_iram.c", "/home/mrak/esp-idf-stable/components/hal/spi_flash_encrypt_hal_iram.c", "/home/mrak/esp-idf-stable/components/hal/esp32p4/clk_tree_hal.c", "/home/mrak/esp-idf-stable/components/hal/uart_hal.c", "/home/mrak/esp-idf-stable/components/hal/uart_hal_iram.c", "/home/mrak/esp-idf-stable/components/hal/gpio_hal.c", "/home/mrak/esp-idf-stable/components/hal/rtc_io_hal.c", "/home/mrak/esp-idf-stable/components/hal/timer_hal.c", "/home/mrak/esp-idf-stable/components/hal/ledc_hal.c", "/home/mrak/esp-idf-stable/components/hal/ledc_hal_iram.c", "/home/mrak/esp-idf-stable/components/hal/i2c_hal.c", "/home/mrak/esp-idf-stable/components/hal/i2c_hal_iram.c", "/home/mrak/esp-idf-stable/components/hal/isp_hal.c", "/home/mrak/esp-idf-stable/components/hal/lp_i2s_hal.c", "/home/mrak/esp-idf-stable/components/hal/rmt_hal.c", "/home/mrak/esp-idf-stable/components/hal/pcnt_hal.c", "/home/mrak/esp-idf-stable/components/hal/mcpwm_hal.c", "/home/mrak/esp-idf-stable/components/hal/uhci_hal.c", "/home/mrak/esp-idf-stable/components/hal/twai_hal.c", "/home/mrak/esp-idf-stable/components/hal/twai_hal_iram.c", "/home/mrak/esp-idf-stable/components/hal/gdma_hal_top.c", "/home/mrak/esp-idf-stable/components/hal/gdma_hal_crc_gen.c", "/home/mrak/esp-idf-stable/components/hal/gdma_hal_ahb_v2.c", "/home/mrak/esp-idf-stable/components/hal/gdma_hal_axi.c", "/home/mrak/esp-idf-stable/components/hal/dw_gdma_hal.c", "/home/mrak/esp-idf-stable/components/hal/dma2d_hal.c", "/home/mrak/esp-idf-stable/components/hal/i2s_hal.c", "/home/mrak/esp-idf-stable/components/hal/sdm_hal.c", "/home/mrak/esp-idf-stable/components/hal/sdmmc_hal.c", "/home/mrak/esp-idf-stable/components/hal/emac_hal.c", "/home/mrak/esp-idf-stable/components/hal/etm_hal.c", "/home/mrak/esp-idf-stable/components/hal/parlio_hal.c", "/home/mrak/esp-idf-stable/components/hal/adc_hal_common.c", "/home/mrak/esp-idf-stable/components/hal/adc_oneshot_hal.c", "/home/mrak/esp-idf-stable/components/hal/adc_hal.c", "/home/mrak/esp-idf-stable/components/hal/lcd_hal.c", "/home/mrak/esp-idf-stable/components/hal/mipi_dsi_hal.c", "/home/mrak/esp-idf-stable/components/hal/mipi_csi_hal.c", "/home/mrak/esp-idf-stable/components/hal/ecc_hal.c", "/home/mrak/esp-idf-stable/components/hal/mpi_hal.c", "/home/mrak/esp-idf-stable/components/hal/sha_hal.c", "/home/mrak/esp-idf-stable/components/hal/aes_hal.c", "/home/mrak/esp-idf-stable/components/hal/esp32p4/pau_hal.c", "/home/mrak/esp-idf-stable/components/hal/brownout_hal.c", "/home/mrak/esp-idf-stable/components/hal/jpeg_hal.c", "/home/mrak/esp-idf-stable/components/hal/ppa_hal.c", "/home/mrak/esp-idf-stable/components/hal/spi_hal.c", "/home/mrak/esp-idf-stable/components/hal/spi_hal_iram.c", "/home/mrak/esp-idf-stable/components/hal/spi_slave_hal.c", "/home/mrak/esp-idf-stable/components/hal/spi_slave_hal_iram.c", "/home/mrak/esp-idf-stable/components/hal/spi_slave_hd_hal.c", "/home/mrak/esp-idf-stable/components/hal/spi_flash_hal_gpspi.c", "/home/mrak/esp-idf-stable/components/hal/esp32p4/pmu_hal.c", "/home/mrak/esp-idf-stable/components/hal/apm_hal.c", "/home/mrak/esp-idf-stable/components/hal/hmac_hal.c", "/home/mrak/esp-idf-stable/components/hal/ds_hal.c", "/home/mrak/esp-idf-stable/components/hal/cam_hal.c", "/home/mrak/esp-idf-stable/components/hal/usb_serial_jtag_hal.c", "/home/mrak/esp-idf-stable/components/hal/usb_utmi_hal.c", "/home/mrak/esp-idf-stable/components/hal/usb_dwc_hal.c", "/home/mrak/esp-idf-stable/components/hal/usb_wrap_hal.c", "/home/mrak/esp-idf-stable/components/hal/esp32p4/touch_sensor_hal.c" ],
             "include_dirs": [ "platform_port/include", "esp32p4/include", "include" ]
         },
         "heap": {
@@ -1495,7 +1600,7 @@
             "managed_reqs": [],
             "managed_priv_reqs": [],
             "file": "/home/mrak/projects/soul_of_fiona/build/esp-idf/lwip/liblwip.a",
-            "sources": [ "/home/mrak/esp-idf-stable/components/lwip/apps/sntp/sntp.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/api/api_lib.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/api/api_msg.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/api/err.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/api/if_api.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/api/netbuf.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/api/netdb.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/api/netifapi.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/api/sockets.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/api/tcpip.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/apps/sntp/sntp.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/apps/netbiosns/netbiosns.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/def.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/dns.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/inet_chksum.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/init.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/ip.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/mem.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/memp.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/netif.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/pbuf.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/raw.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/stats.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/sys.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/tcp.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/tcp_in.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/tcp_out.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/timeouts.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/udp.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/ipv4/autoip.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/ipv4/dhcp.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/ipv4/etharp.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/ipv4/icmp.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/ipv4/igmp.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/ipv4/ip4.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/ipv4/ip4_napt.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/ipv4/ip4_addr.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/ipv4/ip4_frag.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/ipv6/dhcp6.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/ipv6/ethip6.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/ipv6/icmp6.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/ipv6/inet6.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/ipv6/ip6.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/ipv6/ip6_addr.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/ipv6/ip6_frag.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/ipv6/mld6.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/ipv6/nd6.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ethernet.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/bridgeif.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/bridgeif_fdb.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/slipif.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/auth.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/ccp.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/chap-md5.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/chap-new.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/chap_ms.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/demand.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/eap.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/ecp.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/eui64.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/fsm.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/ipcp.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/ipv6cp.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/lcp.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/magic.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/mppe.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/multilink.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/ppp.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/pppapi.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/pppcrypt.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/pppoe.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/pppol2tp.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/pppos.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/upap.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/utils.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/vj.c", "/home/mrak/esp-idf-stable/components/lwip/port/hooks/tcp_isn_default.c", "/home/mrak/esp-idf-stable/components/lwip/port/hooks/lwip_default_hooks.c", "/home/mrak/esp-idf-stable/components/lwip/port/debug/lwip_debug.c", "/home/mrak/esp-idf-stable/components/lwip/port/sockets_ext.c", "/home/mrak/esp-idf-stable/components/lwip/port/freertos/sys_arch.c", "/home/mrak/esp-idf-stable/components/lwip/port/acd_dhcp_check.c", "/home/mrak/esp-idf-stable/components/lwip/port/esp32xx/vfs_lwip.c", "/home/mrak/esp-idf-stable/components/lwip/apps/ping/esp_ping.c", "/home/mrak/esp-idf-stable/components/lwip/apps/ping/ping.c", "/home/mrak/esp-idf-stable/components/lwip/apps/ping/ping_sock.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/polarssl/arc4.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/polarssl/des.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/polarssl/md4.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/polarssl/md5.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/polarssl/sha1.c" ],
+            "sources": [ "/home/mrak/esp-idf-stable/components/lwip/apps/sntp/sntp.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/api/api_lib.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/api/api_msg.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/api/err.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/api/if_api.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/api/netbuf.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/api/netdb.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/api/netifapi.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/api/sockets.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/api/tcpip.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/apps/sntp/sntp.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/apps/netbiosns/netbiosns.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/def.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/dns.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/inet_chksum.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/init.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/ip.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/mem.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/memp.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/netif.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/pbuf.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/raw.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/stats.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/sys.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/tcp.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/tcp_in.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/tcp_out.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/timeouts.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/udp.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/ipv4/autoip.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/ipv4/dhcp.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/ipv4/etharp.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/ipv4/icmp.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/ipv4/igmp.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/ipv4/ip4.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/ipv4/ip4_napt.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/ipv4/ip4_addr.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/ipv4/ip4_frag.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/ipv6/dhcp6.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/ipv6/ethip6.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/ipv6/icmp6.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/ipv6/inet6.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/ipv6/ip6.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/ipv6/ip6_addr.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/ipv6/ip6_frag.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/ipv6/mld6.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/core/ipv6/nd6.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ethernet.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/bridgeif.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/bridgeif_fdb.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/slipif.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/auth.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/ccp.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/chap-md5.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/chap-new.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/chap_ms.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/demand.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/eap.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/ecp.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/eui64.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/fsm.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/ipcp.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/ipv6cp.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/lcp.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/magic.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/mppe.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/multilink.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/ppp.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/pppapi.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/pppcrypt.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/pppoe.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/pppol2tp.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/pppos.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/upap.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/utils.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/vj.c", "/home/mrak/esp-idf-stable/components/lwip/port/hooks/tcp_isn_default.c", "/home/mrak/esp-idf-stable/components/lwip/port/hooks/lwip_default_hooks.c", "/home/mrak/esp-idf-stable/components/lwip/port/debug/lwip_debug.c", "/home/mrak/esp-idf-stable/components/lwip/port/sockets_ext.c", "/home/mrak/esp-idf-stable/components/lwip/port/freertos/sys_arch.c", "/home/mrak/esp-idf-stable/components/lwip/port/acd_dhcp_check.c", "/home/mrak/esp-idf-stable/components/lwip/port/esp32xx/vfs_lwip.c", "/home/mrak/esp-idf-stable/components/lwip/apps/ping/esp_ping.c", "/home/mrak/esp-idf-stable/components/lwip/apps/ping/ping.c", "/home/mrak/esp-idf-stable/components/lwip/apps/ping/ping_sock.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/polarssl/arc4.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/polarssl/des.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/polarssl/md4.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/polarssl/md5.c", "/home/mrak/esp-idf-stable/components/lwip/lwip/src/netif/ppp/polarssl/sha1.c", "/home/mrak/esp-idf-stable/components/lwip/apps/dhcpserver/dhcpserver.c" ],
             "include_dirs": [ "include", "include/apps", "include/apps/sntp", "lwip/src/include", "port/include", "port/freertos/include/", "port/esp32xx/include", "port/esp32xx/include/arch", "port/esp32xx/include/sys" ]
         },
         "main": {
@@ -1505,10 +1610,10 @@
             "dir": "/home/mrak/projects/soul_of_fiona/main",
             "type": "LIBRARY",
             "lib": "__idf_main",
-            "reqs": [ "nvs_flash", "spiffs", "car_data", "espressif__esp32_p4_function_ev_board", "bsp_extra", "gui", "lvgl__lvgl", "uart_protocol", "esp_timer" ],
-            "priv_reqs": [ "espressif__esp-dsp", "espressif__esp_h264", "espressif__esp_lcd_jd9165" ],
+            "reqs": [ "nvs_flash", "spiffs", "car_data", "espressif__esp32_p4_function_ev_board", "bsp_extra", "gui", "lvgl__lvgl", "uart_protocol", "esp_timer", "wifi_manager", "ntp_sync", "gps_parser", "esp_netif_stack" ],
+            "priv_reqs": [ "espressif__esp-dsp", "espressif__esp_h264", "espressif__esp_hosted", "espressif__esp_lcd_jd9165", "espressif__esp_lvgl_port", "espressif__esp_wifi_remote" ],
             "managed_reqs": [ "lvgl__lvgl" ],
-            "managed_priv_reqs": [ "espressif__esp-dsp", "espressif__esp_h264", "espressif__esp_lcd_jd9165" ],
+            "managed_priv_reqs": [ "espressif__esp-dsp", "espressif__esp_h264", "espressif__esp_hosted", "espressif__esp_lcd_jd9165", "espressif__esp_lvgl_port", "espressif__esp_wifi_remote" ],
             "file": "/home/mrak/projects/soul_of_fiona/build/esp-idf/main/libmain.a",
             "sources": [ "/home/mrak/projects/soul_of_fiona/main/main.c" ],
             "include_dirs": [ "." ]
@@ -1557,6 +1662,21 @@
             "file": "/home/mrak/projects/soul_of_fiona/build/esp-idf/newlib/libnewlib.a",
             "sources": [ "/home/mrak/esp-idf-stable/components/newlib/abort.c", "/home/mrak/esp-idf-stable/components/newlib/assert.c", "/home/mrak/esp-idf-stable/components/newlib/heap.c", "/home/mrak/esp-idf-stable/components/newlib/flockfile.c", "/home/mrak/esp-idf-stable/components/newlib/locks.c", "/home/mrak/esp-idf-stable/components/newlib/poll.c", "/home/mrak/esp-idf-stable/components/newlib/pthread.c", "/home/mrak/esp-idf-stable/components/newlib/random.c", "/home/mrak/esp-idf-stable/components/newlib/getentropy.c", "/home/mrak/esp-idf-stable/components/newlib/reent_init.c", "/home/mrak/esp-idf-stable/components/newlib/newlib_init.c", "/home/mrak/esp-idf-stable/components/newlib/syscalls.c", "/home/mrak/esp-idf-stable/components/newlib/termios.c", "/home/mrak/esp-idf-stable/components/newlib/stdatomic.c", "/home/mrak/esp-idf-stable/components/newlib/time.c", "/home/mrak/esp-idf-stable/components/newlib/sysconf.c", "/home/mrak/esp-idf-stable/components/newlib/realpath.c", "/home/mrak/esp-idf-stable/components/newlib/scandir.c", "/home/mrak/esp-idf-stable/components/newlib/port/esp_time_impl.c" ],
             "include_dirs": [ "platform_include" ]
+        },
+        "ntp_sync": {
+            "alias": "idf::ntp_sync",
+            "target": "___idf_ntp_sync",
+            "prefix": "idf",
+            "dir": "/home/mrak/projects/soul_of_fiona/components/ntp_sync",
+            "type": "LIBRARY",
+            "lib": "__idf_ntp_sync",
+            "reqs": [ "nvs_flash", "esp_netif", "rtc_driver" ],
+            "priv_reqs": [],
+            "managed_reqs": [],
+            "managed_priv_reqs": [],
+            "file": "/home/mrak/projects/soul_of_fiona/build/esp-idf/ntp_sync/libntp_sync.a",
+            "sources": [ "/home/mrak/projects/soul_of_fiona/components/ntp_sync/ntp_sync.c" ],
+            "include_dirs": [ "." ]
         },
         "nvs_flash": {
             "alias": "idf::nvs_flash",
@@ -1693,6 +1813,21 @@
             "sources": [ "/home/mrak/esp-idf-stable/components/rt/FreeRTOS_POSIX_mqueue.c", "/home/mrak/esp-idf-stable/components/rt/FreeRTOS_POSIX_utils.c" ],
             "include_dirs": [ "include" ]
         },
+        "rtc_driver": {
+            "alias": "idf::rtc_driver",
+            "target": "___idf_rtc_driver",
+            "prefix": "idf",
+            "dir": "/home/mrak/projects/soul_of_fiona/components/rtc_driver",
+            "type": "LIBRARY",
+            "lib": "__idf_rtc_driver",
+            "reqs": [ "driver", "espressif__esp32_p4_function_ev_board" ],
+            "priv_reqs": [],
+            "managed_reqs": [],
+            "managed_priv_reqs": [],
+            "file": "/home/mrak/projects/soul_of_fiona/build/esp-idf/rtc_driver/librtc_driver.a",
+            "sources": [ "/home/mrak/projects/soul_of_fiona/components/rtc_driver/rtc.c" ],
+            "include_dirs": [ "." ]
+        },
         "sd_utils": {
             "alias": "idf::sd_utils",
             "target": "___idf_sd_utils",
@@ -1805,7 +1940,7 @@
             "dir": "/home/mrak/projects/soul_of_fiona/components/uart_protocol",
             "type": "LIBRARY",
             "lib": "__idf_uart_protocol",
-            "reqs": [ "driver", "esp_timer", "car_data" ],
+            "reqs": [ "driver", "esp_timer", "car_data", "fiona_brain", "rtc_driver" ],
             "priv_reqs": [],
             "managed_reqs": [],
             "managed_priv_reqs": [],
@@ -1887,6 +2022,21 @@
             "file": "/home/mrak/projects/soul_of_fiona/build/esp-idf/wear_levelling/libwear_levelling.a",
             "sources": [ "/home/mrak/esp-idf-stable/components/wear_levelling/Partition.cpp", "/home/mrak/esp-idf-stable/components/wear_levelling/SPI_Flash.cpp", "/home/mrak/esp-idf-stable/components/wear_levelling/WL_Ext_Perf.cpp", "/home/mrak/esp-idf-stable/components/wear_levelling/WL_Ext_Safe.cpp", "/home/mrak/esp-idf-stable/components/wear_levelling/WL_Flash.cpp", "/home/mrak/esp-idf-stable/components/wear_levelling/crc32.cpp", "/home/mrak/esp-idf-stable/components/wear_levelling/wear_levelling.cpp" ],
             "include_dirs": [ "include" ]
+        },
+        "wifi_manager": {
+            "alias": "idf::wifi_manager",
+            "target": "___idf_wifi_manager",
+            "prefix": "idf",
+            "dir": "/home/mrak/projects/soul_of_fiona/components/wifi_manager",
+            "type": "LIBRARY",
+            "lib": "__idf_wifi_manager",
+            "reqs": [ "nvs_flash", "esp_wifi", "esp_netif", "esp_event" ],
+            "priv_reqs": [],
+            "managed_reqs": [],
+            "managed_priv_reqs": [],
+            "file": "/home/mrak/projects/soul_of_fiona/build/esp-idf/wifi_manager/libwifi_manager.a",
+            "sources": [ "/home/mrak/projects/soul_of_fiona/components/wifi_manager/wifi_manager.c" ],
+            "include_dirs": [ "." ]
         },
         "wifi_provisioning": {
             "alias": "idf::wifi_provisioning",
@@ -2410,7 +2560,7 @@
             "priv_reqs": [ "log", "esp_timer", "esp_driver_spi", "esp_driver_gpio" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "include_dirs": []
+            "include_dirs": [ "include" ]
         },
         "esp_event": {
             "alias": "idf::esp_event",
@@ -3198,10 +3348,10 @@
             "prefix": "idf",
             "dir": "/home/mrak/projects/soul_of_fiona/main",
             "lib": "__idf_main",
-            "reqs": [ "nvs_flash", "spiffs", "car_data", "espressif__esp32_p4_function_ev_board", "bsp_extra", "gui", "lvgl__lvgl", "uart_protocol", "esp_timer" ],
-            "priv_reqs": [ "espressif__esp-dsp", "espressif__esp_h264", "espressif__esp_lcd_jd9165" ],
+            "reqs": [ "nvs_flash", "spiffs", "car_data", "espressif__esp32_p4_function_ev_board", "bsp_extra", "gui", "lvgl__lvgl", "uart_protocol", "esp_timer", "wifi_manager", "ntp_sync", "gps_parser", "esp_netif_stack" ],
+            "priv_reqs": [ "espressif__esp-dsp", "espressif__esp_h264", "espressif__esp_hosted", "espressif__esp_lcd_jd9165", "espressif__esp_lvgl_port", "espressif__esp_wifi_remote" ],
             "managed_reqs": [ "lvgl__lvgl" ],
-            "managed_priv_reqs": [ "espressif__esp-dsp", "espressif__esp_h264", "espressif__esp_lcd_jd9165" ],
+            "managed_priv_reqs": [ "espressif__esp-dsp", "espressif__esp_h264", "espressif__esp_hosted", "espressif__esp_lcd_jd9165", "espressif__esp_lvgl_port", "espressif__esp_wifi_remote" ],
             "include_dirs": [ "." ]
         },
         "bsp_extra": {
@@ -3270,7 +3420,19 @@
             "prefix": "idf",
             "dir": "/home/mrak/projects/soul_of_fiona/components/fiona_core",
             "lib": "__idf_fiona_core",
-            "reqs": [ "nvs_flash", "spiffs", "car_data", "lvgl__lvgl", "uart_protocol", "sd_utils", "fiona_soul", "fiona_brain", "config_manager", "esp_timer", "driver", "esp_adc", "bsp_extra", "espressif__esp32_p4_function_ev_board" ],
+            "reqs": [ "nvs_flash", "spiffs", "car_data", "lvgl__lvgl", "uart_protocol", "sd_utils", "fiona_soul", "fiona_brain", "config_manager", "esp_timer", "driver", "esp_adc", "bsp_extra", "espressif__esp32_p4_function_ev_board", "rtc_driver", "gui", "fiona_io_poller" ],
+            "priv_reqs": [],
+            "managed_reqs": [],
+            "managed_priv_reqs": [],
+            "include_dirs": [ "." ]
+        },
+        "fiona_io_poller": {
+            "alias": "idf::fiona_io_poller",
+            "target": "___idf_fiona_io_poller",
+            "prefix": "idf",
+            "dir": "/home/mrak/projects/soul_of_fiona/components/fiona_io_poller",
+            "lib": "__idf_fiona_io_poller",
+            "reqs": [ "freertos", "car_data", "uart_protocol" ],
             "priv_reqs": [],
             "managed_reqs": [],
             "managed_priv_reqs": [],
@@ -3300,17 +3462,53 @@
             "managed_priv_reqs": [ "espressif__cjson" ],
             "include_dirs": [ "." ]
         },
+        "gps_parser": {
+            "alias": "idf::gps_parser",
+            "target": "___idf_gps_parser",
+            "prefix": "idf",
+            "dir": "/home/mrak/projects/soul_of_fiona/components/gps_parser",
+            "lib": "__idf_gps_parser",
+            "reqs": [ "driver", "car_data" ],
+            "priv_reqs": [],
+            "managed_reqs": [],
+            "managed_priv_reqs": [],
+            "include_dirs": [ "." ]
+        },
         "gui": {
             "alias": "idf::gui",
             "target": "___idf_gui",
             "prefix": "idf",
             "dir": "/home/mrak/projects/soul_of_fiona/components/gui",
             "lib": "__idf_gui",
-            "reqs": [ "lvgl__lvgl", "car_data", "uart_protocol", "sd_utils", "fatfs", "fiona_core", "system_actions" ],
+            "reqs": [ "lvgl__lvgl", "car_data", "uart_protocol", "sd_utils", "fatfs", "fiona_core", "system_actions", "ntp_sync", "gps_parser" ],
             "priv_reqs": [],
             "managed_reqs": [],
             "managed_priv_reqs": [],
             "include_dirs": [ ".", "screens", "fonts" ]
+        },
+        "ntp_sync": {
+            "alias": "idf::ntp_sync",
+            "target": "___idf_ntp_sync",
+            "prefix": "idf",
+            "dir": "/home/mrak/projects/soul_of_fiona/components/ntp_sync",
+            "lib": "__idf_ntp_sync",
+            "reqs": [ "nvs_flash", "esp_netif", "rtc_driver" ],
+            "priv_reqs": [],
+            "managed_reqs": [],
+            "managed_priv_reqs": [],
+            "include_dirs": [ "." ]
+        },
+        "rtc_driver": {
+            "alias": "idf::rtc_driver",
+            "target": "___idf_rtc_driver",
+            "prefix": "idf",
+            "dir": "/home/mrak/projects/soul_of_fiona/components/rtc_driver",
+            "lib": "__idf_rtc_driver",
+            "reqs": [ "driver", "espressif__esp32_p4_function_ev_board" ],
+            "priv_reqs": [],
+            "managed_reqs": [],
+            "managed_priv_reqs": [],
+            "include_dirs": [ "." ]
         },
         "sd_utils": {
             "alias": "idf::sd_utils",
@@ -3342,7 +3540,19 @@
             "prefix": "idf",
             "dir": "/home/mrak/projects/soul_of_fiona/components/uart_protocol",
             "lib": "__idf_uart_protocol",
-            "reqs": [ "driver", "esp_timer", "car_data" ],
+            "reqs": [ "driver", "esp_timer", "car_data", "fiona_brain", "rtc_driver" ],
+            "priv_reqs": [],
+            "managed_reqs": [],
+            "managed_priv_reqs": [],
+            "include_dirs": [ "." ]
+        },
+        "wifi_manager": {
+            "alias": "idf::wifi_manager",
+            "target": "___idf_wifi_manager",
+            "prefix": "idf",
+            "dir": "/home/mrak/projects/soul_of_fiona/components/wifi_manager",
+            "lib": "__idf_wifi_manager",
+            "reqs": [ "nvs_flash", "esp_wifi", "esp_netif", "esp_event" ],
             "priv_reqs": [],
             "managed_reqs": [],
             "managed_priv_reqs": [],
@@ -3371,6 +3581,18 @@
             "managed_reqs": [],
             "managed_priv_reqs": [],
             "include_dirs": []
+        },
+        "espressif__eppp_link": {
+            "alias": "idf::espressif__eppp_link",
+            "target": "___idf_espressif__eppp_link",
+            "prefix": "idf",
+            "dir": "/home/mrak/projects/soul_of_fiona/managed_components/espressif__eppp_link",
+            "lib": "__idf_espressif__eppp_link",
+            "reqs": [],
+            "priv_reqs": [ "esp_netif", "esp_timer", "esp_eth", "esp_driver_gpio", "esp_driver_spi", "esp_driver_uart", "esp_driver_sdio", "espressif__esp_serial_slave_link" ],
+            "managed_reqs": [],
+            "managed_priv_reqs": [ "espressif__esp_serial_slave_link" ],
+            "include_dirs": [ "include" ]
         },
         "espressif__esp-dsp": {
             "alias": "idf::espressif__esp-dsp",
@@ -3407,6 +3629,18 @@
             "managed_reqs": [],
             "managed_priv_reqs": [],
             "include_dirs": [ "./interface/include", "./sw/include", "./port/include/", "./hw/include" ]
+        },
+        "espressif__esp_hosted": {
+            "alias": "idf::espressif__esp_hosted",
+            "target": "___idf_espressif__esp_hosted",
+            "prefix": "idf",
+            "dir": "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_hosted",
+            "lib": "__idf_espressif__esp_hosted",
+            "reqs": [ "esp_driver_sdmmc", "esp_driver_spi", "esp_driver_uart", "esp_driver_gpio", "esp_event" ],
+            "priv_reqs": [ "soc", "esp_netif", "esp_timer", "driver", "esp_wifi", "bt", "esp_http_client", "console", "wpa_supplicant", "openthread" ],
+            "managed_reqs": [],
+            "managed_priv_reqs": [],
+            "include_dirs": [ "./host", "./host/api/include" ]
         },
         "espressif__esp_lcd_ek79007": {
             "alias": "idf::espressif__esp_lcd_ek79007",
@@ -3479,6 +3713,42 @@
             "managed_reqs": [ "lvgl__lvgl" ],
             "managed_priv_reqs": [],
             "include_dirs": [ "include" ]
+        },
+        "espressif__esp_serial_slave_link": {
+            "alias": "idf::espressif__esp_serial_slave_link",
+            "target": "___idf_espressif__esp_serial_slave_link",
+            "prefix": "idf",
+            "dir": "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_serial_slave_link",
+            "lib": "__idf_espressif__esp_serial_slave_link",
+            "reqs": [ "sdmmc", "esp_driver_sdspi", "esp_driver_sdmmc" ],
+            "priv_reqs": [],
+            "managed_reqs": [],
+            "managed_priv_reqs": [],
+            "include_dirs": [ "include" ]
+        },
+        "espressif__esp_wifi_remote": {
+            "alias": "idf::espressif__esp_wifi_remote",
+            "target": "___idf_espressif__esp_wifi_remote",
+            "prefix": "idf",
+            "dir": "/home/mrak/projects/soul_of_fiona/managed_components/espressif__esp_wifi_remote",
+            "lib": "__idf_espressif__esp_wifi_remote",
+            "reqs": [ "esp_event", "esp_netif" ],
+            "priv_reqs": [ "esp_wifi", "esp-tls", "vfs", "espressif__esp_hosted", "espressif__wifi_remote_over_eppp" ],
+            "managed_reqs": [],
+            "managed_priv_reqs": [ "espressif__esp_hosted", "espressif__wifi_remote_over_eppp" ],
+            "include_dirs": [ "include" ]
+        },
+        "espressif__wifi_remote_over_eppp": {
+            "alias": "idf::espressif__wifi_remote_over_eppp",
+            "target": "___idf_espressif__wifi_remote_over_eppp",
+            "prefix": "idf",
+            "dir": "/home/mrak/projects/soul_of_fiona/managed_components/espressif__wifi_remote_over_eppp",
+            "lib": "__idf_espressif__wifi_remote_over_eppp",
+            "reqs": [],
+            "priv_reqs": [ "esp_event", "esp_netif", "espressif__eppp_link", "esp-tls", "esp_wifi", "vfs" ],
+            "managed_reqs": [],
+            "managed_priv_reqs": [ "espressif__eppp_link" ],
+            "include_dirs": []
         },
         "lvgl__lvgl": {
             "alias": "idf::lvgl__lvgl",

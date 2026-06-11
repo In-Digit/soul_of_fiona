@@ -604,16 +604,6 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("/home/mrak/projects/soul_of_fiona/build/esp-idf/uart_protocol/cmake_install.cmake")
-endif()
-
-if(NOT CMAKE_INSTALL_LOCAL_ONLY)
-  # Include the install script for the subdirectory.
-  include("/home/mrak/projects/soul_of_fiona/build/esp-idf/sd_utils/cmake_install.cmake")
-endif()
-
-if(NOT CMAKE_INSTALL_LOCAL_ONLY)
-  # Include the install script for the subdirectory.
   include("/home/mrak/projects/soul_of_fiona/build/esp-idf/espressif__cjson/cmake_install.cmake")
 endif()
 
@@ -629,12 +619,32 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
+  include("/home/mrak/projects/soul_of_fiona/build/esp-idf/rtc_driver/cmake_install.cmake")
+endif()
+
+if(NOT CMAKE_INSTALL_LOCAL_ONLY)
+  # Include the install script for the subdirectory.
+  include("/home/mrak/projects/soul_of_fiona/build/esp-idf/uart_protocol/cmake_install.cmake")
+endif()
+
+if(NOT CMAKE_INSTALL_LOCAL_ONLY)
+  # Include the install script for the subdirectory.
+  include("/home/mrak/projects/soul_of_fiona/build/esp-idf/sd_utils/cmake_install.cmake")
+endif()
+
+if(NOT CMAKE_INSTALL_LOCAL_ONLY)
+  # Include the install script for the subdirectory.
   include("/home/mrak/projects/soul_of_fiona/build/esp-idf/fiona_soul/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
   include("/home/mrak/projects/soul_of_fiona/build/esp-idf/config_manager/cmake_install.cmake")
+endif()
+
+if(NOT CMAKE_INSTALL_LOCAL_ONLY)
+  # Include the install script for the subdirectory.
+  include("/home/mrak/projects/soul_of_fiona/build/esp-idf/fiona_io_poller/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
@@ -649,7 +659,22 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
+  include("/home/mrak/projects/soul_of_fiona/build/esp-idf/ntp_sync/cmake_install.cmake")
+endif()
+
+if(NOT CMAKE_INSTALL_LOCAL_ONLY)
+  # Include the install script for the subdirectory.
+  include("/home/mrak/projects/soul_of_fiona/build/esp-idf/gps_parser/cmake_install.cmake")
+endif()
+
+if(NOT CMAKE_INSTALL_LOCAL_ONLY)
+  # Include the install script for the subdirectory.
   include("/home/mrak/projects/soul_of_fiona/build/esp-idf/gui/cmake_install.cmake")
+endif()
+
+if(NOT CMAKE_INSTALL_LOCAL_ONLY)
+  # Include the install script for the subdirectory.
+  include("/home/mrak/projects/soul_of_fiona/build/esp-idf/wifi_manager/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
@@ -660,6 +685,31 @@ endif()
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
   include("/home/mrak/projects/soul_of_fiona/build/esp-idf/espressif__esp_h264/cmake_install.cmake")
+endif()
+
+if(NOT CMAKE_INSTALL_LOCAL_ONLY)
+  # Include the install script for the subdirectory.
+  include("/home/mrak/projects/soul_of_fiona/build/esp-idf/espressif__esp_hosted/cmake_install.cmake")
+endif()
+
+if(NOT CMAKE_INSTALL_LOCAL_ONLY)
+  # Include the install script for the subdirectory.
+  include("/home/mrak/projects/soul_of_fiona/build/esp-idf/espressif__esp_serial_slave_link/cmake_install.cmake")
+endif()
+
+if(NOT CMAKE_INSTALL_LOCAL_ONLY)
+  # Include the install script for the subdirectory.
+  include("/home/mrak/projects/soul_of_fiona/build/esp-idf/espressif__eppp_link/cmake_install.cmake")
+endif()
+
+if(NOT CMAKE_INSTALL_LOCAL_ONLY)
+  # Include the install script for the subdirectory.
+  include("/home/mrak/projects/soul_of_fiona/build/esp-idf/espressif__wifi_remote_over_eppp/cmake_install.cmake")
+endif()
+
+if(NOT CMAKE_INSTALL_LOCAL_ONLY)
+  # Include the install script for the subdirectory.
+  include("/home/mrak/projects/soul_of_fiona/build/esp-idf/espressif__esp_wifi_remote/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)

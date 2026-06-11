@@ -1,6 +1,7 @@
 /**
  * @file protocol.h
  * @brief Общие константы бинарного протокола UART.
+ * Добавлены недостающие ID для статистики, ACK и IMU.
  */
 
 #ifndef PROTOCOL_H
@@ -95,12 +96,11 @@
 #define MSG_REQ_TRIP_STATS      0x4C
 #define MSG_REQ_DAY_STATS       0x4D
 #define MSG_REQ_DRIVE_CYCLES    0x4E
-#define MSG_DRIVE_CYCLE_DATA    0x4F  // первый пакет с количеством заездов
-// Поля заездов: коды от 0x50 до 0x5C (13 полей)
-#define MSG_DRIVE_CYCLE_END     0x66  // завершение передачи заездов (исправлено)
+#define MSG_DRIVE_CYCLE_DATA    0x4F
+#define MSG_DRIVE_CYCLE_END     0x66
 
 // ------------------ HEARTBEAT И СЛУЖЕБНЫЕ ------------------
-#define MSG_HEARTBEAT_REQ      0x60   // теперь приходит с 4 байтами Unix-времени
+#define MSG_HEARTBEAT_REQ      0x60
 #define MSG_HEARTBEAT_RSP      0x61
 #define MSG_CONFIG_REQ         0x62
 #define MSG_CONFIG_RSP         0x63
@@ -109,7 +109,6 @@
 #define MSG_WHO_IS_HERE        0x70
 #define MSG_I_AM_HERE          0x71
 
-// Типы устройств
 #define DEV_TYPE_GATEWAY       0x01
 #define DEV_TYPE_ARDUINO       0x02
 
@@ -126,7 +125,7 @@
 
 // ------------------ УПРАВЛЕНИЕ ШЛЮЗОМ ----------------------
 #define MSG_RECONNECT          0x40
-#define MSG_REFUEL_DATA        0x50   // заправка (не конфликтует с полями заездов 0x50..0x5C)
+#define MSG_REFUEL_DATA        0x50
 #define MSG_ODO_FULL           0x51
 #define MSG_FULL_TANK_FLAG     0x52
 #define MSG_SET_FUEL_LEVEL     0x53
@@ -134,13 +133,13 @@
 #define MSG_REBOOT             0x64
 
 // Датчик освещённости
-#define MSG_LIGHT            0x95   // запрос (Len=0) и ответ (Len=1, 0-100%)
-#define MSG_LIGHT_SYNTH      0x96   // синтетическая освещённость по времени суток (Len=1, 0-100%)
-#define MSG_LIGHT_RAW        0x97   // запрос (Len=0) и ответ (Len=2, uint16_t 0..4095)
+#define MSG_LIGHT            0x95
+#define MSG_LIGHT_SYNTH      0x96
+#define MSG_LIGHT_RAW        0x97
 
 // --------------- IMU (АКСЕЛЕРОМЕТР / ГИРОСКОП / НАКЛОН) ---------------
-#define MSG_REQ_ACCEL         0xA0   // запрос ускорений, ответ: ax,ay (4 байта)
-#define MSG_ACCEL_Z           0xA5   // дополнительный кадр: az (4 байта)
+#define MSG_REQ_ACCEL         0xA0
+#define MSG_ACCEL_Z           0xA5
 #define MSG_REQ_GYRO          0xA1
 #define MSG_REQ_TILT          0xA2
 #define MSG_CALIBRATE_ACCEL   0xA3
@@ -152,9 +151,9 @@
 #define MSG_FAN_SET_PWM2           0xC2
 #define MSG_FAN_SET_AUTO           0xC3
 #define MSG_CLIMATE_SET_PRESET     0xC4
-#define MSG_CLIMATE_SET_TEMP       0xC5   // температура (int16, десятые доли °C)
-#define MSG_CLIMATE_SET_PWM        0xC6   // ШИМ печки 0-255
-#define MSG_CLIMATE_SET_AUTO       0xC7   // авто/ручной
+#define MSG_CLIMATE_SET_TEMP       0xC5
+#define MSG_CLIMATE_SET_PWM        0xC6
+#define MSG_CLIMATE_SET_AUTO       0xC7
 
 // Телеметрия климата (запрос/ответ)
 #define MSG_FAN_TELEMETRY          0xC8
@@ -179,8 +178,11 @@
 #define MSG_HEATER_CALIB_SAVE        0xD7
 
 // Температурное смещение Arduino
-#define MSG_TEMP_OFFSET_SET   0xE0   // установить смещение (int16, десятые доли °C)
-#define MSG_TEMP_OFFSET_GET   0xE1   // запросить текущее смещение
+#define MSG_TEMP_OFFSET_SET   0xE0
+#define MSG_TEMP_OFFSET_GET   0xE1
+
+// Запрос стиля вождения у шлюза
+#define MSG_REQ_DRIVING_STYLE 0xE2
 
 uint8_t crc8_calculate(const uint8_t *data, size_t len);
 

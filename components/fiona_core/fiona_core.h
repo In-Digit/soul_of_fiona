@@ -8,6 +8,7 @@
 
 #include "lvgl.h"
 #include <stdbool.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -37,6 +38,10 @@ extern lv_timer_t * poll_timer;
 extern lv_timer_t * clock_timer;
 extern bool screensaver_active;
 
+// Счётчик времени с момента глушения двигателя (используется для скринсейвера и пробуждения)
+extern uint32_t engine_off_seconds;
+extern uint32_t inactivity_seconds;
+extern uint32_t boot_time;
 // Инициализация ядра (вызывается из main)
 void fiona_core_init(void);
 
@@ -56,6 +61,15 @@ void fiona_core_load_car_data_from_nvs(void);
 // Установка цвета часов
 void fiona_core_set_clock_color(int color);
 
+// Инициализация фоновых таймеров (вызывается при загрузке дашборда)
+void fiona_background_init_timers(void);
+
+// Управление наблюдателями (для безопасной перезагрузки дашборда)
+void fiona_observers_subscribe_all(void);
+void fiona_observers_unsubscribe_all(void);
+void fiona_observers_init_widgets(void);
+extern uint8_t debug_source;
+void debug_update_textarea(void);
 #ifdef __cplusplus
 }
 #endif

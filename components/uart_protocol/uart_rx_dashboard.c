@@ -1,12 +1,16 @@
 /**
  * @file uart_rx_dashboard.c
  * @brief Обработка пакетов с дашборд-данными (скорость, обороты, температура, климат и т.д.)
+ *        Исправлен парсинг MSG_CLIMATE_TELEMETRY согласно протоколу шлюза от 2026-06-11.
  */
 
 #include "uart_rx_dashboard.h"
 #include "protocol.h"
 #include "CarData.h"
+#include "fiona_brain.h"
+#include "rx8025_rtc.h"
 #include <sys/time.h>
+#include <time.h>
 
 void uart_rx_dashboard_process(uint8_t msg_id, const uint8_t *payload, uint8_t len) {
     CarData *data = CarData_Get();
@@ -141,6 +145,20 @@ void uart_rx_dashboard_process(uint8_t msg_id, const uint8_t *payload, uint8_t l
                         settimeofday(&tv, NULL);
                         data->time_synced = true;
                         data->time_received_this_boot = true;
+
+                        // Сохраняем время во внешний RTC
+                        time_t utc_time = time;
+                        struct tm *lt = localtime(&utc_time);
+                        if (lt) {
+                            rtc_time_t rtc_time;
+                            rtc_time.year = lt->tm_year + 1900;
+                            rtc_time.mon  = lt->tm_mon + 1;
+                            rtc_time.day  = lt->tm_mday;
+                            rtc_time.hour = lt->tm_hour;
+                            rtc_time.min  = lt->tm_min;
+                            rtc_time.sec  = lt->tm_sec;
+                            rtc_set_time(&rtc_time);
+                        }
                     }
                 }
             }
@@ -176,23 +194,35 @@ void uart_rx_dashboard_process(uint8_t msg_id, const uint8_t *payload, uint8_t l
             }
             break;
 
-        // --------------- КЛИМАТ-ТЕЛЕМЕТРИЯ (0xC9) ---------------
-        case MSG_CLIMATE_TELEMETRY:
-            if (len >= 4) {
-                // Байт 0: желаемая температура (подтверждённая шлюзом)
-                float target = (float)payload[0];
-                // Байт 1: ШИМ печки (0..255)
-                uint8_t pwm = payload[1];
-                // Байты 2-3: температура салона ×10 (int16, little-endian)
-                int16_t cabin_raw = (int16_t)(payload[2] | (payload[3] << 8));
-                float cabin = cabin_raw / 10.0f;
-
-                data->climate_target_temp = target;
-                data->heater_pwm = pwm;
-                data->cabin_temp = cabin;
-                data->climate_target_dirty = true;
+        // ============== ИСПРАВЛЕННЫЙ ПАРСИНГ КЛИМАТ-ТЕЛЕМЕТРИИ ==============
+        case MSG_CLIMATE_TELEMETRY:   // 0xC9
+            if (len >= 6) {
+                // Протокол шлюза (2026-06-11):
+                // payload[0] = heater_pwm (uint8_t)
+                // payload[1] = target_temp (uint8_t, целые градусы)
+                // payload[2] = auto_flag (uint8_t)
+                // payload[3] = cabin_temp_lo (младший байт int16_t)
+                // payload[4] = cabin_temp_hi (старший байт int16_t)
+                // payload[5] = reserved
+                data->heater_pwm = payload[0];
+                data->climate_target_temp = (float)payload[1];   // Целое число градусов
+                // auto_flag можно сохранить в будущем при необходимости
+                int16_t cabin_raw = (int16_t)(payload[3] | (payload[4] << 8));
+                data->cabin_temp = cabin_raw / 10.0f;
                 data->heater_pwm_dirty = true;
+                data->climate_target_dirty = true;
                 data->cabin_temp_dirty = true;
+            }
+            break;
+
+        // --------------- СТИЛЬ ВОЖДЕНИЯ ОТ ШЛЮЗА (0xE2) ---------------
+        case MSG_REQ_DRIVING_STYLE:
+            if (len >= 1) {
+                uint8_t style = payload[0];
+                FionaState *state = fiona_brain_get_state();
+                if (state && state->manual_style == 0) {
+                    state->driving_style = style;
+                }
             }
             break;
 

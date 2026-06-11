@@ -4,6 +4,7 @@
  *
  * Единый источник истины для всех параметров, получаемых от шлюза, Arduino,
  * датчиков и пользовательского ввода. Потокобезопасный доступ через мьютекс.
+ * Добавлены поля для кольцевого буфера NMEA-строк GPS и функция получения размера структуры.
  */
 
 #ifndef CAR_DATA_H
@@ -32,10 +33,11 @@ extern "C" {
 #define FUEL_YELLOW_THRESHOLD   10
 #define BATT_LOW_THRESHOLD      10.5f
 #define BATT_HIGH_THRESHOLD     14.7f
-#define TEMP_COLD               60
-#define TEMP_NORMAL             95
-#define TEMP_WARM               98
-#define TEMP_HOT               104
+// Обновлённые пороги температуры
+#define TEMP_COLD               85
+#define TEMP_NORMAL             98
+#define TEMP_WARM              103
+#define TEMP_HOT               110
 #define SPEED_LOW               20
 #define SPEED_MID_LOW           35
 #define SPEED_MID_HIGH          40
@@ -310,18 +312,22 @@ typedef struct {
     bool damperModeDirty;
 
     /* --- Новые поля Arduino --- */
-    float   arduino_coolant_temp;      // температура ОЖ с датчика Arduino (градусы)
-    bool    arduino_coolant_dirty;     // флаг обновления
-    uint8_t arduino_fan_mode;          // текущий режим: 1=Normal, 2=Highway, 3=City
-    bool    arduino_mode_from_screen;  // true если режим задан с экрана
+    float   arduino_coolant_temp;
+    bool    arduino_coolant_dirty;
+    uint8_t arduino_fan_mode;
+    bool    arduino_mode_from_screen;
 
-    /* --- Новые поля климата (от шлюза) --- */
-    float   climate_target_temp;       // желаемая температура, подтверждённая шлюзом
-    float   cabin_temp;                // температура в салоне
-    uint8_t heater_pwm;                // текущий ШИМ печки
-    bool    climate_target_dirty;      // флаг обновления желаемой температуры
-    bool    cabin_temp_dirty;          // флаг обновления температуры салона
-    bool    heater_pwm_dirty;          // флаг обновления ШИМ печки
+    float   arduino_temp_offset;
+    bool    arduino_offset_received;
+    bool    arduino_offset_pending;
+
+    /* --- Новые поля климата --- */
+    float   climate_target_temp;
+    float   cabin_temp;
+    uint8_t heater_pwm;
+    bool    climate_target_dirty;
+    bool    cabin_temp_dirty;
+    bool    heater_pwm_dirty;
 
     /* ================ КАТЕГОРИЯ 4: НАСТРОЙКИ ИНТЕРФЕЙСА И СЕТЕЙ ================ */
     char wifiSsid1[33];
@@ -409,8 +415,8 @@ typedef struct {
 
     /* ================ ФЛАГ СИНХРОНИЗАЦИИ ВРЕМЕНИ ================ */
     bool time_synced;
-    bool time_received_this_boot; 
-    
+    bool time_received_this_boot;
+
     /* ================ ЯРКОСТЬ ================ */
     uint8_t  backlight_brightness;
     uint8_t  light_threshold_dark;
@@ -434,7 +440,7 @@ typedef struct {
     uint32_t color_tone_funny;
     uint32_t color_tone_serious;
 
-    /* ================ IMU (АКСЕЛЕРОМЕТР / ГИРОСКОП) ================ */
+    /* ================ IMU ================ */
     float accel_x;
     float accel_y;
     float accel_z;
@@ -452,11 +458,45 @@ typedef struct {
     float max_pos_accel_g;
     float max_neg_accel_g;
 
-    /* --------------- Калибровочные точки (сохраняются на SD) --------------- */
-    uint8_t climateCalibStartPoint;   // точка старта печки
-    uint8_t climateCalibStopPoint;    // точка остановки печки
-    uint8_t climateCalibNoiseLow;     // порог ВЧ шума печки
-    uint8_t climateCalibNoiseHigh;    // порог аэродинамического шума печки
+    /* ================ КАЛИБРОВОЧНЫЕ ТОЧКИ ================ */
+    uint8_t climateCalibStartPoint;
+    uint8_t climateCalibStopPoint;
+    uint8_t climateCalibNoiseLow;
+    uint8_t climateCalibNoiseHigh;
+
+    /* ================ ПРИНУДИТЕЛЬНАЯ ПОЕЗДКА ================ */
+    bool trip_force_active;
+
+    /* ================ GPS-ДАННЫЕ ================ */
+    double gps_lat;
+    double gps_lon;
+    float  gps_speed;
+    uint8_t gps_satellites;
+    bool   gps_valid;
+    char   gps_last_nmea[96];                      // последняя принятая NMEA-строка
+    #define GPS_NMEA_BUF_SIZE 10
+    char   gps_nmea_buf[GPS_NMEA_BUF_SIZE][96];    // кольцевой буфер последних NMEA-строк
+    uint8_t gps_nmea_buf_idx;                      // индекс следующей записи
+    uint8_t gps_nmea_buf_count;                    // количество записанных строк (до заполнения)
+
+    /* ================ РУЧНЫЕ НАСТРОЙКИ UART ================ */
+    // Шлюз (Gateway)
+    int   gw_rx_pin;
+    int   gw_tx_pin;
+    int   gw_baud_rate;
+    bool  gw_configured;      // true – проверенная конфигурация сохранена
+
+    // Arduino
+    int   arduino_rx_pin;
+    int   arduino_tx_pin;
+    int   arduino_baud_rate;
+    bool  arduino_configured;
+
+    // GPS
+    int   gps_rx_pin;
+    int   gps_tx_pin;
+    int   gps_baud_rate;
+    bool  gps_configured;
 
 } CarData;
 
@@ -481,6 +521,11 @@ bool CarData_Lock(uint32_t timeout_ms);
 void CarData_Unlock(void);
 
 void CarData_set_time_synced(bool synced);
+
+/**
+ * @brief Получить размер структуры CarData в байтах.
+ */
+size_t CarData_get_size(void);
 
 #ifdef __cplusplus
 }

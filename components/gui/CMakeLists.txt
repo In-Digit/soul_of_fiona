@@ -1,12 +1,12 @@
 idf_component_register(
     SRCS "screens/ui_Screen_DashBoard.c"
-         "screens/ui_Screen_System.c"
-         "screens/ui_Screen_ClimateControl.c"
          "screens/ui_Screen_SplashScreen.c"
+         "screens/ui_Screen_ScreenReFuel.c"
+         "screens/ui_Screen_Setting.c"
+         "screens/ui_Screen_DebugScreen.c"
          "ui.c"
          "components/ui_comp_hook.c"
          "ui_helpers.c"
-         "ui_debug_helpers.c"
          "ui_events.c"
          "images/ui_img_bg_red_png.c"
          "images/ui_img_small_blue_png.c"
@@ -33,11 +33,14 @@ idf_component_register(
          "images/ui_img_green_cat_png.c"
          "images/ui_img_yellow_cat_png.c"
          "images/ui_img_red_cat_png.c"
+         "images/ui_img_iconwifi_png.c"
+         "images/ui_img_gps_png.c"
+         "images/ui_img_serverwifi_png.c"
+         "images/ui_img_fordlogo_png.c"
          "images/ui_img_global_bg_png.c"
          "images/ui_img_black_png.c"
          "images/ui_img_grey_png.c"
          "images/ui_img_red_png.c"
-         "images/ui_img_fordlogo_png.c"
          "fonts/ui_font_BaseFont.c"
          "fonts/ui_font_BaseFont16.c"
          "fonts/ui_font_BaseFont20.c"
@@ -47,5 +50,5 @@ idf_component_register(
     INCLUDE_DIRS "."
                  "screens"
                  "fonts"
-    REQUIRES lvgl__lvgl car_data uart_protocol sd_utils fatfs fiona_core system_actions
+    REQUIRES lvgl__lvgl car_data uart_protocol sd_utils fatfs fiona_core system_actions ntp_sync gps_parser
 )

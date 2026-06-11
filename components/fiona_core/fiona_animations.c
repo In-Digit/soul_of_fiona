@@ -1,6 +1,8 @@
 /**
  * @file fiona_animations.c
  * @brief Сценарии холодного старта, скринсейвера, пробуждения и цветовые фильтры.
+ *
+ * При деактивации скринсейвера сбрасывается engine_off_seconds.
  */
 
 #include "fiona_animations.h"
@@ -12,8 +14,6 @@
 #include "esp_log.h"
 #include <string.h>
 #include <stdlib.h>
-
-static const char *TAG = "FIONA_ANIM";
 
 // -------------------- Внешние UI-объекты --------------------
 extern lv_obj_t * ui_Screen_DashBoard;
@@ -43,7 +43,6 @@ static bool ring_internet_available = false;
 static void anim_set_opa_cb(void *var, int32_t val);
 static void logo_fade_in_done(lv_anim_t *a);
 static void boot_log_timer_cb(lv_timer_t *t);
-static void wait_for_connection_timer(lv_timer_t *t);
 static void logo_fade_out_done(lv_anim_t *a);
 static void greeting_hold_timer(lv_timer_t *t);
 static void screensaver_phrase_fade_in_complete(lv_anim_t *a);
@@ -61,7 +60,7 @@ static const char *boot_phrases[] = {
     "Загрузка данных...",
     "Подключение к нервной системе...",
     "Подключение к системе обратной связи...",
-    "Синхронизация времени..."
+    "Запуск систем..."
 };
 static int boot_phrase_count = sizeof(boot_phrases) / sizeof(boot_phrases[0]);
 static int current_boot_idx = 0;
@@ -95,32 +94,9 @@ static void boot_log_timer_cb(lv_timer_t *t) {
         lv_label_set_text(ui_SplashScreen_Label_FionaSpeachLabel, boot_phrases[current_boot_idx]);
         if (current_boot_idx == 3) {
             uart_send_broadcast(MSG_WHO_IS_HERE, NULL, 0);
-            uart_send_to_gateway(MSG_REQ_TIME, NULL, 0);
         }
     } else {
         lv_timer_del(t);
-        lv_timer_create(wait_for_connection_timer, 500, NULL);
-    }
-}
-
-static void wait_for_connection_timer(lv_timer_t *t) {
-    CarData *data = CarData_Get();
-    bool synced = false;
-    if (data) {
-        CarData_Lock(0);
-        synced = data->time_received_this_boot;
-        CarData_Unlock();
-    }
-
-    // Счётчик попыток (таймер вызывается каждые 500 мс)
-    static int attempts = 0;
-    attempts++;
-
-    // Условие выхода: шлюз появился И время синхронизировано, ИЛИ прошло 5 секунд (10 попыток)
-    if ((synced && uart_is_gateway_alive()) || attempts >= 10) {
-        lv_timer_del(t);
-        attempts = 0; // сброс на случай повторного использования
-
         lv_anim_t a;
         lv_anim_init(&a);
         lv_anim_set_var(&a, ui_SplashScreen_Image_Logo);
@@ -211,6 +187,10 @@ void fiona_core_deactivate_screensaver(void) {
     if (!screensaver_active) return;
     screensaver_active = false;
 
+    // Сброс таймера скринсейвера, чтобы пробуждение не сорвалось
+    extern uint32_t engine_off_seconds;
+    engine_off_seconds = 0;
+
     if (screensaver_clock_anim_active) {
         lv_anim_delete(ui_SplashScreen_Label_Clock, anim_set_opa_cb);
         screensaver_clock_anim_active = false;
@@ -269,18 +249,16 @@ static lv_color_t bg_color_filter_cb(const lv_color_filter_dsc_t * dsc, lv_color
     if (bg_theme_ptr) theme = *bg_theme_ptr;
     if (theme == 0) return color;
 
-    // RGB888 напрямую
     uint8_t r = color.red;
     uint8_t g = color.green;
     uint8_t b = color.blue;
 
-    // Синий преобладает
     if (b > r && b > g) {
-        if (theme == 1) { // зелёный
+        if (theme == 1) {
             color.red   = (b * 10) / 100;
             color.green = (b * 90) / 100;
             color.blue  = (b * 20) / 100;
-        } else if (theme == 2) { // красный
+        } else if (theme == 2) {
             color.red   = (b * 90) / 100;
             color.green = (b * 10) / 100;
             color.blue  = (b * 20) / 100;
@@ -297,8 +275,6 @@ void fiona_animations_apply_bg_theme(uint8_t theme) {
     current_theme = theme;
     bg_theme_ptr = &current_theme;
 
-    ESP_LOGI(TAG, "Bg theme changed to %d", theme);
-
     lv_color_filter_dsc_init(&bg_filter_dsc, bg_color_filter_cb);
     lv_obj_set_style_color_filter_dsc(ui_DashBoard_Image_Backgrownd, &bg_filter_dsc, LV_PART_MAIN);
     lv_obj_invalidate(ui_DashBoard_Image_Backgrownd);
@@ -307,14 +283,12 @@ void fiona_animations_apply_bg_theme(uint8_t theme) {
 /* ---------- TripImg (оранжевый -> зелёный/синий) ---------- */
 static lv_color_t tripimg_color_filter_cb(const lv_color_filter_dsc_t * dsc, lv_color_t color, lv_opa_t opa)
 {
-    // Оранжевый #FFB600 в RGB888: R=255, G=182, B=0
-    // Допускаем небольшой разброс
     if (color.red >= 240 && color.green >= 160 && color.green <= 200 && color.blue <= 20) {
-        if (trip_color_state == 1) { // зелёный
+        if (trip_color_state == 1) {
             color.red = 0;
             color.green = 255;
             color.blue = 0;
-        } else if (trip_color_state == 2) { // синий
+        } else if (trip_color_state == 2) {
             color.red = 0;
             color.green = 0;
             color.blue = 255;
@@ -327,8 +301,6 @@ void fiona_animations_set_tripimg_color(uint8_t state) {
     if (!ui_DashBoard_Image_TripImg) return;
     if (state == trip_color_state) return;
     trip_color_state = state;
-
-    ESP_LOGI(TAG, "TripImg color state: %d", state);
 
     lv_color_filter_dsc_init(&trip_filter_dsc, tripimg_color_filter_cb);
     if (state == 0) {
@@ -348,10 +320,9 @@ static lv_color_t ring_color_filter_cb(const lv_color_filter_dsc_t * dsc, lv_col
     uint8_t g = color.green;
     uint8_t b = color.blue;
 
-    // Синий пиксель
     if (b > r && b > g) {
         color.red   = 0;
-        color.green = b;  // сохраняем яркость
+        color.green = b;
         color.blue  = 0;
     }
     return color;
@@ -362,8 +333,6 @@ void fiona_animations_set_bluering_color(bool internet_available) {
     if (internet_available == ring_internet_available) return;
     ring_internet_available = internet_available;
 
-    ESP_LOGI(TAG, "Ring internet color: %d", internet_available);
-
     lv_color_filter_dsc_init(&ring_filter_dsc, ring_color_filter_cb);
     if (!internet_available) {
         lv_obj_set_style_color_filter_dsc(ui_DashBoard_Image_BlueRing, NULL, LV_PART_MAIN);
@@ -373,9 +342,6 @@ void fiona_animations_set_bluering_color(bool internet_available) {
     lv_obj_invalidate(ui_DashBoard_Image_BlueRing);
 }
 
-/* -------------------------------------------------------------------------- */
-/* Общая callback-функция прозрачности                                        */
-/* -------------------------------------------------------------------------- */
 static void anim_set_opa_cb(void *var, int32_t val) {
     lv_obj_set_style_opa((lv_obj_t*)var, (lv_opa_t)val, 0);
 }

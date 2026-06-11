@@ -31,17 +31,19 @@ void ui_init(void)
                                                false, LV_FONT_DEFAULT);
     lv_disp_set_theme(dispp, theme);
     ui_Screen_DashBoard_screen_init();
-    ui_Screen_System_screen_init();
-    ui_Screen_ClimateControl_screen_init();
     ui_Screen_SplashScreen_screen_init();
+    ui_Screen_ScreenReFuel_screen_init();
+    ui_Screen_Setting_screen_init();
+    ui_Screen_DebugScreen_screen_init();
     ui_Startevents____initial_actions0 = lv_obj_create(NULL);
-    //lv_disp_load_scr(ui_Screen_DashBoard);
+    lv_disp_load_scr(ui_Screen_DashBoard);
 }
 
 void ui_destroy(void)
 {
     ui_Screen_DashBoard_screen_destroy();
-    ui_Screen_System_screen_destroy();
-    ui_Screen_ClimateControl_screen_destroy();
     ui_Screen_SplashScreen_screen_destroy();
+    ui_Screen_ScreenReFuel_screen_destroy();
+    ui_Screen_Setting_screen_destroy();
+    ui_Screen_DebugScreen_screen_destroy();
 }

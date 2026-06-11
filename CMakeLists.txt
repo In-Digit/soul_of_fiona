@@ -10,6 +10,10 @@ set(EXTRA_COMPONENT_DIRS
     ./components/fiona_soul
     ./components/config_manager
     ./components/fiona_brain
+    ./components/wifi_manager
+    ./components/ntp_sync
+    ./components/gps_parser
+    ./components/fiona_io_poller
     )
 
 set(EXCLUDE_COMPONENTS

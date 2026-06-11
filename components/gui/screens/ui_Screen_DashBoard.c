@@ -62,6 +62,24 @@ lv_obj_t * ui_DashBoard_Image_ImageGreen = NULL;
 lv_obj_t * ui_DashBoard_Image_ImageYellow = NULL;
 lv_obj_t * ui_DashBoard_Image_ImageRed = NULL;
 lv_obj_t * ui_DashBoard_Container_ContainerRez = NULL;
+lv_obj_t * ui_DashBoard_Image_WiFi = NULL;
+lv_obj_t * ui_DashBoard_Image_GPS = NULL;
+lv_obj_t * ui_DashBoard_Image_ServerOn = NULL;
+lv_obj_t * ui_DashBoard_Container_ContainerClimate = NULL;
+lv_obj_t * ui_DashBoard_Label_LabelCC = NULL;
+lv_obj_t * ui_DashBoard_Label_Label13 = NULL;
+lv_obj_t * ui_DashBoard_Label_Label14 = NULL;
+lv_obj_t * ui_DashBoard_Label_Label15 = NULL;
+lv_obj_t * ui_DashBoard_Switch_TempSwitch = NULL;
+lv_obj_t * ui_DashBoard_Switch_AlignSwitch = NULL;
+lv_obj_t * ui_DashBoard_Switch_FlpwSwitch = NULL;
+lv_obj_t * ui_DashBoard_Slider_TempSlider = NULL;
+lv_obj_t * ui_DashBoard_Label_Temperatura = NULL;
+lv_obj_t * ui_DashBoard_Slider_AlignSlider = NULL;
+lv_obj_t * ui_DashBoard_Slider_FlowSlider = NULL;
+lv_obj_t * ui_DashBoard_Label_FlowShim = NULL;
+lv_obj_t * ui_DashBoard_Container_AKBContainer = NULL;
+lv_obj_t * ui_DashBoard_Container_DebugContainer = NULL;
 // event funtions
 void ui_event_Screen_DashBoard(lv_event_t * e)
 {
@@ -92,8 +110,7 @@ void ui_event_DashBoard_Container_CenterContainer(lv_event_t * e)
     lv_event_code_t event_code = lv_event_get_code(e);
 
     if(event_code == LV_EVENT_CLICKED) {
-        _ui_screen_change(&ui_Screen_ClimateControl, LV_SCR_LOAD_ANIM_OVER_RIGHT, 150, 0,
-                          &ui_Screen_ClimateControl_screen_init);
+        _ui_flag_modify(ui_DashBoard_Container_ContainerClimate, LV_OBJ_FLAG_HIDDEN, _UI_MODIFY_FLAG_REMOVE);
     }
 }
 
@@ -111,7 +128,7 @@ void ui_event_DashBoard_Container_FuelContainer(lv_event_t * e)
     lv_event_code_t event_code = lv_event_get_code(e);
 
     if(event_code == LV_EVENT_CLICKED) {
-        _ui_screen_change(&ui_Screen_System, LV_SCR_LOAD_ANIM_FADE_ON, 500, 0, &ui_Screen_System_screen_init);
+        ToRefuelClk(e);
     }
 }
 
@@ -121,6 +138,88 @@ void ui_event_DashBoard_Container_ContainerRez(lv_event_t * e)
 
     if(event_code == LV_EVENT_CLICKED) {
         RezChange(e);
+    }
+}
+
+void ui_event_DashBoard_Label_LabelCC(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+
+    if(event_code == LV_EVENT_CLICKED) {
+        ToHomeClick(e);
+        _ui_flag_modify(ui_DashBoard_Container_ContainerClimate, LV_OBJ_FLAG_HIDDEN, _UI_MODIFY_FLAG_ADD);
+    }
+}
+
+void ui_event_DashBoard_Switch_TempSwitch(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+
+    if(event_code == LV_EVENT_VALUE_CHANGED) {
+        TempAutoChange(e);
+    }
+}
+
+void ui_event_DashBoard_Switch_AlignSwitch(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+
+    if(event_code == LV_EVENT_VALUE_CHANGED) {
+        AlignAutoChange(e);
+    }
+}
+
+void ui_event_DashBoard_Switch_FlpwSwitch(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+
+    if(event_code == LV_EVENT_VALUE_CHANGED) {
+        FlowAutoChange(e);
+    }
+}
+
+void ui_event_DashBoard_Slider_TempSlider(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+
+    if(event_code == LV_EVENT_VALUE_CHANGED) {
+        TempChanged(e);
+    }
+}
+
+void ui_event_DashBoard_Slider_AlignSlider(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+
+    if(event_code == LV_EVENT_VALUE_CHANGED) {
+        AlignChanged(e);
+    }
+}
+
+void ui_event_DashBoard_Slider_FlowSlider(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+
+    if(event_code == LV_EVENT_VALUE_CHANGED) {
+        FlowChanged(e);
+    }
+}
+
+void ui_event_DashBoard_Container_AKBContainer(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+
+    if(event_code == LV_EVENT_CLICKED) {
+        ToSettingClk(e);
+    }
+}
+
+void ui_event_DashBoard_Container_DebugContainer(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+
+    if(event_code == LV_EVENT_CLICKED) {
+        ToDebugClk(e);
     }
 }
 
@@ -137,15 +236,17 @@ void ui_Screen_DashBoard_screen_init(void)
 
     ui_DashBoard_Label_FionaSpeachLabelDash = lv_label_create(ui_Screen_DashBoard);
     lv_obj_set_width(ui_DashBoard_Label_FionaSpeachLabelDash, 1024);
-    lv_obj_set_height(ui_DashBoard_Label_FionaSpeachLabelDash, 60);
+    lv_obj_set_height(ui_DashBoard_Label_FionaSpeachLabelDash, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_align(ui_DashBoard_Label_FionaSpeachLabelDash, LV_ALIGN_BOTTOM_MID);
+    lv_label_set_long_mode(ui_DashBoard_Label_FionaSpeachLabelDash, LV_LABEL_LONG_SCROLL_CIRCULAR);
     lv_label_set_text(ui_DashBoard_Label_FionaSpeachLabelDash, "Привет, Куда поедем?");
     lv_obj_set_style_text_color(ui_DashBoard_Label_FionaSpeachLabelDash, lv_color_hex(0xFFFF00),
                                 LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_DashBoard_Label_FionaSpeachLabelDash, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_align(ui_DashBoard_Label_FionaSpeachLabelDash, LV_TEXT_ALIGN_AUTO,
                                 LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui_DashBoard_Label_FionaSpeachLabelDash, &ui_font_BaseFont, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_DashBoard_Label_FionaSpeachLabelDash, &ui_font_BaseFont20,
+                               LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_color(ui_DashBoard_Label_FionaSpeachLabelDash, lv_color_hex(0x000000),
                               LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_DashBoard_Label_FionaSpeachLabelDash, 128, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -407,7 +508,7 @@ void ui_Screen_DashBoard_screen_init(void)
                        LV_OBJ_FLAG_SNAPPABLE | LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_SCROLL_ELASTIC | LV_OBJ_FLAG_SCROLL_MOMENTUM |
                        LV_OBJ_FLAG_SCROLL_CHAIN);     /// Flags
     lv_arc_set_range(ui_DashBoard_Arc_Uskorenie, -300, 300);
-    lv_arc_set_value(ui_DashBoard_Arc_Uskorenie, 0);
+    lv_arc_set_value(ui_DashBoard_Arc_Uskorenie, 300);
     lv_arc_set_bg_angles(ui_DashBoard_Arc_Uskorenie, 357, 37);
     lv_arc_set_mode(ui_DashBoard_Arc_Uskorenie, LV_ARC_MODE_SYMMETRICAL);
     lv_obj_set_style_arc_width(ui_DashBoard_Arc_Uskorenie, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -660,6 +761,7 @@ void ui_Screen_DashBoard_screen_init(void)
     lv_obj_set_height(ui_DashBoard_Image_FreeWind, LV_SIZE_CONTENT);    /// 152
     lv_obj_set_x(ui_DashBoard_Image_FreeWind, -30);
     lv_obj_set_y(ui_DashBoard_Image_FreeWind, -30);
+    lv_obj_add_flag(ui_DashBoard_Image_FreeWind, LV_OBJ_FLAG_HIDDEN);     /// Flags
     lv_obj_remove_flag(ui_DashBoard_Image_FreeWind,
                        LV_OBJ_FLAG_PRESS_LOCK | LV_OBJ_FLAG_CLICK_FOCUSABLE | LV_OBJ_FLAG_GESTURE_BUBBLE | LV_OBJ_FLAG_SNAPPABLE |
                        LV_OBJ_FLAG_SCROLLABLE);     /// Flags
@@ -671,6 +773,7 @@ void ui_Screen_DashBoard_screen_init(void)
     lv_obj_set_height(ui_DashBoard_Image_ConditionHot, LV_SIZE_CONTENT);    /// 152
     lv_obj_set_x(ui_DashBoard_Image_ConditionHot, 40);
     lv_obj_set_y(ui_DashBoard_Image_ConditionHot, -30);
+    lv_obj_add_flag(ui_DashBoard_Image_ConditionHot, LV_OBJ_FLAG_HIDDEN);     /// Flags
     lv_obj_remove_flag(ui_DashBoard_Image_ConditionHot,
                        LV_OBJ_FLAG_PRESS_LOCK | LV_OBJ_FLAG_CLICK_FOCUSABLE | LV_OBJ_FLAG_GESTURE_BUBBLE | LV_OBJ_FLAG_SNAPPABLE |
                        LV_OBJ_FLAG_SCROLLABLE);     /// Flags
@@ -694,6 +797,7 @@ void ui_Screen_DashBoard_screen_init(void)
     lv_obj_set_height(ui_DashBoard_Image_RFirstVent, LV_SIZE_CONTENT);    /// 152
     lv_obj_set_x(ui_DashBoard_Image_RFirstVent, 120);
     lv_obj_set_y(ui_DashBoard_Image_RFirstVent, -30);
+    lv_obj_add_flag(ui_DashBoard_Image_RFirstVent, LV_OBJ_FLAG_HIDDEN);     /// Flags
     lv_obj_remove_flag(ui_DashBoard_Image_RFirstVent,
                        LV_OBJ_FLAG_PRESS_LOCK | LV_OBJ_FLAG_CLICK_FOCUSABLE | LV_OBJ_FLAG_GESTURE_BUBBLE | LV_OBJ_FLAG_SNAPPABLE |
                        LV_OBJ_FLAG_SCROLLABLE);     /// Flags
@@ -717,6 +821,7 @@ void ui_Screen_DashBoard_screen_init(void)
     lv_obj_set_height(ui_DashBoard_Image_RSecondVent, LV_SIZE_CONTENT);    /// 152
     lv_obj_set_x(ui_DashBoard_Image_RSecondVent, 200);
     lv_obj_set_y(ui_DashBoard_Image_RSecondVent, -30);
+    lv_obj_add_flag(ui_DashBoard_Image_RSecondVent, LV_OBJ_FLAG_HIDDEN);     /// Flags
     lv_obj_remove_flag(ui_DashBoard_Image_RSecondVent,
                        LV_OBJ_FLAG_PRESS_LOCK | LV_OBJ_FLAG_CLICK_FOCUSABLE | LV_OBJ_FLAG_GESTURE_BUBBLE | LV_OBJ_FLAG_SNAPPABLE |
                        LV_OBJ_FLAG_SCROLLABLE);     /// Flags
@@ -740,6 +845,7 @@ void ui_Screen_DashBoard_screen_init(void)
     lv_obj_set_height(ui_DashBoard_Image_RSecondVentAlert1, LV_SIZE_CONTENT);    /// 152
     lv_obj_set_x(ui_DashBoard_Image_RSecondVentAlert1, 200);
     lv_obj_set_y(ui_DashBoard_Image_RSecondVentAlert1, -30);
+    lv_obj_add_flag(ui_DashBoard_Image_RSecondVentAlert1, LV_OBJ_FLAG_HIDDEN);     /// Flags
     lv_obj_remove_flag(ui_DashBoard_Image_RSecondVentAlert1,
                        LV_OBJ_FLAG_PRESS_LOCK | LV_OBJ_FLAG_CLICK_FOCUSABLE | LV_OBJ_FLAG_GESTURE_BUBBLE | LV_OBJ_FLAG_SNAPPABLE |
                        LV_OBJ_FLAG_SCROLLABLE);     /// Flags
@@ -778,38 +884,38 @@ void ui_Screen_DashBoard_screen_init(void)
     lv_obj_set_width(ui_DashBoard_Label_CondShim, LV_SIZE_CONTENT);   /// 1024
     lv_obj_set_height(ui_DashBoard_Label_CondShim, LV_SIZE_CONTENT);    /// 60
     lv_obj_set_x(ui_DashBoard_Label_CondShim, 99);
-    lv_obj_set_y(ui_DashBoard_Label_CondShim, 78);
+    lv_obj_set_y(ui_DashBoard_Label_CondShim, -3);
     lv_label_set_text(ui_DashBoard_Label_CondShim, "000");
     lv_obj_set_style_text_color(ui_DashBoard_Label_CondShim, lv_color_hex(0xFFFF00), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_DashBoard_Label_CondShim, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_align(ui_DashBoard_Label_CondShim, LV_TEXT_ALIGN_AUTO, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui_DashBoard_Label_CondShim, &ui_font_BaseFont, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_DashBoard_Label_CondShim, &ui_font_BaseFont20, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_color(ui_DashBoard_Label_CondShim, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_DashBoard_Label_CondShim, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_DashBoard_Label_VFirstShim = lv_label_create(ui_Screen_DashBoard);
     lv_obj_set_width(ui_DashBoard_Label_VFirstShim, LV_SIZE_CONTENT);   /// 1024
     lv_obj_set_height(ui_DashBoard_Label_VFirstShim, LV_SIZE_CONTENT);    /// 60
-    lv_obj_set_x(ui_DashBoard_Label_VFirstShim, 170);
-    lv_obj_set_y(ui_DashBoard_Label_VFirstShim, 78);
+    lv_obj_set_x(ui_DashBoard_Label_VFirstShim, 178);
+    lv_obj_set_y(ui_DashBoard_Label_VFirstShim, -3);
     lv_label_set_text(ui_DashBoard_Label_VFirstShim, "000");
     lv_obj_set_style_text_color(ui_DashBoard_Label_VFirstShim, lv_color_hex(0xFFFF00), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_DashBoard_Label_VFirstShim, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_align(ui_DashBoard_Label_VFirstShim, LV_TEXT_ALIGN_AUTO, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui_DashBoard_Label_VFirstShim, &ui_font_BaseFont, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_DashBoard_Label_VFirstShim, &ui_font_BaseFont20, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_color(ui_DashBoard_Label_VFirstShim, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_DashBoard_Label_VFirstShim, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_DashBoard_Label_VSecondShim = lv_label_create(ui_Screen_DashBoard);
     lv_obj_set_width(ui_DashBoard_Label_VSecondShim, LV_SIZE_CONTENT);   /// 1024
     lv_obj_set_height(ui_DashBoard_Label_VSecondShim, LV_SIZE_CONTENT);    /// 60
-    lv_obj_set_x(ui_DashBoard_Label_VSecondShim, 245);
-    lv_obj_set_y(ui_DashBoard_Label_VSecondShim, 78);
+    lv_obj_set_x(ui_DashBoard_Label_VSecondShim, 253);
+    lv_obj_set_y(ui_DashBoard_Label_VSecondShim, -3);
     lv_label_set_text(ui_DashBoard_Label_VSecondShim, "000");
     lv_obj_set_style_text_color(ui_DashBoard_Label_VSecondShim, lv_color_hex(0xFFFF00), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_DashBoard_Label_VSecondShim, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_align(ui_DashBoard_Label_VSecondShim, LV_TEXT_ALIGN_AUTO, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui_DashBoard_Label_VSecondShim, &ui_font_BaseFont, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_DashBoard_Label_VSecondShim, &ui_font_BaseFont20, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_color(ui_DashBoard_Label_VSecondShim, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_DashBoard_Label_VSecondShim, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
@@ -887,6 +993,257 @@ void ui_Screen_DashBoard_screen_init(void)
                        LV_OBJ_FLAG_PRESS_LOCK | LV_OBJ_FLAG_CLICK_FOCUSABLE | LV_OBJ_FLAG_GESTURE_BUBBLE | LV_OBJ_FLAG_SNAPPABLE |
                        LV_OBJ_FLAG_SCROLLABLE);     /// Flags
 
+    ui_DashBoard_Image_WiFi = lv_image_create(ui_Screen_DashBoard);
+    lv_image_set_src(ui_DashBoard_Image_WiFi, &ui_img_iconwifi_png);
+    lv_obj_set_width(ui_DashBoard_Image_WiFi, LV_SIZE_CONTENT);   /// 94
+    lv_obj_set_height(ui_DashBoard_Image_WiFi, LV_SIZE_CONTENT);    /// 94
+    lv_obj_set_x(ui_DashBoard_Image_WiFi, 259);
+    lv_obj_set_y(ui_DashBoard_Image_WiFi, -250);
+    lv_obj_set_align(ui_DashBoard_Image_WiFi, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_DashBoard_Image_WiFi, LV_OBJ_FLAG_HIDDEN);     /// Flags
+    lv_obj_remove_flag(ui_DashBoard_Image_WiFi,
+                       LV_OBJ_FLAG_PRESS_LOCK | LV_OBJ_FLAG_CLICK_FOCUSABLE | LV_OBJ_FLAG_GESTURE_BUBBLE | LV_OBJ_FLAG_SNAPPABLE |
+                       LV_OBJ_FLAG_SCROLLABLE);     /// Flags
+
+    ui_DashBoard_Image_GPS = lv_image_create(ui_Screen_DashBoard);
+    lv_image_set_src(ui_DashBoard_Image_GPS, &ui_img_gps_png);
+    lv_obj_set_width(ui_DashBoard_Image_GPS, LV_SIZE_CONTENT);   /// 96
+    lv_obj_set_height(ui_DashBoard_Image_GPS, LV_SIZE_CONTENT);    /// 96
+    lv_obj_set_x(ui_DashBoard_Image_GPS, 222);
+    lv_obj_set_y(ui_DashBoard_Image_GPS, -245);
+    lv_obj_set_align(ui_DashBoard_Image_GPS, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_DashBoard_Image_GPS, LV_OBJ_FLAG_HIDDEN);     /// Flags
+    lv_obj_remove_flag(ui_DashBoard_Image_GPS,
+                       LV_OBJ_FLAG_PRESS_LOCK | LV_OBJ_FLAG_CLICK_FOCUSABLE | LV_OBJ_FLAG_GESTURE_BUBBLE | LV_OBJ_FLAG_SNAPPABLE |
+                       LV_OBJ_FLAG_SCROLLABLE);     /// Flags
+
+    ui_DashBoard_Image_ServerOn = lv_image_create(ui_Screen_DashBoard);
+    lv_image_set_src(ui_DashBoard_Image_ServerOn, &ui_img_serverwifi_png);
+    lv_obj_set_width(ui_DashBoard_Image_ServerOn, LV_SIZE_CONTENT);   /// 94
+    lv_obj_set_height(ui_DashBoard_Image_ServerOn, LV_SIZE_CONTENT);    /// 94
+    lv_obj_set_x(ui_DashBoard_Image_ServerOn, 469);
+    lv_obj_set_y(ui_DashBoard_Image_ServerOn, 231);
+    lv_obj_set_align(ui_DashBoard_Image_ServerOn, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_DashBoard_Image_ServerOn, LV_OBJ_FLAG_HIDDEN);     /// Flags
+    lv_obj_remove_flag(ui_DashBoard_Image_ServerOn,
+                       LV_OBJ_FLAG_PRESS_LOCK | LV_OBJ_FLAG_CLICK_FOCUSABLE | LV_OBJ_FLAG_GESTURE_BUBBLE | LV_OBJ_FLAG_SNAPPABLE |
+                       LV_OBJ_FLAG_SCROLLABLE);     /// Flags
+
+    ui_DashBoard_Container_ContainerClimate = lv_obj_create(ui_Screen_DashBoard);
+    lv_obj_remove_style_all(ui_DashBoard_Container_ContainerClimate);
+    lv_obj_set_width(ui_DashBoard_Container_ContainerClimate, 1024);
+    lv_obj_set_height(ui_DashBoard_Container_ContainerClimate, 600);
+    lv_obj_add_flag(ui_DashBoard_Container_ContainerClimate, LV_OBJ_FLAG_HIDDEN);     /// Flags
+    lv_obj_remove_flag(ui_DashBoard_Container_ContainerClimate,
+                       LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_bg_color(ui_DashBoard_Container_ContainerClimate, lv_color_hex(0x000429),
+                              LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_DashBoard_Container_ContainerClimate, 192, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_DashBoard_Label_LabelCC = lv_label_create(ui_DashBoard_Container_ContainerClimate);
+    lv_obj_set_width(ui_DashBoard_Label_LabelCC, 400);
+    lv_obj_set_height(ui_DashBoard_Label_LabelCC, 30);
+    lv_obj_set_x(ui_DashBoard_Label_LabelCC, 0);
+    lv_obj_set_y(ui_DashBoard_Label_LabelCC, 10);
+    lv_obj_set_align(ui_DashBoard_Label_LabelCC, LV_ALIGN_TOP_MID);
+    lv_obj_set_ext_click_area(ui_DashBoard_Label_LabelCC, 20);
+    lv_label_set_long_mode(ui_DashBoard_Label_LabelCC, LV_LABEL_LONG_CLIP);
+    lv_label_set_text(ui_DashBoard_Label_LabelCC, "");
+    lv_obj_add_flag(ui_DashBoard_Label_LabelCC, LV_OBJ_FLAG_CLICKABLE);     /// Flags
+    lv_obj_remove_flag(ui_DashBoard_Label_LabelCC,
+                       LV_OBJ_FLAG_PRESS_LOCK | LV_OBJ_FLAG_CLICK_FOCUSABLE | LV_OBJ_FLAG_GESTURE_BUBBLE |
+                       LV_OBJ_FLAG_SNAPPABLE);     /// Flags
+    lv_obj_set_style_text_color(ui_DashBoard_Label_LabelCC, lv_color_hex(0xFFFF00), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_DashBoard_Label_LabelCC, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_align(ui_DashBoard_Label_LabelCC, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_decor(ui_DashBoard_Label_LabelCC, LV_TEXT_DECOR_UNDERLINE, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_DashBoard_Label_LabelCC, &ui_font_BaseFont, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui_DashBoard_Label_LabelCC, lv_color_hex(0x00FF00), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_DashBoard_Label_LabelCC, 120, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_DashBoard_Label_Label13 = lv_label_create(ui_DashBoard_Container_ContainerClimate);
+    lv_obj_set_width(ui_DashBoard_Label_Label13, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_DashBoard_Label_Label13, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_DashBoard_Label_Label13, 35);
+    lv_obj_set_y(ui_DashBoard_Label_Label13, 70);
+    lv_obj_set_align(ui_DashBoard_Label_Label13, LV_ALIGN_TOP_MID);
+    lv_label_set_text(ui_DashBoard_Label_Label13, "Температура");
+    lv_obj_remove_flag(ui_DashBoard_Label_Label13,
+                       LV_OBJ_FLAG_PRESS_LOCK | LV_OBJ_FLAG_CLICK_FOCUSABLE | LV_OBJ_FLAG_GESTURE_BUBBLE |
+                       LV_OBJ_FLAG_SNAPPABLE);     /// Flags
+    lv_obj_set_style_text_color(ui_DashBoard_Label_Label13, lv_color_hex(0xFFFF00), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_DashBoard_Label_Label13, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_DashBoard_Label_Label13, &ui_font_BaseFont, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_DashBoard_Label_Label14 = lv_label_create(ui_DashBoard_Container_ContainerClimate);
+    lv_obj_set_width(ui_DashBoard_Label_Label14, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_DashBoard_Label_Label14, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_DashBoard_Label_Label14, 36);
+    lv_obj_set_y(ui_DashBoard_Label_Label14, 268);
+    lv_obj_set_align(ui_DashBoard_Label_Label14, LV_ALIGN_TOP_MID);
+    lv_label_set_text(ui_DashBoard_Label_Label14,
+                      "Салон---------------------------Ноги---------------------------Стекло");
+    lv_obj_remove_flag(ui_DashBoard_Label_Label14,
+                       LV_OBJ_FLAG_PRESS_LOCK | LV_OBJ_FLAG_CLICK_FOCUSABLE | LV_OBJ_FLAG_GESTURE_BUBBLE |
+                       LV_OBJ_FLAG_SNAPPABLE);     /// Flags
+    lv_obj_set_style_text_color(ui_DashBoard_Label_Label14, lv_color_hex(0xFFFF00), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_DashBoard_Label_Label14, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_DashBoard_Label_Label14, &ui_font_BaseFont, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_DashBoard_Label_Label15 = lv_label_create(ui_DashBoard_Container_ContainerClimate);
+    lv_obj_set_width(ui_DashBoard_Label_Label15, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_DashBoard_Label_Label15, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_DashBoard_Label_Label15, 35);
+    lv_obj_set_y(ui_DashBoard_Label_Label15, 446);
+    lv_obj_set_align(ui_DashBoard_Label_Label15, LV_ALIGN_TOP_MID);
+    lv_label_set_text(ui_DashBoard_Label_Label15, "Сила");
+    lv_obj_remove_flag(ui_DashBoard_Label_Label15,
+                       LV_OBJ_FLAG_PRESS_LOCK | LV_OBJ_FLAG_CLICK_FOCUSABLE | LV_OBJ_FLAG_GESTURE_BUBBLE |
+                       LV_OBJ_FLAG_SNAPPABLE);     /// Flags
+    lv_obj_set_style_text_color(ui_DashBoard_Label_Label15, lv_color_hex(0xFFFF00), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_DashBoard_Label_Label15, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_DashBoard_Label_Label15, &ui_font_BaseFont, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_DashBoard_Switch_TempSwitch = lv_switch_create(ui_DashBoard_Container_ContainerClimate);
+    lv_obj_set_width(ui_DashBoard_Switch_TempSwitch, 66);
+    lv_obj_set_height(ui_DashBoard_Switch_TempSwitch, 25);
+    lv_obj_set_x(ui_DashBoard_Switch_TempSwitch, -451);
+    lv_obj_set_y(ui_DashBoard_Switch_TempSwitch, -150);
+    lv_obj_set_align(ui_DashBoard_Switch_TempSwitch, LV_ALIGN_CENTER);
+    lv_obj_set_style_bg_color(ui_DashBoard_Switch_TempSwitch, lv_color_hex(0x000810), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_DashBoard_Switch_TempSwitch, 128, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    lv_obj_set_style_bg_color(ui_DashBoard_Switch_TempSwitch, lv_color_hex(0x00FF17), LV_PART_KNOB | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_DashBoard_Switch_TempSwitch, 255, LV_PART_KNOB | LV_STATE_DEFAULT);
+
+    ui_DashBoard_Switch_AlignSwitch = lv_switch_create(ui_DashBoard_Container_ContainerClimate);
+    lv_obj_set_width(ui_DashBoard_Switch_AlignSwitch, 66);
+    lv_obj_set_height(ui_DashBoard_Switch_AlignSwitch, 25);
+    lv_obj_set_x(ui_DashBoard_Switch_AlignSwitch, -452);
+    lv_obj_set_y(ui_DashBoard_Switch_AlignSwitch, 50);
+    lv_obj_set_align(ui_DashBoard_Switch_AlignSwitch, LV_ALIGN_CENTER);
+    lv_obj_set_style_bg_color(ui_DashBoard_Switch_AlignSwitch, lv_color_hex(0x000810), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_DashBoard_Switch_AlignSwitch, 128, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    lv_obj_set_style_bg_color(ui_DashBoard_Switch_AlignSwitch, lv_color_hex(0x00FF17), LV_PART_KNOB | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_DashBoard_Switch_AlignSwitch, 255, LV_PART_KNOB | LV_STATE_DEFAULT);
+
+    ui_DashBoard_Switch_FlpwSwitch = lv_switch_create(ui_DashBoard_Container_ContainerClimate);
+    lv_obj_set_width(ui_DashBoard_Switch_FlpwSwitch, 66);
+    lv_obj_set_height(ui_DashBoard_Switch_FlpwSwitch, 25);
+    lv_obj_set_x(ui_DashBoard_Switch_FlpwSwitch, -448);
+    lv_obj_set_y(ui_DashBoard_Switch_FlpwSwitch, 229);
+    lv_obj_set_align(ui_DashBoard_Switch_FlpwSwitch, LV_ALIGN_CENTER);
+    lv_obj_set_style_bg_color(ui_DashBoard_Switch_FlpwSwitch, lv_color_hex(0x000810), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_DashBoard_Switch_FlpwSwitch, 128, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    lv_obj_set_style_bg_color(ui_DashBoard_Switch_FlpwSwitch, lv_color_hex(0x00FF17), LV_PART_KNOB | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_DashBoard_Switch_FlpwSwitch, 255, LV_PART_KNOB | LV_STATE_DEFAULT);
+
+    ui_DashBoard_Slider_TempSlider = lv_slider_create(ui_DashBoard_Container_ContainerClimate);
+    lv_slider_set_range(ui_DashBoard_Slider_TempSlider, -20, 20);
+    lv_slider_set_mode(ui_DashBoard_Slider_TempSlider, LV_SLIDER_MODE_SYMMETRICAL);
+    lv_slider_set_value(ui_DashBoard_Slider_TempSlider, 0, LV_ANIM_OFF);
+    if(lv_slider_get_mode(ui_DashBoard_Slider_TempSlider) == LV_SLIDER_MODE_RANGE) lv_slider_set_left_value(
+            ui_DashBoard_Slider_TempSlider, 0, LV_ANIM_OFF);
+    lv_obj_set_width(ui_DashBoard_Slider_TempSlider, 800);
+    lv_obj_set_height(ui_DashBoard_Slider_TempSlider, 60);
+    lv_obj_set_x(ui_DashBoard_Slider_TempSlider, 35);
+    lv_obj_set_y(ui_DashBoard_Slider_TempSlider, -150);
+    lv_obj_set_align(ui_DashBoard_Slider_TempSlider, LV_ALIGN_CENTER);
+
+    lv_obj_set_style_bg_color(ui_DashBoard_Slider_TempSlider, lv_color_hex(0x0000FF), LV_PART_INDICATOR | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_DashBoard_Slider_TempSlider, 255, LV_PART_INDICATOR | LV_STATE_DEFAULT);
+
+    //Compensating for LVGL9.1 draw crash with bar/slider max value when top-padding is nonzero and right-padding is 0
+    if(lv_obj_get_style_pad_top(ui_DashBoard_Slider_TempSlider,
+                                LV_PART_MAIN) > 0) lv_obj_set_style_pad_right(ui_DashBoard_Slider_TempSlider,
+                                                                                  lv_obj_get_style_pad_right(ui_DashBoard_Slider_TempSlider, LV_PART_MAIN) + 1, LV_PART_MAIN);
+    ui_DashBoard_Label_Temperatura = lv_label_create(ui_DashBoard_Container_ContainerClimate);
+    lv_obj_set_width(ui_DashBoard_Label_Temperatura, LV_SIZE_CONTENT);   /// 1024
+    lv_obj_set_height(ui_DashBoard_Label_Temperatura, LV_SIZE_CONTENT);    /// 60
+    lv_obj_set_x(ui_DashBoard_Label_Temperatura, 35);
+    lv_obj_set_y(ui_DashBoard_Label_Temperatura, 134);
+    lv_obj_set_align(ui_DashBoard_Label_Temperatura, LV_ALIGN_TOP_MID);
+    lv_label_set_text(ui_DashBoard_Label_Temperatura, "000");
+    lv_obj_set_style_text_color(ui_DashBoard_Label_Temperatura, lv_color_hex(0xFFFF00), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_DashBoard_Label_Temperatura, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_align(ui_DashBoard_Label_Temperatura, LV_TEXT_ALIGN_AUTO, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_DashBoard_Label_Temperatura, &ui_font_BaseFont, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui_DashBoard_Label_Temperatura, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_DashBoard_Label_Temperatura, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_DashBoard_Slider_AlignSlider = lv_slider_create(ui_DashBoard_Container_ContainerClimate);
+    lv_slider_set_range(ui_DashBoard_Slider_AlignSlider, 0, 255);
+    lv_slider_set_value(ui_DashBoard_Slider_AlignSlider, 128, LV_ANIM_OFF);
+    if(lv_slider_get_mode(ui_DashBoard_Slider_AlignSlider) == LV_SLIDER_MODE_RANGE) lv_slider_set_left_value(
+            ui_DashBoard_Slider_AlignSlider, 0, LV_ANIM_OFF);
+    lv_obj_set_width(ui_DashBoard_Slider_AlignSlider, 800);
+    lv_obj_set_height(ui_DashBoard_Slider_AlignSlider, 60);
+    lv_obj_set_x(ui_DashBoard_Slider_AlignSlider, 35);
+    lv_obj_set_y(ui_DashBoard_Slider_AlignSlider, 50);
+    lv_obj_set_align(ui_DashBoard_Slider_AlignSlider, LV_ALIGN_CENTER);
+
+    lv_obj_set_style_bg_color(ui_DashBoard_Slider_AlignSlider, lv_color_hex(0x0000FF),
+                              LV_PART_INDICATOR | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_DashBoard_Slider_AlignSlider, 255, LV_PART_INDICATOR | LV_STATE_DEFAULT);
+
+    //Compensating for LVGL9.1 draw crash with bar/slider max value when top-padding is nonzero and right-padding is 0
+    if(lv_obj_get_style_pad_top(ui_DashBoard_Slider_AlignSlider,
+                                LV_PART_MAIN) > 0) lv_obj_set_style_pad_right(ui_DashBoard_Slider_AlignSlider,
+                                                                                  lv_obj_get_style_pad_right(ui_DashBoard_Slider_AlignSlider, LV_PART_MAIN) + 1, LV_PART_MAIN);
+    ui_DashBoard_Slider_FlowSlider = lv_slider_create(ui_DashBoard_Container_ContainerClimate);
+    lv_slider_set_range(ui_DashBoard_Slider_FlowSlider, 0, 255);
+    lv_slider_set_value(ui_DashBoard_Slider_FlowSlider, 128, LV_ANIM_OFF);
+    if(lv_slider_get_mode(ui_DashBoard_Slider_FlowSlider) == LV_SLIDER_MODE_RANGE) lv_slider_set_left_value(
+            ui_DashBoard_Slider_FlowSlider, 0, LV_ANIM_OFF);
+    lv_obj_set_width(ui_DashBoard_Slider_FlowSlider, 800);
+    lv_obj_set_height(ui_DashBoard_Slider_FlowSlider, 60);
+    lv_obj_set_x(ui_DashBoard_Slider_FlowSlider, 35);
+    lv_obj_set_y(ui_DashBoard_Slider_FlowSlider, 230);
+    lv_obj_set_align(ui_DashBoard_Slider_FlowSlider, LV_ALIGN_CENTER);
+
+    lv_obj_set_style_bg_color(ui_DashBoard_Slider_FlowSlider, lv_color_hex(0x0000FF), LV_PART_INDICATOR | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_DashBoard_Slider_FlowSlider, 255, LV_PART_INDICATOR | LV_STATE_DEFAULT);
+
+    //Compensating for LVGL9.1 draw crash with bar/slider max value when top-padding is nonzero and right-padding is 0
+    if(lv_obj_get_style_pad_top(ui_DashBoard_Slider_FlowSlider,
+                                LV_PART_MAIN) > 0) lv_obj_set_style_pad_right(ui_DashBoard_Slider_FlowSlider,
+                                                                                  lv_obj_get_style_pad_right(ui_DashBoard_Slider_FlowSlider, LV_PART_MAIN) + 1, LV_PART_MAIN);
+    ui_DashBoard_Label_FlowShim = lv_label_create(ui_DashBoard_Container_ContainerClimate);
+    lv_obj_set_width(ui_DashBoard_Label_FlowShim, LV_SIZE_CONTENT);   /// 1024
+    lv_obj_set_height(ui_DashBoard_Label_FlowShim, LV_SIZE_CONTENT);    /// 60
+    lv_obj_set_x(ui_DashBoard_Label_FlowShim, 35);
+    lv_obj_set_y(ui_DashBoard_Label_FlowShim, 516);
+    lv_obj_set_align(ui_DashBoard_Label_FlowShim, LV_ALIGN_TOP_MID);
+    lv_label_set_text(ui_DashBoard_Label_FlowShim, "000");
+    lv_obj_set_style_text_color(ui_DashBoard_Label_FlowShim, lv_color_hex(0xFFFF00), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_DashBoard_Label_FlowShim, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_align(ui_DashBoard_Label_FlowShim, LV_TEXT_ALIGN_AUTO, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_DashBoard_Label_FlowShim, &ui_font_BaseFont, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui_DashBoard_Label_FlowShim, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_DashBoard_Label_FlowShim, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_DashBoard_Container_AKBContainer = lv_obj_create(ui_Screen_DashBoard);
+    lv_obj_remove_style_all(ui_DashBoard_Container_AKBContainer);
+    lv_obj_set_width(ui_DashBoard_Container_AKBContainer, 209);
+    lv_obj_set_height(ui_DashBoard_Container_AKBContainer, 192);
+    lv_obj_set_x(ui_DashBoard_Container_AKBContainer, 7);
+    lv_obj_set_y(ui_DashBoard_Container_AKBContainer, 304);
+    lv_obj_add_flag(ui_DashBoard_Container_AKBContainer, LV_OBJ_FLAG_EVENT_BUBBLE);     /// Flags
+    lv_obj_remove_flag(ui_DashBoard_Container_AKBContainer,
+                       LV_OBJ_FLAG_PRESS_LOCK | LV_OBJ_FLAG_CLICK_FOCUSABLE | LV_OBJ_FLAG_SNAPPABLE | LV_OBJ_FLAG_SCROLLABLE);     /// Flags
+
+    ui_DashBoard_Container_DebugContainer = lv_obj_create(ui_Screen_DashBoard);
+    lv_obj_remove_style_all(ui_DashBoard_Container_DebugContainer);
+    lv_obj_set_width(ui_DashBoard_Container_DebugContainer, 314);
+    lv_obj_set_height(ui_DashBoard_Container_DebugContainer, 85);
+    lv_obj_set_x(ui_DashBoard_Container_DebugContainer, 5);
+    lv_obj_set_y(ui_DashBoard_Container_DebugContainer, 2);
+    lv_obj_add_flag(ui_DashBoard_Container_DebugContainer, LV_OBJ_FLAG_EVENT_BUBBLE);     /// Flags
+    lv_obj_remove_flag(ui_DashBoard_Container_DebugContainer,
+                       LV_OBJ_FLAG_PRESS_LOCK | LV_OBJ_FLAG_CLICK_FOCUSABLE | LV_OBJ_FLAG_SNAPPABLE | LV_OBJ_FLAG_SCROLLABLE);     /// Flags
+
     lv_obj_add_event_cb(ui_DashBoard_Label_Time, ui_event_DashBoard_Label_Time, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_DashBoard_Container_CenterContainer, ui_event_DashBoard_Container_CenterContainer, LV_EVENT_ALL,
                         NULL);
@@ -895,6 +1252,16 @@ void ui_Screen_DashBoard_screen_init(void)
     lv_obj_add_event_cb(ui_DashBoard_Container_FuelContainer, ui_event_DashBoard_Container_FuelContainer, LV_EVENT_ALL,
                         NULL);
     lv_obj_add_event_cb(ui_DashBoard_Container_ContainerRez, ui_event_DashBoard_Container_ContainerRez, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_DashBoard_Label_LabelCC, ui_event_DashBoard_Label_LabelCC, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_DashBoard_Switch_TempSwitch, ui_event_DashBoard_Switch_TempSwitch, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_DashBoard_Switch_AlignSwitch, ui_event_DashBoard_Switch_AlignSwitch, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_DashBoard_Switch_FlpwSwitch, ui_event_DashBoard_Switch_FlpwSwitch, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_DashBoard_Slider_TempSlider, ui_event_DashBoard_Slider_TempSlider, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_DashBoard_Slider_AlignSlider, ui_event_DashBoard_Slider_AlignSlider, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_DashBoard_Slider_FlowSlider, ui_event_DashBoard_Slider_FlowSlider, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_DashBoard_Container_AKBContainer, ui_event_DashBoard_Container_AKBContainer, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_DashBoard_Container_DebugContainer, ui_event_DashBoard_Container_DebugContainer, LV_EVENT_ALL,
+                        NULL);
     lv_obj_add_event_cb(ui_Screen_DashBoard, ui_event_Screen_DashBoard, LV_EVENT_ALL, NULL);
     uic_DashBoard_Label_q = ui_DashBoard_Label_TripTimePause;
 
@@ -962,5 +1329,23 @@ void ui_Screen_DashBoard_screen_destroy(void)
     ui_DashBoard_Image_ImageYellow = NULL;
     ui_DashBoard_Image_ImageRed = NULL;
     ui_DashBoard_Container_ContainerRez = NULL;
+    ui_DashBoard_Image_WiFi = NULL;
+    ui_DashBoard_Image_GPS = NULL;
+    ui_DashBoard_Image_ServerOn = NULL;
+    ui_DashBoard_Container_ContainerClimate = NULL;
+    ui_DashBoard_Label_LabelCC = NULL;
+    ui_DashBoard_Label_Label13 = NULL;
+    ui_DashBoard_Label_Label14 = NULL;
+    ui_DashBoard_Label_Label15 = NULL;
+    ui_DashBoard_Switch_TempSwitch = NULL;
+    ui_DashBoard_Switch_AlignSwitch = NULL;
+    ui_DashBoard_Switch_FlpwSwitch = NULL;
+    ui_DashBoard_Slider_TempSlider = NULL;
+    ui_DashBoard_Label_Temperatura = NULL;
+    ui_DashBoard_Slider_AlignSlider = NULL;
+    ui_DashBoard_Slider_FlowSlider = NULL;
+    ui_DashBoard_Label_FlowShim = NULL;
+    ui_DashBoard_Container_AKBContainer = NULL;
+    ui_DashBoard_Container_DebugContainer = NULL;
 
 }

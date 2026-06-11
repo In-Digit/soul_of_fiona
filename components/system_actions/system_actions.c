@@ -1,18 +1,26 @@
+/**
+ * @file system_actions.c
+ * @brief Системные действия: установка времени из текстового поля и запрос времени у шлюза.
+ *
+ * При ручной установке времени также обновляется внешний RTC (RX8025), если он доступен.
+ */
+
 #include "system_actions.h"
 #include "CarData.h"
 #include "uart_protocol.h"
+#include "rx8025_rtc.h"
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
 #include <sys/time.h>
 
 // Внешний объект UI
-extern lv_obj_t * ui_System_Textarea_TimeTextArea;
+extern lv_obj_t * ui_Setting_Textarea_TimeTextArea;   // исправлено
 // Таймер часов (объявлен в fiona_core)
 extern lv_timer_t * clock_timer;
 
 void system_actions_set_time_from_textarea(void) {
-    const char *text = lv_textarea_get_text(ui_System_Textarea_TimeTextArea);
+    const char *text = lv_textarea_get_text(ui_Setting_Textarea_TimeTextArea);
     if (!text || strlen(text) < 3) return;
 
     int values[3] = {0}, count = 0, num_pos = 0;
@@ -44,6 +52,16 @@ void system_actions_set_time_from_textarea(void) {
                 data->time_set_manually = true;
                 CarData_Unlock();
             }
+
+            // Обновить внешний RTC
+            rtc_time_t rtc_time;
+            rtc_time.year = tm.tm_year + 1900;
+            rtc_time.mon  = tm.tm_mon + 1;
+            rtc_time.day  = tm.tm_mday;
+            rtc_time.hour = tm.tm_hour;
+            rtc_time.min  = tm.tm_min;
+            rtc_time.sec  = tm.tm_sec;
+            rtc_set_time(&rtc_time);
         }
     }
 }

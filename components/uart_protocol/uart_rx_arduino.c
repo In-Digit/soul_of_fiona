@@ -1,9 +1,10 @@
 /**
  * @file uart_rx_arduino.c
- * @brief Обработчик данных от Arduino (вентиляторы радиатора, температура).
+ * @brief Обработчик данных от Arduino (вентиляторы радиатора, температура, смещение).
  *
  * Принимает и разбирает телеметрию: ШИМ вентиляторов, температуру ОЖ,
- * режим работы (автономный/от экрана).
+ * режим работы (автономный/от экрана), ответ на запрос смещения температуры.
+ * Флаг живости обновляется только при получении известных ID команд.
  */
 
 #include "uart_rx_arduino.h"
@@ -17,11 +18,6 @@ static const char *TAG = "UART_ARDUINO";
 void uart_rx_arduino_process(uint8_t msg_id, const uint8_t *payload, uint8_t len) {
     CarData *data = CarData_Get();
     if (!data) return;
-
-    // Любой валидный пакет от Arduino — признак жизни
-    CarData_Lock(10);
-    data->uartArduinoAlive = true;
-    CarData_Unlock();
 
     switch (msg_id) {
         case MSG_FAN_TELEMETRY:   // 0xC8 — телеметрия вентиляторов
@@ -38,12 +34,12 @@ void uart_rx_arduino_process(uint8_t msg_id, const uint8_t *payload, uint8_t len
                 data->arduino_coolant_dirty = true;
                 data->fan1Dirty = true;
                 data->fan2Dirty = true;
+                data->uartArduinoAlive = true;   // <-- только здесь и ниже
                 CarData_Unlock();
             }
             break;
 
         case MSG_HEARTBEAT_RSP:    // 0x61 — heartbeat от Arduino
-            // Формат такой же, как MSG_FAN_TELEMETRY (fan1, fan2, temp_x10)
             if (len >= 4) {
                 uint8_t fan1 = payload[0];
                 uint8_t fan2 = payload[1];
@@ -57,7 +53,7 @@ void uart_rx_arduino_process(uint8_t msg_id, const uint8_t *payload, uint8_t len
                 data->arduino_coolant_dirty = true;
                 data->fan1Dirty = true;
                 data->fan2Dirty = true;
-                // Режим Arduino не передаётся в heartbeat, оставляем предыдущий
+                data->uartArduinoAlive = true;   // <--
                 CarData_Unlock();
             }
             break;
@@ -66,13 +62,19 @@ void uart_rx_arduino_process(uint8_t msg_id, const uint8_t *payload, uint8_t len
             if (len >= 2) {
                 int16_t offset_raw = (int16_t)(payload[0] | (payload[1] << 8));
                 float offset = offset_raw / 10.0f;
-                ESP_LOGI(TAG, "Arduino temp offset: %.1f C", offset);
-                // Можно сохранить в CarData для отладки, но пока не требуется
+                CarData_Lock(10);
+                data->arduino_temp_offset = offset;
+                data->arduino_offset_received = true;
+                data->arduino_offset_pending = false;
+                data->uartArduinoAlive = true;   // <--
+                CarData_Unlock();
+                ESP_LOGI(TAG, "Arduino temp offset received: %.1f C", offset);
             }
             break;
 
         default:
-            ESP_LOGD(TAG, "Unhandled Arduino packet: msg_id=0x%02X, len=%d", msg_id, len);
+            // Неизвестный ID — флаг живости не обновляем, чтобы случайный шум не создавал ложную активность
+            ESP_LOGD(TAG, "Ignored unknown Arduino packet: msg_id=0x%02X, len=%d", msg_id, len);
             break;
     }
 }
